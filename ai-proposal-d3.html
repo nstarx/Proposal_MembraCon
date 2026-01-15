@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon — Geodesic Blockchain AI Proposal System (Concept & Flow)</title>
+
+  <!-- D3 -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#0f1733;
+      --card:#111b3d;
+      --muted:#9fb0d0;
+      --text:#eaf0ff;
+      --line:#23315e;
+      --accent:#7c5cff;
+      --accent2:#35d0ba;
+      --warn:#ffb020;
+      --ok:#4ade80;
+      --bad:#fb7185;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(124,92,255,.25), transparent 60%),
+                  radial-gradient(900px 700px at 80% 20%, rgba(53,208,186,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+    header{
+      padding:16px 18px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    header .badge{
+      padding:6px 10px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.2px;
+    }
+    header h1{
+      font-size:16px;
+      margin:0;
+      font-weight:650;
+      letter-spacing:.2px;
+    }
+    header .spacer{flex:1}
+    header .hint{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .wrap{
+      height: calc(100vh - 58px);
+      display:grid;
+      grid-template-columns: 360px 1fr 360px;
+      gap:12px;
+      padding:12px;
+    }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .panel .top{
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .panel .top h2{
+      margin:0;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.2px;
+      color:rgba(234,240,255,.92);
+    }
+    .panel .content{
+      padding:12px;
+      overflow:auto;
+      min-height:0;
+      flex:1;
+    }
+
+    .card{
+      background: rgba(17,27,61,.72);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:12px;
+      margin-bottom:10px;
+    }
+    .card h3{
+      margin:0 0 6px 0;
+      font-size:12px;
+      letter-spacing:.2px;
+      color:rgba(234,240,255,.92);
+    }
+    .card p, .card li{
+      margin:0;
+      font-size:12px;
+      line-height:1.45;
+      color:var(--muted);
+    }
+    .card ul{margin:8px 0 0 16px; padding:0}
+    .row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .pill{
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size:12px;
+      color:var(--text);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .08s ease, background .2s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .pill.active{
+      border-color: rgba(124,92,255,.6);
+      box-shadow: 0 0 0 3px rgba(124,92,255,.15) inset;
+    }
+
+    .mini{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      margin-bottom:8px;
+      cursor:pointer;
+    }
+    .mini .t{
+      font-size:12px;
+      color:rgba(234,240,255,.92);
+      font-weight:650;
+    }
+    .mini .s{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:11px;
+      padding:2px 6px;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:8px;
+      background: rgba(255,255,255,.06);
+      color:rgba(234,240,255,.9);
+    }
+
+    /* center graph */
+    #graphPanel{ position:relative; }
+    #viz{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+    .legend{
+      position:absolute;
+      left:12px;
+      bottom:12px;
+      right:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      pointer-events:none;
+    }
+    .legend .tag{
+      pointer-events:none;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(12,18,40,.65);
+      color: var(--muted);
+      font-size:11px;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+    /* SVG styling */
+    .link{
+      stroke: rgba(159,176,208,.40);
+      stroke-width: 1.2;
+    }
+    .link.emph{
+      stroke: rgba(124,92,255,.65);
+      stroke-width: 2.0;
+    }
+    .link.feedback{
+      stroke: rgba(53,208,186,.50);
+      stroke-width: 1.4;
+      stroke-dasharray: 6 3;
+    }
+    .node .shape{
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
+      cursor: pointer;
+    }
+    .node text{
+      font-size: 10px;
+      fill: rgba(234,240,255,.95);
+      pointer-events:none;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    }
+    .node .sub{
+      fill: rgba(159,176,208,.85);
+      font-size: 9px;
+      font-weight: 400;
+    }
+
+    .toast{
+      position:absolute;
+      top:12px; left:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(12,18,40,.78);
+      color:var(--muted);
+      font-size:12px;
+      display:none;
+    }
+
+    /* timeline */
+    .timeline{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .phase{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      border-radius:14px;
+      padding:10px;
+    }
+    .phase .hdr{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .phase .name{
+      font-size:12px;
+      font-weight:700;
+      color:rgba(234,240,255,.92);
+    }
+    .phase .time{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .bar{
+      margin-top:8px;
+      height:8px;
+      border-radius:999px;
+      background: rgba(35,49,94,.7);
+      overflow:hidden;
+    }
+    .bar > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, rgba(124,92,255,.75), rgba(53,208,186,.70));
+    }
+    .phase p{
+      margin:8px 0 0 0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    a{ color: inherit; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <span class="badge">D3 Interactive Concept Map</span>
+    <h1>AI-Native Solution Design & Pricing System — Geodesic Blockchain AI (MembraCon UK)</h1>
+    <div class="spacer"></div>
+    <div class="hint">
+      Drag nodes · Click a node for details · <span class="kbd">F</span> focus path · <span class="kbd">R</span> reset
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- LEFT: Controls & Summary -->
+    <section class="panel">
+      <div class="top">
+        <h2>Concept Controls</h2>
+        <span class="badge" id="modeBadge">Mode: Full Map</span>
+      </div>
+      <div class="content">
+        <div class="card">
+          <h3>What this shows</h3>
+          <p>
+            A sequential execution flow showing how proposals are generated:
+            <b>Inputs → Knowledge → Decisions → Simulation → AI Engine → Strategy → Output → Governance</b>.
+            Learning agents provide feedback loops (dashed lines) to continuously improve the system.
+          </p>
+          <div class="row" style="margin-top:10px;">
+            <div class="pill active" data-mode="full">Full Map</div>
+            <div class="pill" data-mode="flow">Decision Flow</div>
+            <div class="pill" data-mode="architecture">Architecture</div>
+            <div class="pill" data-mode="learning">Autonomous Agents</div>
+            <div class="pill" data-mode="roadmap">Roadmap</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Legend</h3>
+          <ul>
+            <li><b>Inputs</b>: sector, water analysis, constraints, ESG priorities</li>
+            <li><b>Structural intelligence</b>: decision nodes, rules, constraints, simulators</li>
+            <li><b>AI engine</b>: multi-objective optimization (cost/margin/ESG/compliance)</li>
+            <li><b>Ledger</b>: immutable “why” trail (explainability, governance, audit)</li>
+            <li><b>Agents</b>: win/loss, pricing, tech performance, ESG tracking, ingestion</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Quick highlights</h3>
+          <div class="mini" data-jump="proposalFlow">
+            <div>
+              <div class="t">Structured Decision Framework</div>
+              <div class="s">raw water → stages → sizing → cost → pricing → ESG → narrative</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+          <div class="mini" data-jump="ledger">
+            <div>
+              <div class="t">Blockchain Decision Ledger</div>
+              <div class="s">tamper-proof rationale, approvals, policy checks</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+          <div class="mini" data-jump="agents">
+            <div>
+              <div class="t">Continuous Learning Loop</div>
+              <div class="s">outcomes feed back → better next proposal</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Keyboard</h3>
+          <ul>
+            <li><span class="kbd">F</span> Focus: show only the primary “proposal generation” path</li>
+            <li><span class="kbd">R</span> Reset: show full map again</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER: Graph -->
+    <section class="panel" id="graphPanel">
+      <div class="top">
+        <h2>Execution Flow Sequence</h2>
+        <span class="badge" id="statusBadge">Ready</span>
+      </div>
+      <div class="content" style="padding:0;">
+        <div class="toast" id="toast"></div>
+        <svg id="viz" role="img" aria-label="D3 concept map"></svg>
+
+        <div class="legend" aria-hidden="true">
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><path d="M2,7 L9,2 L16,7 L9,12 Z" fill="rgba(255,165,0,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Decision</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="14" height="8" fill="rgba(64,224,208,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Process</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="9,1 16,4 16,10 9,13 2,10 2,4" fill="rgba(186,85,211,.90)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> AI Engine</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="14" height="8" rx="3" fill="rgba(50,205,50,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Strategy</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="4,3 16,3 14,11 2,11" fill="rgba(100,149,237,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Input/Output</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><ellipse cx="9" cy="7" rx="7" ry="5" fill="rgba(255,193,37,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Governance</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="5,1 13,1 17,5 17,9 13,13 5,13 1,9 1,5" fill="rgba(0,206,209,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Agent</div>
+          <div class="tag"><span style="width:20px;height:2px;display:inline-block;vertical-align:middle;margin-right:4px;border-top:2px dashed rgba(0,206,209,.80)"></span> Feedback</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Details -->
+    <section class="panel">
+      <div class="top">
+        <h2>Selected Node</h2>
+        <span class="badge" id="selectedType">None</span>
+      </div>
+      <div class="content" id="details">
+        <div class="card">
+          <h3>Click a node</h3>
+          <p>
+            You’ll see what it represents in the proposal (concept), why it exists (value),
+            and what it consumes/produces (inputs/outputs). Use the left modes to filter.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Implementation Roadmap (overview)</h3>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---------- Data model (concept map) ----------
+    // Node types with industry-standard shapes and colors
+    const NODE_TYPES = {
+      input:      { color: "rgba(100,149,237,.80)", label: "Input Data", shape: "parallelogram" },
+      knowledge:  { color: "rgba(147,112,219,.85)", label: "Knowledge Base", shape: "cylinder" },
+      decision:   { color: "rgba(255,165,0,.85)", label: "Decision Point", shape: "diamond" },
+      process:    { color: "rgba(64,224,208,.80)", label: "Process/Simulation", shape: "rectangle" },
+      ai:         { color: "rgba(186,85,211,.90)", label: "AI Engine", shape: "hexagon" },
+      strategy:   { color: "rgba(50,205,50,.80)", label: "Strategy Module", shape: "roundedRect" },
+      output:     { color: "rgba(30,144,255,.85)", label: "Output", shape: "parallelogramRight" },
+      governance: { color: "rgba(255,193,37,.85)", label: "Governance/Ledger", shape: "cylinder" },
+      agent:      { color: "rgba(0,206,209,.80)", label: "Learning Agent", shape: "octagon" },
+      outcome:    { color: "rgba(169,169,169,.75)", label: "Outcome/Milestone", shape: "ellipse" }
+    };
+
+    // Legacy group colors (for backward compatibility)
+    const COLORS = {
+      core: "rgba(124,92,255,.75)",
+      learning: "rgba(53,208,186,.70)",
+      gov: "rgba(255,176,32,.70)",
+      context: "rgba(159,176,208,.60)"
+    };
+
+    const NODES = [
+      // Inputs
+      { id:"caseInputs", label:"Customer Case Inputs", sub:"sector · water · constraints · priorities", group:"context", nodeType:"input",
+        details:{
+          concept:"Representative customer cases + project constraints + ESG priorities provided ahead of demo.",
+          value:"Ensures recommendations are context-specific (industry + chemistry + constraints + ESG).",
+          io:{ in:["Client sector/application", "Influent water quality parameters", "Flow/conditions", "Targets (effluent/reuse)", "Constraints", "ESG priorities"],
+              out:["Structured context vector", "Activated rules + decision branches"] }
+        }
+      },
+      { id:"artifacts", label:"Existing Artifacts", sub:"templates · spreadsheets", group:"context", nodeType:"input",
+        details:{
+          concept:"Current proposal template + sizing/costing spreadsheets + margin/logistics assumptions.",
+          value:"Anchors outputs to real MembraCon workflow (not generic).",
+          io:{ in:["Word/PDF templates","Cost/sizing sheets","Margin/contingency rules"], out:["Canonical schema","Baseline pricing + assumptions"] }
+        }
+      },
+      { id:"catalog", label:"Technology Catalog", sub:"UF · MBR · RO · UV · AOP", group:"context", nodeType:"input",
+        details:{
+          concept:"List of common processes, constraints, vendors, envelopes.",
+          value:"Grounds recommendations in deployable solutions and preferred families.",
+          io:{ in:["Process modules","Operating envelopes","Vendors/families"], out:["Option set for graph traversal"] }
+        }
+      },
+      { id:"history", label:"Historical Context", sub:"past proposals · won/lost", group:"context", nodeType:"input",
+        details:{
+          concept:"Anonymized dataset of prior proposals and outcomes.",
+          value:"Enables pricing intelligence + win/loss feedback + calibration.",
+          io:{ in:["5–10 past proposals","Indicative prices","Outcomes (if known)"], out:["Training signals","Deal-response priors"] }
+        }
+      },
+      { id:"esgFramework", label:"ESG Framework", sub:"metrics · reporting style", group:"context", nodeType:"input",
+        details:{
+          concept:"Preferred ESG metrics (water recovery, energy intensity, carbon).",
+          value:"Makes sustainability a first-class optimization objective and reporting layer.",
+          io:{ in:["Targets/metrics","Claim styles"], out:["ESG calculators","ESG narrative templates"] }
+        }
+      },
+
+      // Core structural intelligence
+      { id:"knowledgeLayer", label:"Structural Intelligence", sub:"knowledge graph · rules", group:"core", nodeType:"knowledge",
+        details:{
+          concept:"Decision network encoding MembraCon expertise: relationships among water params, tech choices, cost, ESG.",
+          value:"Turns tribal knowledge into repeatable, explainable, scalable logic (guardrails + reuse).",
+          io:{ in:["Domain rules","Process constraints","Standards/regulations"], out:["Decision graph","Constraints for AI engine"] }
+        }
+      },
+      { id:"decisionNodes", label:"Decision Nodes", sub:"tech → sizing → ops → pricing", group:"core", nodeType:"decision",
+        details:{
+          concept:"Explicit nodes: technology selection, system sizing, operational setup, pricing strategy, ESG enhancements, presentation.",
+          value:"Prevents omissions; enforces completeness; makes reasoning queryable.",
+          io:{ in:["Context vector","Knowledge graph"], out:["Candidate paths (solutions)","Explainable branch decisions"] }
+        }
+      },
+      { id:"simulators", label:"Simulation & Checks", sub:"mass balance · OPEX · energy", group:"core", nodeType:"process",
+        details:{
+          concept:"Quantitative checks inside the flow: verifies effluent targets, estimates OPEX, waste generation, energy use.",
+          value:"Moves beyond 'plausible' to 'validated enough for proposals'.",
+          io:{ in:["Candidate designs","Formulas/models"], out:["Performance estimates","Cost + ESG metrics"] }
+        }
+      },
+
+      // AI engine
+      { id:"aiEngine", label:"AI Decision Engine", sub:"multi-objective optimization", group:"core", nodeType:"ai",
+        details:{
+          concept:"Optimizes across technical compliance, cost, margin, ESG priorities, and client preferences.",
+          value:"Finds the 'geodesic' (best) path in a complex decision space faster than manual workflows.",
+          io:{ in:["Decision graph","Metrics from simulators","Historical priors (optional)"], out:["Ranked solution shortlist","Chosen path + confidence"] }
+        }
+      },
+      { id:"pricing", label:"Pricing Strategy", sub:"value-driven · BOO/BOT", group:"core", nodeType:"strategy",
+        details:{
+          concept:"Selects pricing model and ranges (CAPEX sale vs BOO/BOT/service) and justifies margin/elasticity.",
+          value:"Improves win-rate consistency and protects margin with data-backed pricing logic.",
+          io:{ in:["Cost model","Segment priors","Client preference"], out:["Price bands","Commercial options","Justifications"] }
+        }
+      },
+      { id:"esgOptimize", label:"ESG Optimization", sub:"water reuse · carbon · energy", group:"core", nodeType:"strategy",
+        details:{
+          concept:"Uses ESG priorities as weights; can produce cost-optimized vs ESG-optimized scenarios.",
+          value:"Differentiates brand with credible quantified sustainability and avoids greenwashing.",
+          io:{ in:["ESG targets","Metrics"], out:["ESG features","Quantified impacts","Trade-off scenarios"] }
+        }
+      },
+      { id:"proposalOut", label:"Proposal Output", sub:"ranked options · rationale", group:"core", nodeType:"output",
+        details:{
+          concept:"Delivers ranked shortlist, rationale, and a draft proposal structure aligned to MembraCon templates.",
+          value:"Cuts turnaround time drastically while keeping quality consistent.",
+          io:{ in:["Chosen path","Pricing + ESG narratives","Template schema"], out:["Draft proposal","Client-facing explanation report"] }
+        }
+      },
+
+      // Governance / ledger
+      { id:"ledger", label:"Decision Ledger", sub:"immutable 'why' trail", group:"gov", nodeType:"governance",
+        details:{
+          concept:"Permissioned blockchain logs inputs, decisions, overrides, confidence, and rationale.",
+          value:"Explainability + auditability + governance (policy checks, approvals).",
+          io:{ in:["Decision events","Policy rules","Human sign-offs"], out:["Tamper-proof audit trail","Queryable explanations"] }
+        }
+      },
+      { id:"governance", label:"Governance & Compliance", sub:"policies · approvals", group:"gov", nodeType:"governance",
+        details:{
+          concept:"Human-in-the-loop controls, policy enforcement, compliance checks and monitoring.",
+          value:"Makes the system 'responsible by design' and safe for regulated contexts.",
+          io:{ in:["Policies","Threshold rules"], out:["Approvals/flags","Compliance reports"] }
+        }
+      },
+
+      // Learning agents
+      { id:"agents", label:"Learning Agents Hub", sub:"continuous improvement", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Specialized agents: win/loss, pricing intelligence, tech performance, ESG tracking, external ingestion.",
+          value:"System improves with every proposal and deployment—competitive advantage compounds over time.",
+          io:{ in:["Outcomes","New costs","Performance data","Reg updates"], out:["Updated weights","New rules","Refreshed models"] }
+        }
+      },
+      { id:"winLoss", label:"Win/Loss Agent", sub:"pattern mining", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Learns what correlates with wins/losses by segment; feeds back to proposal framing and selection.",
+          value:"Improves win rate and messaging relevance.",
+          io:{ in:["Won/lost outcomes","Reasons (if known)"], out:["Segment patterns","Recommendation nudges"] }
+        }
+      },
+      { id:"pricingAgent", label:"Pricing Agent", sub:"elasticity · benchmarks", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Learns price sensitivity, supports alternate financing options, integrates market benchmarks (if available).",
+          value:"Optimizes margin without losing deals to uncertainty-driven discounting.",
+          io:{ in:["Historical deals","Segment priors"], out:["Price recommendations","Discount rules","Model updates"] }
+        }
+      },
+      { id:"techPerf", label:"Tech Performance Agent", sub:"real-world reliability", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Tracks actual performance/lifetime/maintenance outcomes and updates tech priors.",
+          value:"Keeps proposals technically sharp and reduces risk from optimistic assumptions.",
+          io:{ in:["Ops data","Maintenance data"], out:["Updated performance priors","Better OPEX estimates"] }
+        }
+      },
+      { id:"esgTrack", label:"ESG Tracking Agent", sub:"outcomes vs projections", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Compares projected vs actual ESG outcomes; refines calculators and supports proof points.",
+          value:"Strengthens credibility and client trust with verifiable sustainability claims.",
+          io:{ in:["Measured savings","Energy use","Carbon estimates"], out:["Calibrated ESG models","Case-study proof points"] }
+        }
+      },
+      { id:"ingestion", label:"Knowledge Ingestion", sub:"regulations · market data", group:"learning", nodeType:"agent",
+        details:{
+          concept:"Scans external updates (regulatory changes, new tech, cost shifts) and flags/updates the system.",
+          value:"Prevents knowledge staleness in a fast-moving field.",
+          io:{ in:["Reg updates","Industry reports"], out:["Rule updates","Alerts","Catalog refresh"] }
+        }
+      },
+
+      // Outcomes
+      { id:"outcomes", label:"Business Outcomes", sub:"speed · win rate · margin", group:"context", nodeType:"outcome",
+        details:{
+          concept:"Expected results: reduced turnaround, consistent quality, improved win rate, value-driven pricing, ESG differentiation.",
+          value:"Maps system capabilities to measurable business KPIs.",
+          io:{ in:["System adoption","Data feedback"], out:["KPI improvements","Strategic insights"] }
+        }
+      },
+
+      // Roadmap anchor
+      { id:"roadmap", label:"Roadmap", sub:"phased deployment", group:"context", nodeType:"outcome",
+        details:{
+          concept:"Phases: discovery → MVP → expansion → pilot → full deployment → ongoing evolution.",
+          value:"Reduces risk; delivers value early; builds trust and adoption.",
+          io:{ in:["Workshops","Data","Pilot feedback"], out:["Production rollout","Continuous improvement"] }
+        }
+      }
+    ];
+
+    const LINKS = [
+      // Inputs feed the core
+      { source:"caseInputs", target:"knowledgeLayer", type:"context" },
+      { source:"artifacts", target:"knowledgeLayer", type:"context" },
+      { source:"catalog", target:"knowledgeLayer", type:"context" },
+      { source:"history", target:"agents", type:"learning" },
+      { source:"history", target:"pricing", type:"core" },
+      { source:"esgFramework", target:"esgOptimize", type:"core" },
+
+      // Core flow
+      { source:"knowledgeLayer", target:"decisionNodes", type:"core" },
+      { source:"decisionNodes", target:"simulators", type:"core" },
+      { source:"simulators", target:"aiEngine", type:"core" },
+      { source:"aiEngine", target:"pricing", type:"core" },
+      { source:"aiEngine", target:"esgOptimize", type:"core" },
+      { source:"pricing", target:"proposalOut", type:"core" },
+      { source:"esgOptimize", target:"proposalOut", type:"core" },
+
+      // Ledger logging
+      { source:"caseInputs", target:"ledger", type:"gov" },
+      { source:"decisionNodes", target:"ledger", type:"gov" },
+      { source:"aiEngine", target:"ledger", type:"gov" },
+      { source:"pricing", target:"ledger", type:"gov" },
+      { source:"esgOptimize", target:"ledger", type:"gov" },
+      { source:"proposalOut", target:"ledger", type:"gov" },
+      { source:"ledger", target:"governance", type:"gov" },
+
+      // Learning loop
+      { source:"proposalOut", target:"agents", type:"learning" },
+      { source:"agents", target:"winLoss", type:"learning" },
+      { source:"agents", target:"pricingAgent", type:"learning" },
+      { source:"agents", target:"techPerf", type:"learning" },
+      { source:"agents", target:"esgTrack", type:"learning" },
+      { source:"agents", target:"ingestion", type:"learning" },
+
+      // Back into the system
+      { source:"winLoss", target:"aiEngine", type:"learning" },
+      { source:"pricingAgent", target:"pricing", type:"learning" },
+      { source:"techPerf", target:"simulators", type:"learning" },
+      { source:"esgTrack", target:"esgOptimize", type:"learning" },
+      { source:"ingestion", target:"knowledgeLayer", type:"learning" },
+
+      // Outcomes & roadmap
+      { source:"proposalOut", target:"outcomes", type:"context" },
+      { source:"roadmap", target:"knowledgeLayer", type:"context" },
+      { source:"roadmap", target:"ledger", type:"context" },
+      { source:"roadmap", target:"agents", type:"context" }
+    ];
+
+    // A “primary flow” for focus mode
+    const PRIMARY_PATH = new Set([
+      "caseInputs->knowledgeLayer",
+      "knowledgeLayer->decisionNodes",
+      "decisionNodes->simulators",
+      "simulators->aiEngine",
+      "aiEngine->pricing",
+      "aiEngine->esgOptimize",
+      "pricing->proposalOut",
+      "esgOptimize->proposalOut",
+      "proposalOut->ledger"
+    ]);
+
+    // ---------- Roadmap timeline data ----------
+    const ROADMAP = [
+      { phase:"Phase 1", time:"Month 0–2", name:"Discovery & Knowledge Capture", pct: 12,
+        note:"Workshops, capture rules/templates, define schema + ledger environment." },
+      { phase:"Phase 2", time:"Month 3–5", name:"Minimum Viable Prototype", pct: 28,
+        note:"Narrow scope (e.g., one sector). Core engine + basic pricing + ledger logging." },
+      { phase:"Phase 3", time:"Month 6–10", name:"Expansion & Refinement", pct: 55,
+        note:"Add more sectors/tech, ML pricing, ESG calculators, agent pilots, side-by-side validation." },
+      { phase:"Phase 4", time:"Month 9–12", name:"Training & Pilot Rollout", pct: 70,
+        note:"Train users, run live pilot, monitor KPIs, fix gaps, validate ledger capture." },
+      { phase:"Phase 5", time:"Month 13–18", name:"Full Deployment & Integrations", pct: 92,
+        note:"Company-wide rollout, CRM integrations, performance + security hardening." },
+      { phase:"Phase 6", time:"Month 19+", name:"Ongoing Support & Evolution", pct: 100,
+        note:"Governance team, periodic retraining, new features (multilingual, portals, deeper optimization)." }
+    ];
+
+    // ---------- Render timeline ----------
+    const timeline = d3.select("#timeline");
+    ROADMAP.forEach(d=>{
+      const el = timeline.append("div").attr("class","phase");
+      const hdr = el.append("div").attr("class","hdr");
+      hdr.append("div").attr("class","name").text(`${d.phase}: ${d.name}`);
+      hdr.append("div").attr("class","time").text(d.time);
+      const bar = el.append("div").attr("class","bar");
+      bar.append("div").style("width", d.pct + "%");
+      el.append("p").text(d.note);
+    });
+
+    // ---------- D3 graph ----------
+    const svg = d3.select("#viz");
+    const graphPanel = document.getElementById("graphPanel");
+    const statusBadge = document.getElementById("statusBadge");
+    const toast = document.getElementById("toast");
+    const modeBadge = document.getElementById("modeBadge");
+
+    function size() {
+      const rect = graphPanel.querySelector(".content").getBoundingClientRect();
+      return { w: rect.width, h: rect.height };
+    }
+
+    let { w, h } = size();
+    svg.attr("viewBox", `0 0 ${w} ${h}`);
+
+    const defs = svg.append("defs");
+    defs.append("marker")
+      .attr("id", "arrow")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 16)
+      .attr("refY", 0)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("d", "M0,-5L10,0L0,5")
+      .attr("fill", "rgba(159,176,208,.55)");
+
+    const g = svg.append("g");
+
+    // Zoom/pan
+    const zoom = d3.zoom()
+      .scaleExtent([0.55, 2.5])
+      .on("zoom", (event) => g.attr("transform", event.transform));
+    svg.call(zoom);
+
+    // Build node map
+    const nodeById = new Map(NODES.map(d => [d.id, d]));
+    const links = LINKS.map(l => ({
+      source: nodeById.get(l.source),
+      target: nodeById.get(l.target),
+      type: l.type,
+      key: `${l.source}->${l.target}`
+    }));
+
+    // Flow-based layout: define execution sequence layers (left to right)
+    // Consolidated to 8 layers for better spacing
+    const FLOW_LAYERS = {
+      // Layer 0: External inputs
+      caseInputs: { layer: 0, slot: 0 },
+      artifacts: { layer: 0, slot: 1 },
+      catalog: { layer: 0, slot: 2 },
+      history: { layer: 0, slot: 3 },
+      esgFramework: { layer: 0, slot: 4 },
+
+      // Layer 1: Knowledge & Decision structure
+      knowledgeLayer: { layer: 1, slot: 0 },
+      decisionNodes: { layer: 1, slot: 2 },
+
+      // Layer 2: Simulation & AI
+      simulators: { layer: 2, slot: 0 },
+      aiEngine: { layer: 2, slot: 2 },
+
+      // Layer 3: Strategy modules
+      pricing: { layer: 3, slot: 0 },
+      esgOptimize: { layer: 3, slot: 2 },
+
+      // Layer 4: Output generation
+      proposalOut: { layer: 4, slot: 1 },
+
+      // Layer 5: Governance
+      ledger: { layer: 5, slot: 0 },
+      governance: { layer: 5, slot: 2 },
+
+      // Layer 6: Learning agents
+      agents: { layer: 6, slot: 0 },
+      winLoss: { layer: 6, slot: 1 },
+      pricingAgent: { layer: 6, slot: 2 },
+      techPerf: { layer: 6, slot: 3 },
+      esgTrack: { layer: 6, slot: 4 },
+      ingestion: { layer: 6, slot: 5 },
+
+      // Layer 7: Outcomes & roadmap
+      outcomes: { layer: 7, slot: 0 },
+      roadmap: { layer: 7, slot: 2 }
+    };
+
+    const NUM_LAYERS = 8;
+    const LAYER_PADDING = 50;
+    const layerWidth = (w - LAYER_PADDING * 2) / NUM_LAYERS;
+
+    // Layer labels for execution sequence (8 layers)
+    const LAYER_LABELS = [
+      "Inputs",
+      "Structure",
+      "Processing",
+      "Strategy",
+      "Output",
+      "Governance",
+      "Learning",
+      "Outcomes"
+    ];
+
+    const labelGroup = svg.append("g").attr("class", "layer-labels");
+    LAYER_LABELS.forEach((label, i) => {
+      labelGroup.append("text")
+        .attr("x", LAYER_PADDING + i * layerWidth + layerWidth / 2)
+        .attr("y", 24)
+        .attr("text-anchor", "middle")
+        .attr("fill", "rgba(159,176,208,.6)")
+        .attr("font-size", "10px")
+        .attr("font-weight", "600")
+        .attr("letter-spacing", "0.5px")
+        .text(label.toUpperCase());
+    });
+
+    // Position nodes based on flow layer
+    const TOP_MARGIN = 45; // Space for layer labels
+    const BOTTOM_MARGIN = 70; // Space for legend
+    const availableHeight = h - TOP_MARGIN - BOTTOM_MARGIN;
+
+    NODES.forEach((n) => {
+      const flow = FLOW_LAYERS[n.id] || { layer: 5, slot: 2 };
+
+      // Find this node's position among nodes in same layer
+      const nodesInLayer = Object.entries(FLOW_LAYERS)
+        .filter(([id, f]) => f.layer === flow.layer)
+        .sort((a, b) => a[1].slot - b[1].slot);
+      const slotIndex = nodesInLayer.findIndex(([id]) => id === n.id);
+      const slotsInLayer = nodesInLayer.length;
+      const slotHeight = availableHeight / (slotsInLayer + 1);
+
+      n.x = LAYER_PADDING + flow.layer * layerWidth + layerWidth / 2;
+      n.y = TOP_MARGIN + (slotIndex + 1) * slotHeight;
+      n.flowLayer = flow.layer;
+    });
+
+    // Shape path generators (centered at 0,0)
+    const SHAPE_SIZE = 22;
+    function getShapePath(shape, size = SHAPE_SIZE) {
+      const s = size;
+      const h = s * 0.866; // height factor for hexagon
+      switch(shape) {
+        case "diamond": // Decision point - rhombus
+          return `M0,${-s} L${s},0 L0,${s} L${-s},0 Z`;
+        case "rectangle": // Process
+          return `M${-s},${-s*0.7} L${s},${-s*0.7} L${s},${s*0.7} L${-s},${s*0.7} Z`;
+        case "roundedRect": // Strategy module
+          const r = s * 0.3;
+          return `M${-s+r},${-s*0.65} L${s-r},${-s*0.65} Q${s},${-s*0.65} ${s},${-s*0.65+r} L${s},${s*0.65-r} Q${s},${s*0.65} ${s-r},${s*0.65} L${-s+r},${s*0.65} Q${-s},${s*0.65} ${-s},${s*0.65-r} L${-s},${-s*0.65+r} Q${-s},${-s*0.65} ${-s+r},${-s*0.65} Z`;
+        case "hexagon": // AI Engine
+          return `M${-s},0 L${-s*0.5},${-h} L${s*0.5},${-h} L${s},0 L${s*0.5},${h} L${-s*0.5},${h} Z`;
+        case "parallelogram": // Input
+          const skew = s * 0.3;
+          return `M${-s+skew},${-s*0.6} L${s+skew},${-s*0.6} L${s-skew},${s*0.6} L${-s-skew},${s*0.6} Z`;
+        case "parallelogramRight": // Output
+          const sk = s * 0.3;
+          return `M${-s-sk},${-s*0.6} L${s-sk},${-s*0.6} L${s+sk},${s*0.6} L${-s+sk},${s*0.6} Z`;
+        case "cylinder": // Knowledge/Data storage
+          const cy = s * 0.7;
+          const ew = s * 0.25; // ellipse width for top/bottom
+          return `M${-s},${-cy+ew}
+                  C${-s},${-cy-ew} ${s},${-cy-ew} ${s},${-cy+ew}
+                  L${s},${cy-ew}
+                  C${s},${cy+ew} ${-s},${cy+ew} ${-s},${cy-ew}
+                  Z
+                  M${-s},${-cy+ew}
+                  C${-s},${-cy+ew*2.5} ${s},${-cy+ew*2.5} ${s},${-cy+ew}`;
+        case "octagon": // Agent
+          const o = s * 0.4;
+          return `M${-o},${-s} L${o},${-s} L${s},${-o} L${s},${o} L${o},${s} L${-o},${s} L${-s},${o} L${-s},${-o} Z`;
+        case "ellipse": // Outcome
+          return `M${-s},0
+                  C${-s},${-s*0.6} ${s},${-s*0.6} ${s},0
+                  C${s},${s*0.6} ${-s},${s*0.6} ${-s},0 Z`;
+        default: // Circle fallback
+          return null;
+      }
+    }
+
+    const linkSel = g.append("g")
+      .attr("stroke-linecap", "round")
+      .attr("fill", "none")
+      .selectAll("path")
+      .data(links)
+      .join("path")
+      .attr("class", d => "link" + (PRIMARY_PATH.has(d.key) ? " emph" : "") + (d.type === "learning" ? " feedback" : ""))
+      .attr("marker-end", "url(#arrow)");
+
+    const nodeSel = g.append("g")
+      .selectAll("g")
+      .data(NODES)
+      .join("g")
+      .attr("class","node")
+      .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended)
+      )
+      .on("click", (event,d)=> {
+        event.stopPropagation();
+        selectNode(d);
+      });
+
+    // Render shapes based on nodeType
+    nodeSel.each(function(d) {
+      const node = d3.select(this);
+      const typeInfo = NODE_TYPES[d.nodeType] || NODE_TYPES.input;
+      const shapePath = getShapePath(typeInfo.shape);
+
+      if (shapePath) {
+        node.append("path")
+          .attr("d", shapePath)
+          .attr("fill", typeInfo.color)
+          .attr("stroke", "rgba(255,255,255,.35)")
+          .attr("stroke-width", 1.5)
+          .attr("class", "shape");
+      } else {
+        // Fallback to circle
+        node.append("circle")
+          .attr("r", SHAPE_SIZE)
+          .attr("fill", typeInfo.color)
+          .attr("stroke", "rgba(255,255,255,.35)")
+          .attr("stroke-width", 1.5)
+          .attr("class", "shape");
+      }
+    });
+
+    nodeSel.append("text")
+      .attr("text-anchor","middle")
+      .attr("dy", 38)
+      .text(d => d.label);
+
+    nodeSel.append("text")
+      .attr("class","sub")
+      .attr("text-anchor","middle")
+      .attr("dy", 52)
+      .text(d => d.sub);
+
+    // Store target positions for flow layout
+    const targetX = new Map();
+    const targetY = new Map();
+    NODES.forEach(n => {
+      targetX.set(n.id, n.x);
+      targetY.set(n.id, n.y);
+    });
+
+    const simulation = d3.forceSimulation(NODES)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(d => {
+        // Shorter distances for sequential flow
+        if (PRIMARY_PATH.has(d.key)) return 80;
+        if (d.type==="gov") return 90;
+        if (d.type==="learning") return 100;
+        return 85;
+      }).strength(d => PRIMARY_PATH.has(d.key) ? 0.08 : 0.05))
+      .force("charge", d3.forceManyBody().strength(-150))
+      // Strong X force to maintain flow columns
+      .force("x", d3.forceX(d => targetX.get(d.id)).strength(0.8))
+      // Moderate Y force to maintain vertical positions
+      .force("y", d3.forceY(d => targetY.get(d.id)).strength(0.3))
+      .force("collide", d3.forceCollide().radius(d => 32))
+      .on("tick", ticked);
+
+    function ticked(){
+      linkSel.attr("d", d => {
+        const sx = d.source.x, sy = d.source.y;
+        const tx = d.target.x, ty = d.target.y;
+        const srcLayer = d.source.flowLayer ?? 5;
+        const tgtLayer = d.target.flowLayer ?? 5;
+
+        // Feedback links (going backward) use curved paths
+        if (tgtLayer < srcLayer) {
+          // Curve below for feedback loops
+          const midY = Math.max(sy, ty) + 60;
+          return `M${sx},${sy} Q${sx},${midY} ${(sx+tx)/2},${midY} Q${tx},${midY} ${tx},${ty}`;
+        }
+        // Forward links use subtle curves
+        const midX = (sx + tx) / 2;
+        const curveOffset = (ty - sy) * 0.15;
+        return `M${sx},${sy} C${midX},${sy + curveOffset} ${midX},${ty - curveOffset} ${tx},${ty}`;
+      });
+
+      nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
+    }
+
+    function dragstarted(event){
+      if(!event.active) simulation.alphaTarget(0.15).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+    function dragged(event){
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+    function dragended(event){
+      if(!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+
+    // Background click clears selection
+    svg.on("click", () => clearSelection());
+
+    // ---------- Details panel ----------
+    const details = document.getElementById("details");
+    const selectedType = document.getElementById("selectedType");
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function cardHTML(title, body){
+      return `<div class="card"><h3>${escapeHtml(title)}</h3>${body}</div>`;
+    }
+
+    function listHTML(items){
+      return `<ul>${items.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+    }
+
+    function ioHTML(io){
+      return `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+          <div style="border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);border-radius:12px;padding:10px;">
+            <div style="font-size:11px;color:rgba(234,240,255,.9);font-weight:700;margin-bottom:6px;">Consumes</div>
+            ${listHTML(io.in)}
+          </div>
+          <div style="border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);border-radius:12px;padding:10px;">
+            <div style="font-size:11px;color:rgba(234,240,255,.9);font-weight:700;margin-bottom:6px;">Produces</div>
+            ${listHTML(io.out)}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectNode(d){
+      statusBadge.textContent = "Selected";
+      const typeInfo = NODE_TYPES[d.nodeType] || NODE_TYPES.input;
+      selectedType.textContent = typeInfo.label.toUpperCase();
+      // Highlight node + connected edges
+      nodeSel.selectAll(".shape")
+        .attr("stroke", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return nodeData.id === d.id ? "rgba(255,255,255,.95)" : "rgba(255,255,255,.35)";
+        })
+        .attr("stroke-width", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return nodeData.id === d.id ? 2.5 : 1.5;
+        });
+
+      linkSel
+        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.18)
+        .attr("stroke", l => (l.source.id===d.id || l.target.id===d.id)
+          ? (PRIMARY_PATH.has(l.key) ? "rgba(124,92,255,.85)" : "rgba(159,176,208,.60)")
+          : "rgba(159,176,208,.25)")
+        .attr("stroke-width", l => (l.source.id===d.id || l.target.id===d.id) ? 2.0 : 1.0);
+
+      const det = d.details ?? {};
+      const body =
+        `<p style="color:var(--muted);font-size:12px;line-height:1.5;margin:0;">
+          <span style="color:rgba(234,240,255,.92);font-weight:700;">${escapeHtml(d.label)}</span>
+          — ${escapeHtml(d.sub)}
+        </p>`;
+
+      const concept = det.concept ? `<p>${escapeHtml(det.concept)}</p>` : `<p>(No details)</p>`;
+      const value   = det.value   ? `<p>${escapeHtml(det.value)}</p>`   : ``;
+
+      // Show related nodes list
+      const outgoing = links.filter(l => l.source.id===d.id).map(l => nodeById.get(l.target.id));
+      const incoming = links.filter(l => l.target.id===d.id).map(l => nodeById.get(l.source.id));
+
+      const relHTML = `
+        <div class="card">
+          <h3>Connections</h3>
+          <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.5;">
+            <b style="color:rgba(234,240,255,.92)">Incoming</b>: ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+            <br/>
+            <b style="color:rgba(234,240,255,.92)">Outgoing</b>: ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+          </p>
+        </div>
+      `;
+
+      const io = det.io ? ioHTML(det.io) : "";
+
+      details.innerHTML =
+        cardHTML("Node Summary", body) +
+        cardHTML("Concept", `<p>${escapeHtml(det.concept ?? "—")}</p>`) +
+        cardHTML("Value", `<p>${escapeHtml(det.value ?? "—")}</p>${io}`) +
+        relHTML +
+        cardHTML("Implementation Roadmap (overview)", `<div class="timeline" id="timeline2"></div>`);
+
+      // re-render timeline in details (so it remains visible after selection)
+      const timeline2 = d3.select("#timeline2");
+      ROADMAP.forEach(rr=>{
+        const el = timeline2.append("div").attr("class","phase");
+        const hdr = el.append("div").attr("class","hdr");
+        hdr.append("div").attr("class","name").text(`${rr.phase}: ${rr.name}`);
+        hdr.append("div").attr("class","time").text(rr.time);
+        const bar = el.append("div").attr("class","bar");
+        bar.append("div").style("width", rr.pct + "%");
+        el.append("p").text(rr.note);
+      });
+
+      showToast(`Selected: ${d.label}`);
+    }
+
+    function clearSelection(){
+      statusBadge.textContent = "Ready";
+      selectedType.textContent = "None";
+      nodeSel.selectAll(".shape")
+        .attr("stroke","rgba(255,255,255,.35)")
+        .attr("stroke-width",1.5);
+
+      linkSel
+        .attr("opacity", 1)
+        .attr("stroke", d => PRIMARY_PATH.has(d.key) ? "rgba(124,92,255,.65)" : "rgba(159,176,208,.40)")
+        .attr("stroke-width", d => PRIMARY_PATH.has(d.key) ? 2.0 : 1.2);
+
+      // restore default details panel
+      details.innerHTML = `
+        <div class="card">
+          <h3>Click a node</h3>
+          <p>
+            You’ll see what it represents in the proposal (concept), why it exists (value),
+            and what it consumes/produces (inputs/outputs). Use the left modes to filter.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Implementation Roadmap (overview)</h3>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      `;
+      const timeline = d3.select("#timeline");
+      ROADMAP.forEach(d=>{
+        const el = timeline.append("div").attr("class","phase");
+        const hdr = el.append("div").attr("class","hdr");
+        hdr.append("div").attr("class","name").text(`${d.phase}: ${d.name}`);
+        hdr.append("div").attr("class","time").text(d.time);
+        const bar = el.append("div").attr("class","bar");
+        bar.append("div").style("width", d.pct + "%");
+        el.append("p").text(d.note);
+      });
+    }
+
+    // ---------- Modes (filters) ----------
+    let currentMode = "full";
+
+    function applyMode(mode){
+      currentMode = mode;
+      modeBadge.textContent = `Mode: ${modeLabel(mode)}`;
+      statusBadge.textContent = "Filtered";
+
+      // Determine which nodes are visible by mode
+      const visible = new Set();
+      const add = id => visible.add(id);
+
+      if(mode==="full"){
+        NODES.forEach(n=>add(n.id));
+      } else if(mode==="flow"){
+        // The main structured decision framework + ledger
+        ["caseInputs","knowledgeLayer","decisionNodes","simulators","aiEngine","pricing","esgOptimize","proposalOut","ledger"].forEach(add);
+      } else if(mode==="architecture"){
+        ["caseInputs","artifacts","catalog","knowledgeLayer","aiEngine","ledger","governance","proposalOut","simulators","decisionNodes"].forEach(add);
+      } else if(mode==="learning"){
+        ["history","proposalOut","agents","winLoss","pricingAgent","techPerf","esgTrack","ingestion","aiEngine","pricing","simulators","esgOptimize","ledger"].forEach(add);
+      } else if(mode==="roadmap"){
+        // Show roadmap anchor + the big blocks it touches
+        ["roadmap","knowledgeLayer","ledger","agents","proposalOut","caseInputs","artifacts","catalog"].forEach(add);
+      }
+
+      // Update node visibility
+      nodeSel
+        .attr("display", d => visible.has(d.id) ? null : "none");
+
+      // Update link visibility (only if both ends visible)
+      linkSel
+        .attr("display", l => (visible.has(l.source.id) && visible.has(l.target.id)) ? null : "none")
+        .attr("class", l => {
+          const base = "link";
+          const emph = PRIMARY_PATH.has(l.key) ? " emph" : "";
+          return base + emph;
+        });
+
+      // Nudge simulation to settle
+      simulation.alpha(0.35).restart();
+    }
+
+    function modeLabel(m){
+      return ({
+        full:"Full Map",
+        flow:"Decision Flow",
+        architecture:"Architecture",
+        learning:"Autonomous Agents",
+        roadmap:"Roadmap"
+      })[m] ?? m;
+    }
+
+    document.querySelectorAll(".pill").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        applyMode(btn.dataset.mode);
+      });
+    });
+
+    // Quick “jump” links
+    document.querySelectorAll(".mini").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const id = el.dataset.jump;
+        const n = nodeById.get(id);
+        if(n) {
+          selectNode(n);
+          // pan/zoom a bit towards it
+          const transform = d3.zoomTransform(svg.node());
+          const k = transform.k;
+          const x = w/2 - n.x*k;
+          const y = h/2 - n.y*k;
+          svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(x,y).scale(k));
+        }
+      });
+    });
+
+    // ---------- Focus path (keyboard + toast) ----------
+    function focusPrimaryPath(){
+      // force mode to flow-ish but with stronger emphasis
+      applyMode("flow");
+      linkSel
+        .attr("opacity", l => PRIMARY_PATH.has(l.key) ? 1 : 0.12)
+        .attr("stroke", l => PRIMARY_PATH.has(l.key) ? "rgba(124,92,255,.90)" : "rgba(159,176,208,.25)")
+        .attr("stroke-width", l => PRIMARY_PATH.has(l.key) ? 2.2 : 1.0);
+
+      nodeSel
+        .attr("opacity", d => {
+          // keep visible nodes solid
+          const visible = (d3.select(d3.selectAll(".pill").filter(function(){ return this.classList.contains("active"); }).node()).attr("data-mode") === "flow");
+          return 1;
+        });
+
+      showToast("Focused: primary proposal-generation path");
+      statusBadge.textContent = "Focused";
+    }
+
+    function resetAll(){
+      // reset mode button UI to full
+      document.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+      document.querySelector('.pill[data-mode="full"]').classList.add("active");
+      applyMode("full");
+      clearSelection();
+      svg.transition().duration(450).call(zoom.transform, d3.zoomIdentity);
+      showToast("Reset to full map");
+      statusBadge.textContent = "Ready";
+    }
+
+    document.addEventListener("keydown", (e)=>{
+      if(e.key.toLowerCase()==="f") focusPrimaryPath();
+      if(e.key.toLowerCase()==="r") resetAll();
+    });
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.style.display="none", 1200);
+    }
+
+    // ---------- Responsive ----------
+    function onResize(){
+      ({ w, h } = size());
+      svg.attr("viewBox", `0 0 ${w} ${h}`);
+
+      // Recalculate flow positions
+      const newLayerWidth = (w - LAYER_PADDING * 2) / NUM_LAYERS;
+      const newAvailableHeight = h - TOP_MARGIN - BOTTOM_MARGIN;
+      NODES.forEach((n) => {
+        const flow = FLOW_LAYERS[n.id] || { layer: 5, slot: 2 };
+        const nodesInLayer = Object.entries(FLOW_LAYERS)
+          .filter(([id, f]) => f.layer === flow.layer)
+          .sort((a, b) => a[1].slot - b[1].slot);
+        const slotIndex = nodesInLayer.findIndex(([id]) => id === n.id);
+        const slotsInLayer = nodesInLayer.length;
+        const slotHeight = newAvailableHeight / (slotsInLayer + 1);
+
+        const newX = LAYER_PADDING + flow.layer * newLayerWidth + newLayerWidth / 2;
+        const newY = TOP_MARGIN + (slotIndex + 1) * slotHeight;
+        targetX.set(n.id, newX);
+        targetY.set(n.id, newY);
+      });
+
+      // Update layer labels
+      labelGroup.selectAll("text").each(function(d, i) {
+        d3.select(this).attr("x", LAYER_PADDING + i * newLayerWidth + newLayerWidth / 2);
+      });
+
+      simulation.force("x", d3.forceX(d => targetX.get(d.id)).strength(0.8));
+      simulation.force("y", d3.forceY(d => targetY.get(d.id)).strength(0.3));
+      simulation.alpha(0.5).restart();
+    }
+    window.addEventListener("resize", onResize);
+
+    // Initial mode
+    applyMode("full");
+    statusBadge.textContent = "Ready";
+
+    // Small helper: highlight primary-path edges on hover
+    nodeSel.on("mouseenter", (event,d)=>{
+      linkSel.attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.25);
+    }).on("mouseleave", ()=>{
+      linkSel.attr("opacity", 1);
+    });
+  </script>
+</body>
+</html>
