@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon — Geodesic Blockchain AI Proposal System</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #0f1733;
+      --card: #111b3d;
+      --muted: #9fb0d0;
+      --text: #eaf0ff;
+      --line: #23315e;
+      --accent: #7c5cff;
+      --accent2: #35d0ba;
+      --warn: #ffb020;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1400px 900px at 30% 20%, rgba(124,92,255,.20), transparent 60%),
+                  radial-gradient(1000px 800px at 70% 60%, rgba(53,208,186,.15), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      padding: 24px 40px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+    }
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .logo span {
+      font-size: 12px;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+    nav {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    nav a:hover {
+      color: var(--text);
+    }
+
+    /* Hero Section */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border: 1px solid rgba(124,92,255,.4);
+      border-radius: 999px;
+      background: rgba(124,92,255,.12);
+      color: rgba(234,240,255,.9);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+    .hero h2 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      line-height: 1.15;
+      max-width: 900px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    /* CTA Buttons */
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), rgba(124,92,255,.85));
+      color: white;
+      border: none;
+      box-shadow: 0 4px 20px rgba(124,92,255,.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 8px 30px rgba(124,92,255,.45);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,.10);
+    }
+    .btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Features Grid */
+    .features {
+      padding: 60px 40px;
+      background: rgba(0,0,0,.2);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .features h3 {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 24px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,92,255,.3);
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+    .feature-card h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      padding: 32px 40px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .executor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .executor a {
+      color: var(--accent2);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .executor a:hover {
+      color: var(--text);
+    }
+    .copyright {
+      font-size: 13px;
+      color: rgba(159,176,208,.6);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header {
+        padding: 16px 20px;
+      }
+      .hero {
+        padding: 40px 20px;
+      }
+      .features {
+        padding: 40px 20px;
+      }
+      footer {
+        padding: 24px 20px;
+        flex-direction: column;
+        text-align: center;
+      }
+      .footer-left {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">M</div>
+      <div>
+        <h1>MembraCon</h1>
+        <span>Geodesic Blockchain AI</span>
+      </div>
+    </div>
+    <nav>
+      <a href="ai-proposal-d3.html">Interactive Map</a>
+      <a href="https://www.nstarxinc.com" target="_blank" rel="noopener">NStarX</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <div class="badge">AI-Native Proposal System</div>
+    <h2>Intelligent Water Treatment Proposal Generation</h2>
+    <p>
+      A structured decision framework powered by AI optimization, blockchain-based decision ledger,
+      and continuous learning agents. Transform complex water treatment proposals into optimized,
+      explainable, and auditable solutions.
+    </p>
+    <div class="cta-group">
+      <a href="ai-proposal-d3.html" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        Explore Flow Diagram
+      </a>
+      <a href="https://www.nstarxinc.com" target="_blank" rel="noopener" class="btn btn-secondary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        Contact NStarX
+      </a>
+    </div>
+  </main>
+
+  <section class="features">
+    <h3>System Capabilities</h3>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(124,92,255,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(124,92,255,1)" stroke-width="2">
+            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+            <line x1="12" y1="22" x2="12" y2="15.5"/>
+            <polyline points="22 8.5 12 15.5 2 8.5"/>
+          </svg>
+        </div>
+        <h4>Structural Intelligence</h4>
+        <p>Knowledge graph encoding domain expertise with rules, constraints, and decision paths for water treatment.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(255,165,0,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,165,0,1)" stroke-width="2">
+            <path d="M12 3L2 9l10 6 10-6-10-6z"/>
+            <path d="M2 15l10 6 10-6"/>
+          </svg>
+        </div>
+        <h4>Decision Framework</h4>
+        <p>Explicit decision nodes ensuring completeness: technology selection, sizing, operations, pricing, ESG.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(186,85,211,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(186,85,211,1)" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+          </svg>
+        </div>
+        <h4>AI Optimization</h4>
+        <p>Multi-objective optimization across cost, margin, ESG priorities, and compliance requirements.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(255,193,37,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,193,37,1)" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <h4>Blockchain Ledger</h4>
+        <p>Immutable decision trail with tamper-proof audit, explainability, and governance compliance.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(0,206,209,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(0,206,209,1)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <h4>Learning Agents</h4>
+        <p>Continuous improvement through win/loss analysis, pricing intelligence, and performance tracking.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(50,205,50,.15);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(50,205,50,1)" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <h4>ESG Integration</h4>
+        <p>First-class sustainability optimization with quantified water reuse, carbon, and energy metrics.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <div class="executor">
+        <span>Executed by</span>
+        <a href="https://www.nstarxinc.com" target="_blank" rel="noopener">NStarX Inc.</a>
+      </div>
+      <div class="copyright">
+        &copy; 2025 MembraCon UK. All rights reserved.
+      </div>
+    </div>
+    <nav>
+      <a href="ai-proposal-d3.html">Interactive Map</a>
+    </nav>
+  </footer>
+</body>
+</html>
