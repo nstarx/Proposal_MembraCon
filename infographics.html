@@ -1,0 +1,1025 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon — AI-Native Solution Design & Pricing System (Geodesic Blockchain AI)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1a2f;
+      --panel2:#0c162a;
+      --card:#101f3a;
+      --muted:#9fb0d0;
+      --text:#e9f0ff;
+      --line:rgba(255,255,255,.08);
+      --accent:#7dd3fc;   /* cyan */
+      --accent2:#a78bfa;  /* violet */
+      --accent3:#34d399;  /* green */
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --good:#22c55e;
+      --shadow: 0 18px 60px rgba(0,0,0,.38);
+      --radius:18px;
+      --radius2:24px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1100px 500px at 10% -5%, rgba(125,211,252,.14), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(167,139,250,.14), transparent 55%),
+        radial-gradient(900px 600px at 60% 100%, rgba(52,211,153,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), #060b16 70%, #050812);
+      color:var(--text);
+      line-height:1.35;
+    }
+    a{color:inherit}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 64px}
+    .hero{
+      position:relative;
+      padding:26px 22px 22px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(16,31,58,.78), rgba(12,22,42,.68));
+      border-radius:var(--radius2);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .hero:before{
+      content:"";
+      position:absolute;inset:-2px;
+      background:
+        radial-gradient(700px 240px at 12% 20%, rgba(125,211,252,.16), transparent 60%),
+        radial-gradient(700px 240px at 80% 10%, rgba(167,139,250,.14), transparent 62%),
+        radial-gradient(700px 260px at 60% 90%, rgba(52,211,153,.10), transparent 65%);
+      pointer-events:none;
+      filter:saturate(1.1);
+    }
+    .hero > *{position:relative}
+    .kicker{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      font-family:var(--mono);
+      color:rgba(233,240,255,.86);
+      font-size:12px;
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.09);
+      backdrop-filter: blur(8px);
+    }
+    .dot{width:8px;height:8px;border-radius:50%;}
+    .dot.c{background:var(--accent)}
+    .dot.v{background:var(--accent2)}
+    .dot.g{background:var(--accent3)}
+    h1{
+      margin:14px 0 10px;
+      font-size:28px;
+      letter-spacing:-.02em;
+    }
+    .sub{
+      margin:0 0 14px;
+      color:rgba(233,240,255,.78);
+      max-width:920px;
+      font-size:14.5px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(16,31,58,.72), rgba(12,22,42,.65));
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:15px;
+      letter-spacing:-.01em;
+      color:rgba(233,240,255,.92);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .hint{
+      font-size:12px;color:rgba(159,176,208,.86);
+      font-family:var(--mono);
+    }
+    .mini{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .mini{grid-template-columns:1fr}
+    }
+    .metric{
+      padding:12px 12px 10px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+    }
+    .metric .label{font-size:12px;color:rgba(159,176,208,.9)}
+    .metric .value{margin-top:6px;font-size:16px;letter-spacing:-.01em}
+    .metric .bar{
+      height:8px;border-radius:999px;margin-top:10px;
+      background:rgba(255,255,255,.06);overflow:hidden;border:1px solid rgba(255,255,255,.06);
+    }
+    .metric .fill{height:100%;width:60%;background:linear-gradient(90deg,var(--accent),rgba(167,139,250,.9));}
+    .metric:nth-child(2) .fill{width:72%;background:linear-gradient(90deg,var(--accent2),rgba(125,211,252,.9));}
+    .metric:nth-child(3) .fill{width:55%;background:linear-gradient(90deg,var(--accent3),rgba(125,211,252,.65));}
+
+    /* Tabs */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
+    .tab{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:rgba(233,240,255,.88);
+      padding:8px 10px;border-radius:999px;
+      font-size:12.5px;cursor:pointer;
+      user-select:none;
+      transition:.18s transform,.18s background,.18s border-color;
+    }
+    .tab:hover{transform:translateY(-1px)}
+    .tab.active{
+      background:rgba(125,211,252,.12);
+      border-color:rgba(125,211,252,.35);
+      color:rgba(233,240,255,.95);
+    }
+
+    .section{display:none}
+    .section.active{display:block}
+
+    /* Lists */
+    ul{margin:8px 0 0 18px;color:rgba(233,240,255,.82)}
+    li{margin:8px 0}
+    .muted{color:rgba(159,176,208,.9)}
+    .hr{height:1px;background:var(--line);margin:12px 0}
+
+    /* Accordion */
+    details{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:14px;
+      padding:10px 12px;
+      margin:10px 0;
+    }
+    summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px}
+    summary::-webkit-details-marker{display:none}
+    .chev{margin-left:auto;opacity:.7;transition:.18s transform}
+    details[open] .chev{transform:rotate(90deg)}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:11px;
+      padding:4px 8px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:rgba(233,240,255,.86);
+      font-family:var(--mono);
+      white-space:nowrap;
+    }
+    .badge.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10)}
+    .badge.warn{border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.10)}
+    .badge.blue{border-color:rgba(125,211,252,.35);background:rgba(125,211,252,.10)}
+    .badge.violet{border-color:rgba(167,139,250,.35);background:rgba(167,139,250,.10)}
+    .badge.green{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.10)}
+
+    /* Diagram */
+    .diagram{
+      width:100%;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(5,8,18,.35);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    .diagram header{
+      padding:10px 12px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.02);
+    }
+    .diagram header .title{
+      font-size:12px;
+      font-family:var(--mono);
+      color:rgba(233,240,255,.78);
+    }
+    .legend{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .legend .key{
+      display:inline-flex;align-items:center;gap:8px;font-size:11px;color:rgba(159,176,208,.95);
+      font-family:var(--mono);
+      padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
+    }
+    .legend .sw{width:10px;height:10px;border-radius:3px}
+    .sw.c{background:rgba(125,211,252,.9)}
+    .sw.v{background:rgba(167,139,250,.9)}
+    .sw.g{background:rgba(52,211,153,.9)}
+    .sw.y{background:rgba(251,191,36,.9)}
+    svg{display:block;width:100%;height:auto}
+    .node{
+      cursor:pointer;
+      transition:.18s transform, .18s filter;
+      transform-origin:center;
+    }
+    .node:hover{transform:translateY(-2px);filter:brightness(1.05)}
+    .tooltip{
+      position:fixed;
+      max-width:330px;
+      background:rgba(15,26,47,.92);
+      border:1px solid rgba(255,255,255,.12);
+      padding:10px 12px;
+      border-radius:14px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      pointer-events:none;
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .12s, transform .12s;
+      z-index:30;
+    }
+    .tooltip .t{font-size:12px;font-family:var(--mono);color:rgba(233,240,255,.85)}
+    .tooltip .d{margin-top:6px;font-size:12.5px;color:rgba(233,240,255,.78)}
+    .kbd{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+    .callout{
+      border:1px dashed rgba(125,211,252,.28);
+      background:rgba(125,211,252,.06);
+      padding:10px 12px;border-radius:14px;
+      color:rgba(233,240,255,.80);
+      font-size:13px;
+    }
+
+    /* Roadmap */
+    .road{
+      display:grid;
+      gap:10px;
+    }
+    .phase{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+      border-radius:16px;
+      padding:12px 12px 10px;
+    }
+    .phase .top{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:8px;
+    }
+    .phase .name{font-size:13.5px}
+    .phase .meta{font-size:11px;color:rgba(159,176,208,.92);font-family:var(--mono)}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{
+      font-size:11px;
+      padding:4px 8px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.09);
+      background:rgba(255,255,255,.03);
+      color:rgba(233,240,255,.82);
+      font-family:var(--mono);
+    }
+
+    /* Footer */
+    .footer{
+      margin-top:16px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:var(--radius);
+      display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+      color:rgba(159,176,208,.95);
+      font-size:12px;
+      font-family:var(--mono);
+    }
+
+    /* Print */
+    @media print{
+      body{background:white;color:#111}
+      .hero,.card,.diagram,.phase,details,.footer{box-shadow:none}
+      .wrap{max-width:none}
+      .tab{display:none}
+      .section{display:block !important}
+      .tooltip{display:none}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="kicker">
+        <span class="pill"><span class="dot c"></span> AI-native proposals</span>
+        <span class="pill"><span class="dot v"></span> Geodesic decision structure</span>
+        <span class="pill"><span class="dot g"></span> ESG by design</span>
+        <span class="pill"><span class="dot c"></span> Blockchain audit trail</span>
+      </div>
+      <h1>Proposal: AI-Native Solution Design & Pricing System<br/>Powered by <span style="color:var(--accent)">Geodesic Blockchain AI</span></h1>
+      <p class="sub">
+        MembraCon UK can move from spreadsheets + manual intuition to a <b>living decision system</b> that
+        automates solution recommendations, optimizes pricing, and embeds ESG outcomes into every proposal —
+        while keeping decisions <b>explainable</b>, <b>auditable</b>, and <b>governed</b>.
+      </p>
+
+      <div class="mini">
+        <div class="metric">
+          <div class="label">Primary pain</div>
+          <div class="value">Slow, error-prone proposal workflow</div>
+          <div class="bar"><div class="fill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Primary lever</div>
+          <div class="value">Structured decision flows + optimization</div>
+          <div class="bar"><div class="fill"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Primary moat</div>
+          <div class="value">Learning loop + immutable decision ledger</div>
+          <div class="bar"><div class="fill"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: MAIN CONTENT -->
+      <div class="card">
+        <h2>
+          Interactive infographic
+          <span class="hint">Tip: hover nodes • expand sections • press <span class="kbd">P</span> to print</span>
+        </h2>
+
+        <div class="tabs" role="tablist" aria-label="Infographic sections">
+          <div class="tab active" data-tab="overview" role="tab" aria-selected="true">Overview</div>
+          <div class="tab" data-tab="pain" role="tab">Current Workflow Limits</div>
+          <div class="tab" data-tab="architecture" role="tab">Architecture</div>
+          <div class="tab" data-tab="decisionflow" role="tab">Structural Intelligence</div>
+          <div class="tab" data-tab="learning" role="tab">Autonomous Learning</div>
+          <div class="tab" data-tab="ledger" role="tab">Explainability & Governance</div>
+          <div class="tab" data-tab="outcomes" role="tab">Business Outcomes</div>
+          <div class="tab" data-tab="roadmap" role="tab">Roadmap</div>
+          <div class="tab" data-tab="inputs" role="tab">What We Need</div>
+        </div>
+
+        <!-- OVERVIEW -->
+        <section class="section active" id="overview">
+          <div class="callout">
+            <b>What this system becomes:</b> a single, consistent “proposal brain” that evaluates technical paths,
+            prices them strategically, quantifies ESG impact, and logs every decision in a tamper-resistant ledger.
+          </div>
+
+          <div class="hr"></div>
+
+          <details open>
+            <summary>
+              <span class="badge blue">Why now</span>
+              Water treatment proposals need speed + complexity handling + ESG accountability
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Multi-dimensional constraints:</b> water chemistry, effluent standards, CAPEX/OPEX, client budget, ESG targets.</li>
+              <li><b>Context specificity:</b> aerospace ≠ food & beverage ≠ pharma; recommendations must adapt per sector + regulation.</li>
+              <li><b>Continuous change:</b> new technologies, energy price shifts, new ESG reporting expectations.</li>
+              <li><b>Client expectation:</b> fast proposals without sacrificing engineering rigor and credibility.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge violet">Geodesic idea</span>
+              “Shortest path” through a complex decision space
+              <span class="chev">›</span>
+            </summary>
+            <p class="muted" style="margin:10px 0 0;">
+              Think of solution design as a graph: each node is a decision (technology, sizing, pricing model, ESG options).
+              The AI finds the optimal path through the graph while honoring constraints — then <b>records the rationale</b>.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge green">ESG by design</span>
+              Sustainability is an input constraint, not a marketing add-on
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li>Expose ESG priorities (water reuse, energy/carbon, waste minimization) as weights in optimization.</li>
+              <li>Generate dual scenarios: cost-optimized vs ESG-optimized, with quantified tradeoffs.</li>
+              <li>Use the ledger to support audit-ready sustainability claims (anti-greenwashing).</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- PAIN -->
+        <section class="section" id="pain">
+          <details open>
+            <summary>
+              <span class="badge warn">Workflow bottlenecks</span>
+              What spreadsheets can’t do at scale
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Time-consuming:</b> re-building designs + documents from scratch for each proposal.</li>
+              <li><b>Error risk:</b> manual entry + complex formulas + inconsistent assumptions.</li>
+              <li><b>Low reuse:</b> win/loss learnings live in documents or memory, not in a system.</li>
+              <li><b>Rigid:</b> hard to adapt to new technologies, changing ESG priorities, or evolving pricing.</li>
+              <li><b>Scaling pain:</b> more proposals = proportionally more labor; onboarding is slow because expertise isn’t codified.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge blue">The need</span>
+              Dynamic, context-aware decision-making
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Structured framework:</b> raw water → treatment steps → technology options → sizing → cost → pricing strategy → ESG impact → proposal narrative.</li>
+              <li><b>Speed with accuracy:</b> AI navigates the structure instantly; humans focus on review + strategy.</li>
+              <li><b>Continuous learning:</b> system updates rules/models from outcomes, not one-off templates.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- ARCHITECTURE -->
+        <section class="section" id="architecture">
+          <div class="diagram" aria-label="Geodesic Blockchain AI architecture diagram">
+            <header>
+              <div class="title">Geodesic Blockchain AI — component map (hover nodes)</div>
+              <div class="legend">
+                <span class="key"><span class="sw c"></span> AI decision</span>
+                <span class="key"><span class="sw v"></span> Structure & rules</span>
+                <span class="key"><span class="sw g"></span> Learning agents</span>
+                <span class="key"><span class="sw y"></span> Blockchain ledger</span>
+              </div>
+            </header>
+
+            <!-- Responsive SVG -->
+            <svg viewBox="0 0 1100 520" role="img">
+              <defs>
+                <linearGradient id="gradC" x1="0" x2="1">
+                  <stop offset="0" stop-color="rgba(125,211,252,.95)"/>
+                  <stop offset="1" stop-color="rgba(167,139,250,.9)"/>
+                </linearGradient>
+                <linearGradient id="gradG" x1="0" x2="1">
+                  <stop offset="0" stop-color="rgba(52,211,153,.95)"/>
+                  <stop offset="1" stop-color="rgba(125,211,252,.65)"/>
+                </linearGradient>
+                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="rgba(0,0,0,.35)"/>
+                </filter>
+              </defs>
+
+              <!-- connectors -->
+              <g opacity=".75" stroke="rgba(233,240,255,.18)" stroke-width="2" fill="none">
+                <path d="M 220 140 C 340 140, 360 160, 470 170" />
+                <path d="M 220 260 C 340 260, 360 240, 470 220" />
+                <path d="M 220 380 C 330 380, 350 330, 470 270" />
+
+                <path d="M 630 200 C 740 200, 760 150, 880 140" />
+                <path d="M 630 240 C 760 260, 760 310, 880 330" />
+                <path d="M 630 260 C 760 290, 760 390, 880 410" />
+                <path d="M 630 220 C 720 220, 720 210, 820 210" />
+
+                <path d="M 880 140 C 940 170, 980 220, 980 260" />
+                <path d="M 880 330 C 920 320, 950 290, 980 260" />
+                <path d="M 880 410 C 930 380, 960 330, 980 260" />
+              </g>
+
+              <!-- Left inputs -->
+              <g class="node" data-title="Inputs" data-desc="Sector, water analysis, flow/operating conditions, constraints, client priorities (cost/ESG), must-use/avoid tech.">
+                <rect x="70" y="85" rx="18" ry="18" width="260" height="95" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.10)" filter="url(#softShadow)"/>
+                <text x="95" y="120" fill="rgba(233,240,255,.92)" font-size="16" font-weight="600">Project Inputs</text>
+                <text x="95" y="145" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">sector • water quality • constraints</text>
+                <text x="95" y="165" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">priorities • ESG • regional regs</text>
+              </g>
+
+              <g class="node" data-title="Knowledge Artifacts" data-desc="Templates, costing sheets, sizing rules, vendor catalogs, best practices, case studies: codified into a structured model.">
+                <rect x="70" y="205" rx="18" ry="18" width="260" height="110" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.10)" filter="url(#softShadow)"/>
+                <text x="95" y="240" fill="rgba(233,240,255,.92)" font-size="16" font-weight="600">Existing Artifacts</text>
+                <text x="95" y="265" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">spreadsheets • templates • rules</text>
+                <text x="95" y="285" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">pricing history • catalog • docs</text>
+              </g>
+
+              <g class="node" data-title="External Signals" data-desc="Regulatory updates, new technology performance, energy price shifts, ESG accounting methods (optional ingestion agents).">
+                <rect x="70" y="350" rx="18" ry="18" width="260" height="95" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.10)" filter="url(#softShadow)"/>
+                <text x="95" y="385" fill="rgba(233,240,255,.92)" font-size="16" font-weight="600">External Updates</text>
+                <text x="95" y="410" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">regs • market • tech • ESG methods</text>
+              </g>
+
+              <!-- Structural intelligence -->
+              <g class="node" data-title="Structural Intelligence Layer" data-desc="Knowledge graph / decision network: constraints, rules, relationships. Ensures completeness + consistency.">
+                <rect x="420" y="130" rx="20" ry="20" width="260" height="110" fill="rgba(167,139,250,.10)" stroke="rgba(167,139,250,.40)" filter="url(#softShadow)"/>
+                <text x="446" y="165" fill="rgba(233,240,255,.95)" font-size="16" font-weight="700">Structural Intelligence</text>
+                <text x="446" y="192" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">decision nodes • constraints • rules</text>
+                <text x="446" y="212" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">sector context • water chemistry logic</text>
+              </g>
+
+              <!-- AI engine -->
+              <g class="node" data-title="AI Decision Engine" data-desc="Optimization + ML: explores feasible treatment trains, sizes systems, estimates CAPEX/OPEX, selects pricing model and price range.">
+                <rect x="420" y="255" rx="20" ry="20" width="260" height="120" fill="rgba(125,211,252,.10)" stroke="rgba(125,211,252,.45)" filter="url(#softShadow)"/>
+                <text x="446" y="290" fill="rgba(233,240,255,.95)" font-size="16" font-weight="700">AI Decision Engine</text>
+                <text x="446" y="317" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">multi-objective optimization</text>
+                <text x="446" y="337" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">pricing intelligence • ESG scoring</text>
+                <text x="446" y="357" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">simulation checks • scenario compare</text>
+              </g>
+
+              <!-- Ledger -->
+              <g class="node" data-title="Blockchain Decision Ledger" data-desc="Permissioned ledger records: inputs, key decisions, rationale, approvals/overrides, versioning. Enables audit & governance.">
+                <rect x="790" y="180" rx="20" ry="20" width="260" height="105" fill="rgba(251,191,36,.10)" stroke="rgba(251,191,36,.45)" filter="url(#softShadow)"/>
+                <text x="815" y="215" fill="rgba(233,240,255,.95)" font-size="16" font-weight="700">Decision Ledger</text>
+                <text x="815" y="242" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">immutable trail • explainability</text>
+                <text x="815" y="262" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">policy compliance • approvals</text>
+              </g>
+
+              <!-- UI -->
+              <g class="node" data-title="UI & Integrations" data-desc="Team inputs + outputs; connects to CRM, pricing DB, document generation, component catalogs, and feedback capture.">
+                <rect x="790" y="105" rx="18" ry="18" width="260" height="70" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.10)" filter="url(#softShadow)"/>
+                <text x="815" y="135" fill="rgba(233,240,255,.92)" font-size="15" font-weight="600">User Interface</text>
+                <text x="815" y="156" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">inputs • proposal output • CRM</text>
+              </g>
+
+              <!-- Outputs -->
+              <g class="node" data-title="Proposal Outputs" data-desc="Ranked solution options + rationale, pricing range & strategy, ESG metrics, and a proposal-ready narrative.">
+                <rect x="790" y="300" rx="18" ry="18" width="260" height="90" fill="rgba(255,255,255,.035)" stroke="rgba(255,255,255,.10)" filter="url(#softShadow)"/>
+                <text x="815" y="335" fill="rgba(233,240,255,.92)" font-size="15" font-weight="600">Proposal Package</text>
+                <text x="815" y="358" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">options • ROI • ESG • narrative</text>
+                <text x="815" y="378" fill="rgba(159,176,208,.95)" font-size="12" font-family="ui-monospace">pricing model • terms • compliance</text>
+              </g>
+
+              <!-- Learning agents -->
+              <g class="node" data-title="Autonomous Learning Agents" data-desc="Win/loss, pricing, performance, ESG tracking, external ingestion. Feeds improvements back to structure and models.">
+                <rect x="790" y="400" rx="18" ry="18" width="260" height="95" fill="rgba(52,211,153,.09)" stroke="rgba(52,211,153,.40)" filter="url(#softShadow)"/>
+                <text x="815" y="435" fill="rgba(233,240,255,.95)" font-size="15" font-weight="700">Learning Agents</text>
+                <text x="815" y="458" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">continuous improvement loop</text>
+                <text x="815" y="478" fill="rgba(233,240,255,.78)" font-size="12" font-family="ui-monospace">market + tech + ESG updates</text>
+              </g>
+
+              <!-- Center label -->
+              <g opacity=".9">
+                <text x="548" y="420" text-anchor="middle" fill="rgba(159,176,208,.9)" font-size="12" font-family="ui-monospace">
+                  Geodesic principle: optimize the “shortest path” through design + pricing + ESG constraints
+                </text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="hr"></div>
+
+          <details open>
+            <summary>
+              <span class="badge violet">Key components</span>
+              What each layer is responsible for
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Structural intelligence layer:</b> knowledge graph / decision network that encodes MembraCon logic and constraints.</li>
+              <li><b>AI decision engine:</b> optimization + ML to propose treatment train, sizing, costs, pricing strategy, ESG tradeoffs.</li>
+              <li><b>Blockchain ledger:</b> immutable trail of inputs, decisions, explanations, approvals, overrides.</li>
+              <li><b>UI & integrations:</b> smooth workflow (CRM, component pricing DB, document generation).</li>
+              <li><b>Autonomous agents:</b> win/loss, pricing intelligence, performance learning, ESG tracking, external ingestion.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- STRUCTURAL INTELLIGENCE -->
+        <section class="section" id="decisionflow">
+          <details open>
+            <summary>
+              <span class="badge violet">Decision nodes</span>
+              A consistent end-to-end flow for every proposal
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Technology selection:</b> influent → required stages → candidate technologies (UF/MF/RO/IX/UV/AOP/etc.).</li>
+              <li><b>System sizing:</b> capacity, redundancy, flow rates, equipment sizing.</li>
+              <li><b>Operational setup:</b> dosing, CIP, automation level, controls.</li>
+              <li><b>Cost estimation:</b> CAPEX + OPEX projections with assumptions explicitly tracked.</li>
+              <li><b>Pricing strategy:</b> capital sale vs BOO/BOT vs service contracts; optimized pricing range.</li>
+              <li><b>ESG enhancements:</b> energy recovery, reuse loops, waste reduction features.</li>
+              <li><b>Proposal narrative:</b> context-grounded explanation + ROI + compliance + ESG metrics.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge blue">Rules & constraints</span>
+              Guardrails that prevent “hallucinated engineering”
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li>Hard constraints: discharge limits, safety factors, certifications, regional regulations.</li>
+              <li>Business constraints: preferred vendors, must-use/avoid tech, delivery constraints.</li>
+              <li>Context triggers: sector-specific nodes (e.g., GMP for pharma).</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge green">Optimization</span>
+              Multi-objective “geodesic path” selection
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li>Objective blend: compliance + performance + cost + margin + ESG.</li>
+              <li>Scenario compare: cost-optimized vs ESG-optimized vs speed-to-deliver.</li>
+              <li>Consistency: one coherent source of truth drives all text + numbers.</li>
+            </ul>
+          </details>
+        </section>
+
+        <!-- LEARNING -->
+        <section class="section" id="learning">
+          <details open>
+            <summary>
+              <span class="badge green">Autonomous agents</span>
+              The system improves as you use it
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Win/Loss analysis:</b> learns which framing/pricing wins in each segment.</li>
+              <li><b>Pricing intelligence:</b> models elasticity; suggests financing alternatives where needed.</li>
+              <li><b>Technology performance:</b> updates expected life, chemical usage, maintenance costs based on outcomes.</li>
+              <li><b>ESG impact tracking:</b> refines estimates with real project outcomes; strengthens proof points.</li>
+              <li><b>External ingestion:</b> regulatory changes + new tech signals keep knowledge fresh.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge blue">Reinforcement loop</span>
+              “How did my last recommendation perform?”
+              <span class="chev">›</span>
+            </summary>
+            <p class="muted" style="margin:10px 0 0;">
+              Each proposal outcome becomes feedback. The system adjusts weights, suggests new rules,
+              and improves confidence — while governance controls ensure changes are reviewed and auditable.
+            </p>
+          </details>
+        </section>
+
+        <!-- LEDGER -->
+        <section class="section" id="ledger">
+          <details open>
+            <summary>
+              <span class="badge warn">Ledger purpose</span>
+              Make the AI “crystal box,” not black box
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Explainability:</b> log “why” at each key decision node (inputs, rules used, tradeoffs, confidence).</li>
+              <li><b>Governance:</b> record policies + sign-offs; capture human overrides with rationale.</li>
+              <li><b>Auditability:</b> tamper-evident chain provides a source of truth for pricing/ESG claims.</li>
+              <li><b>Client trust:</b> generate a client-facing rationale report derived from ledger entries.</li>
+              <li><b>Institutional memory:</b> ledger becomes searchable knowledge of “how we decide.”</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge blue">Example ledger entry (concept)</span>
+              What gets stored per decision
+              <span class="chev">›</span>
+            </summary>
+            <pre style="margin:10px 0 0; padding:12px; border-radius:14px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.08); overflow:auto; color:rgba(233,240,255,.82); font-family:var(--mono); font-size:12px;">
+{
+  "proposal_id": "MC-2026-0017",
+  "node": "PretreatmentSelection",
+  "inputs": {"TSS_mgL": 50, "sector": "Food & Beverage", "ESG_priority": "water_reuse"},
+  "decision": "Ultrafiltration (UF) before RO",
+  "rationale": [
+    "Rule: pre-filtration required when TSS > 10 mg/L",
+    "Historical: UF reduced RO maintenance cost by ~30% in similar cases",
+    "ESG: lowers chemical cleaning frequency → less waste"
+  ],
+  "alternatives_considered": ["MF", "DAF+Filter"],
+  "confidence": 0.83,
+  "timestamp": "2026-01-15T19:00:00Z",
+  "approvals": [{"role":"Lead Engineer","status":"approved"}]
+}
+            </pre>
+          </details>
+        </section>
+
+        <!-- OUTCOMES -->
+        <section class="section" id="outcomes">
+          <details open>
+            <summary>
+              <span class="badge good">Expected outcomes</span>
+              What improves and why
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li><b>Turnaround time:</b> proposals shift from weeks → hours/minutes for first draft.</li>
+              <li><b>Win rate + consistency:</b> every proposal hits technical fit + ROI + ESG narrative reliably.</li>
+              <li><b>Profitability:</b> value-driven pricing calibrated by segment and outcomes.</li>
+              <li><b>ESG differentiation:</b> quantified sustainability metrics, backed by audit trails.</li>
+              <li><b>Knowledge retention:</b> expertise becomes a system asset; onboarding accelerates.</li>
+              <li><b>Operational efficiency:</b> fewer manual errors; reduced cost-of-sales engineering time.</li>
+              <li><b>Strategic insight:</b> ledger analytics reveal trends in tech selection, pricing, and client needs.</li>
+            </ul>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge blue">Practical KPIs (year 1 targets)</span>
+              Metrics you can baseline and track
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li>Proposal prep time reduction: <b>50–70%</b></li>
+              <li>Variance in proposal quality between individuals: <b>down sharply</b></li>
+              <li>Margin capture: <b>higher on segments with low elasticity</b></li>
+              <li>ESG reporting credibility: <b>audit-ready claims</b> with assumptions on-chain</li>
+            </ul>
+            <p class="muted" style="margin-top:10px">
+              Exact numbers should be finalized after baseline measurement in Discovery (Phase 1).
+            </p>
+          </details>
+        </section>
+
+        <!-- ROADMAP -->
+        <section class="section" id="roadmap">
+          <div class="road">
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 1:</b> Discovery & Knowledge Capture</div>
+                <div class="meta">Month 0–2</div>
+              </div>
+              <div class="muted">Map current workflow, capture rules/artifacts, define KPIs, design knowledge graph + ledger schema.</div>
+              <div class="chips">
+                <span class="chip">workshops</span><span class="chip">templates + sheets</span><span class="chip">data sources</span><span class="chip">ledger design</span>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 2:</b> Minimum Viable Prototype</div>
+                <div class="meta">Month 3–5</div>
+              </div>
+              <div class="muted">Narrow scope (e.g., one sector or treatment type), basic UI, core decision logic, ledger logging.</div>
+              <div class="chips">
+                <span class="chip">core decision nodes</span><span class="chip">basic pricing</span><span class="chip">explanations</span><span class="chip">test on historical cases</span>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 3:</b> Expansion & Refinement</div>
+                <div class="meta">Month 6–10</div>
+              </div>
+              <div class="muted">Add sectors/tech modules, equipment DB, advanced pricing model, ESG calculators, learning agents (controlled).</div>
+              <div class="chips">
+                <span class="chip">UF/RO/MBR/DAF…</span><span class="chip">ML pricing</span><span class="chip">ESG scoring</span><span class="chip">side-by-side trials</span>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 4:</b> Training & Pilot Rollout</div>
+                <div class="meta">Month 9–12</div>
+              </div>
+              <div class="muted">Train team, run pilot for live proposals, monitor KPIs + ledger performance, tighten governance.</div>
+              <div class="chips">
+                <span class="chip">change management</span><span class="chip">feedback loop</span><span class="chip">policy controls</span>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 5:</b> Full Deployment & Integrations</div>
+                <div class="meta">Month 13–18</div>
+              </div>
+              <div class="muted">Company-wide rollout, CRM integration, performance tuning, security hardening, retire legacy spreadsheets.</div>
+              <div class="chips">
+                <span class="chip">CRM</span><span class="chip">document gen</span><span class="chip">security</span><span class="chip">scale</span>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="top">
+                <div class="name"><b>Phase 6:</b> Ongoing Support & Evolution</div>
+                <div class="meta">Month 19+</div>
+              </div>
+              <div class="muted">Governance ops, periodic retraining, new features (multilingual, client portal, maintenance optimization).</div>
+              <div class="chips">
+                <span class="chip">governance</span><span class="chip">retraining</span><span class="chip">new modules</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INPUTS -->
+        <section class="section" id="inputs">
+          <details open>
+            <summary>
+              <span class="badge blue">Requested in advance</span>
+              Inputs to build a realistic demo (anonymizable)
+              <span class="chev">›</span>
+            </summary>
+            <ol style="margin:10px 0 0 18px; color:rgba(233,240,255,.82)">
+              <li style="margin:10px 0;">
+                <b>1–2 representative customer cases</b><br/>
+                <span class="muted">Industry, influent parameters, flow, targets, constraints, priorities, must-use/avoid tech.</span>
+              </li>
+              <li style="margin:10px 0;">
+                <b>Current proposal template + key spreadsheets</b><br/>
+                <span class="muted">Assumptions for margin, labor, logistics, contingencies.</span>
+              </li>
+              <li style="margin:10px 0;">
+                <b>Technology & solution catalog</b><br/>
+                <span class="muted">Processes used (UF/MBR/RO/UV/AOP…), envelopes, preferred vendors.</span>
+              </li>
+              <li style="margin:10px 0;">
+                <b>Pricing history (optional but high leverage)</b><br/>
+                <span class="muted">5–10 past proposals with indicative pricing + outcomes (won/lost).</span>
+              </li>
+              <li style="margin:10px 0;">
+                <b>ESG framework (optional)</b><br/>
+                <span class="muted">Preferred reporting style, water recovery targets, energy/carbon considerations.</span>
+              </li>
+            </ol>
+          </details>
+
+          <details>
+            <summary>
+              <span class="badge green">Demo deliverables</span>
+              What the session outputs
+              <span class="chev">›</span>
+            </summary>
+            <ul>
+              <li>Ranked shortlist of solution options with rationale</li>
+              <li>How technical paths were explored and pruned</li>
+              <li>Pricing range + chosen pricing model + justification</li>
+              <li>How ESG weights influenced decisions and tradeoffs</li>
+              <li>Draft proposal structure reflecting the decision trail</li>
+            </ul>
+          </details>
+        </section>
+
+        <div class="footer">
+          <span>Geodesic Blockchain AI • Proposal Infographic</span>
+          <span class="muted">Keyboard: <span class="kbd">P</span> print • <span class="kbd">Esc</span> hide tooltip</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: QUICK SUMMARY / EXEC VIEW -->
+      <aside class="card">
+        <h2>
+          Executive snapshot
+          <span class="hint">one screen</span>
+        </h2>
+
+        <details open>
+          <summary>
+            <span class="badge blue">Value proposition</span>
+            Faster + smarter + greener proposals
+            <span class="chev">›</span>
+          </summary>
+          <ul>
+            <li><b>Speed:</b> first draft in minutes.</li>
+            <li><b>Rigor:</b> structured engineering logic + simulation checks.</li>
+            <li><b>Commercial edge:</b> pricing intelligence tuned by outcomes.</li>
+            <li><b>Trust:</b> blockchain audit trail for decisions + ESG claims.</li>
+          </ul>
+        </details>
+
+        <details>
+          <summary>
+            <span class="badge violet">Core differentiator</span>
+            Structural intelligence (not free-form AI)
+            <span class="chev">›</span>
+          </summary>
+          <p class="muted" style="margin:10px 0 0;">
+            The AI doesn’t “wing it.” It follows a codified decision network built from MembraCon expertise.
+            This reduces errors, improves repeatability, and makes reasoning auditable.
+          </p>
+        </details>
+
+        <details>
+          <summary>
+            <span class="badge green">Moat</span>
+            The system learns from your outcomes
+            <span class="chev">›</span>
+          </summary>
+          <ul>
+            <li>Win/loss feedback optimizes narrative + pricing.</li>
+            <li>Performance data improves OPEX and reliability assumptions.</li>
+            <li>ESG tracking upgrades credibility of sustainability claims.</li>
+          </ul>
+        </details>
+
+        <details>
+          <summary>
+            <span class="badge warn">Risk controls</span>
+            Human-in-the-loop + governance
+            <span class="chev">›</span>
+          </summary>
+          <ul>
+            <li>Policy checks + approvals captured in ledger.</li>
+            <li>Overrides are logged with rationale (accountability).</li>
+            <li>Permissioned access; audit trails by design.</li>
+          </ul>
+        </details>
+
+        <div class="hr"></div>
+
+        <div class="callout">
+          <b>Next step:</b> Kick off Phase 1 (Discovery). Capture decision nodes + artifacts, define baselines, then prototype on 1–2 cases.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tt" aria-hidden="true">
+    <div class="t" id="ttTitle"></div>
+    <div class="d" id="ttDesc"></div>
+  </div>
+
+  <script>
+    // Tabs
+    const tabs = [...document.querySelectorAll(".tab")];
+    const sections = [...document.querySelectorAll(".section")];
+    function activateTab(name){
+      tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+      sections.forEach(s => s.classList.toggle("active", s.id === name));
+      // accessibility hint
+      tabs.forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name ? "true" : "false"));
+      window.location.hash = name;
+    }
+    tabs.forEach(t => t.addEventListener("click", () => activateTab(t.dataset.tab)));
+
+    // Restore from hash
+    const hash = (location.hash || "").replace("#","");
+    if(hash && document.getElementById(hash)){
+      activateTab(hash);
+    }
+
+    // Tooltip for SVG nodes
+    const tt = document.getElementById("tt");
+    const ttTitle = document.getElementById("ttTitle");
+    const ttDesc = document.getElementById("ttDesc");
+    let ttVisible = false;
+
+    function showTT(title, desc, x, y){
+      ttTitle.textContent = title || "";
+      ttDesc.textContent = desc || "";
+      tt.style.left = Math.min(x + 14, window.innerWidth - 360) + "px";
+      tt.style.top = Math.min(y + 14, window.innerHeight - 160) + "px";
+      tt.style.opacity = "1";
+      tt.style.transform = "translateY(0)";
+      tt.setAttribute("aria-hidden","false");
+      ttVisible = true;
+    }
+    function hideTT(){
+      tt.style.opacity = "0";
+      tt.style.transform = "translateY(6px)";
+      tt.setAttribute("aria-hidden","true");
+      ttVisible = false;
+    }
+
+    document.querySelectorAll(".node").forEach(el => {
+      el.addEventListener("mousemove", (e) => {
+        const title = el.getAttribute("data-title");
+        const desc  = el.getAttribute("data-desc");
+        showTT(title, desc, e.clientX, e.clientY);
+      });
+      el.addEventListener("mouseleave", hideTT);
+      el.addEventListener("click", (e) => {
+        // On click, pin briefly
+        const title = el.getAttribute("data-title");
+        const desc  = el.getAttribute("data-desc");
+        showTT(title, desc, e.clientX, e.clientY);
+        setTimeout(() => { if(ttVisible) hideTT(); }, 1600);
+      });
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener("keydown", (e) => {
+      if(e.key.toLowerCase() === "p"){
+        e.preventDefault();
+        window.print();
+      }
+      if(e.key === "Escape"){
+        hideTT();
+      }
+    });
+
+    // Smooth UX: close other details within the same section when one opens (optional “tidy mode”)
+    const tidy = false; // set true if you want single-open accordion behavior
+    if(tidy){
+      sections.forEach(sec => {
+        sec.querySelectorAll("details").forEach(d => {
+          d.addEventListener("toggle", () => {
+            if(d.open){
+              sec.querySelectorAll("details").forEach(other => {
+                if(other !== d) other.open = false;
+              });
+            }
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>
