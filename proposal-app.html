@@ -1,0 +1,2606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon WaterLogic - Intelligent Proposal System</title>
+
+  <!-- D3 for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --panel: #0d1424;
+      --card: #111b2e;
+      --card-hover: #162035;
+      --muted: #8fa3c0;
+      --text: #e8f0ff;
+      --line: #1e2d4a;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #a855f7;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --esg-green: #10b981;
+      --esg-blue: #3b82f6;
+      --esg-purple: #8b5cf6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(13,20,36,0.98), rgba(13,20,36,0.95));
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text span {
+      color: var(--accent2);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      margin-left: 40px;
+    }
+
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
+    }
+
+    .nav-tab:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.1));
+      border-color: rgba(99,102,241,0.3);
+      color: var(--text);
+    }
+
+    .nav-tab .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Main Layout */
+    .app-container {
+      margin-top: 60px;
+      display: flex;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-section {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-title .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    /* Project Status */
+    .project-item {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .project-item:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(99,102,241,0.3);
+    }
+
+    .project-item.active {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.08);
+    }
+
+    .project-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .project-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+    }
+
+    .project-stage {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .stage-intake { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    .stage-design { background: rgba(168,85,247,0.2); color: #c084fc; }
+    .stage-pricing { background: rgba(245,158,11,0.2); color: #fbbf24; }
+    .stage-proposal { background: rgba(34,197,94,0.2); color: #4ade80; }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    /* View Container */
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    /* Workflow Steps */
+    .workflow-header {
+      margin-bottom: 24px;
+    }
+
+    .workflow-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .workflow-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .workflow-steps {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .workflow-step {
+      flex: 1;
+      padding: 14px 16px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .workflow-step::after {
+      content: '';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-right: 2px solid var(--line);
+      border-top: 2px solid var(--line);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .workflow-step:last-child::after {
+      display: none;
+    }
+
+    .workflow-step:hover {
+      border-color: rgba(99,102,241,0.4);
+    }
+
+    .workflow-step.active {
+      background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(34,211,238,0.08));
+      border-color: var(--accent);
+    }
+
+    .workflow-step.completed {
+      border-color: var(--success);
+    }
+
+    .workflow-step.completed .step-icon {
+      background: var(--success);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .step-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .workflow-step.active .step-icon {
+      background: var(--accent);
+    }
+
+    .step-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: var(--muted);
+      padding-left: 38px;
+    }
+
+    /* Content Panels */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .content-grid.three-cols {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .content-panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .content-panel.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-title .material-icons-outlined {
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .panel-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(99,102,241,0.15);
+      color: var(--accent);
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+
+    .form-input::placeholder {
+      color: rgba(143,163,192,0.5);
+    }
+
+    select.form-input {
+      cursor: pointer;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-row.three-cols {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    /* Range Slider */
+    .range-group {
+      margin-bottom: 16px;
+    }
+
+    .range-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .range-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .range-value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--line);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.4);
+    }
+
+    /* Toggle Chips */
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip:hover {
+      border-color: rgba(99,102,241,0.4);
+      background: rgba(99,102,241,0.08);
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(34,211,238,0.15));
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .chip .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    /* Technology Cards */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .tech-card {
+      padding: 16px;
+      background: rgba(0,0,0,0.15);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .tech-card:hover {
+      border-color: rgba(99,102,241,0.4);
+      background: rgba(99,102,241,0.05);
+    }
+
+    .tech-card.selected {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(34,211,238,0.08));
+    }
+
+    .tech-card.recommended::before {
+      content: 'Recommended';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      padding: 3px 8px;
+      background: var(--success);
+      color: #000;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .tech-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .tech-full {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .tech-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .tech-stat {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .tech-stat-value {
+      font-weight: 600;
+      color: var(--accent2);
+    }
+
+    /* Metrics Cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .metric-value.accent { color: var(--accent); }
+    .metric-value.success { color: var(--success); }
+    .metric-value.warning { color: var(--warning); }
+    .metric-value.accent2 { color: var(--accent2); }
+
+    .metric-change {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .metric-change.positive { color: var(--success); }
+    .metric-change.negative { color: var(--danger); }
+
+    /* Solution Comparison */
+    .solution-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .solution-table th,
+    .solution-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .solution-table th {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .solution-table td {
+      font-size: 13px;
+    }
+
+    .solution-table tr:hover td {
+      background: rgba(99,102,241,0.05);
+    }
+
+    .solution-rank {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #000; }
+    .rank-3 { background: linear-gradient(135deg, #c2855a, #a16941); color: #fff; }
+
+    .confidence-bar {
+      width: 100px;
+      height: 6px;
+      background: var(--line);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .confidence-high { background: var(--success); }
+    .confidence-medium { background: var(--warning); }
+    .confidence-low { background: var(--danger); }
+
+    /* ESG Gauge */
+    .esg-gauges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .esg-gauge {
+      text-align: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .gauge-ring {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 12px;
+      position: relative;
+    }
+
+    .gauge-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .gauge-ring circle {
+      fill: none;
+      stroke-width: 8;
+    }
+
+    .gauge-bg { stroke: var(--line); }
+    .gauge-fill { stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+
+    .gauge-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .esg-gauge.water .gauge-fill { stroke: var(--esg-blue); }
+    .esg-gauge.carbon .gauge-fill { stroke: var(--esg-green); }
+    .esg-gauge.energy .gauge-fill { stroke: var(--esg-purple); }
+
+    .esg-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    /* Cost Breakdown */
+    .cost-bar {
+      display: flex;
+      height: 32px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .cost-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .cost-segment:hover {
+      filter: brightness(1.15);
+    }
+
+    .cost-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #16a34a);
+      color: #fff;
+    }
+
+    .btn .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* Override Panel */
+    .override-panel {
+      background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(239,68,68,0.05));
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .override-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .override-header .material-icons-outlined {
+      color: var(--warning);
+    }
+
+    .override-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--warning);
+    }
+
+    .override-note {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 12px;
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    /* Proposal Preview */
+    .proposal-preview {
+      background: #fff;
+      color: #1a1a1a;
+      border-radius: 12px;
+      padding: 32px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .proposal-preview h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .proposal-preview h2 {
+      font-size: 18px;
+      color: #4f46e5;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .proposal-preview p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+
+    .proposal-preview table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+
+    .proposal-preview table th,
+    .proposal-preview table td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+      font-size: 13px;
+    }
+
+    .proposal-preview table th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+
+    /* Documentation View */
+    .docs-embed {
+      width: 100%;
+      height: calc(100vh - 200px);
+      border: none;
+      border-radius: 12px;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-in {
+      animation: slideIn 0.3s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .tech-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* AI Processing Animation */
+    .ai-processing {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.08));
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .ai-spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--line);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ai-text {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Decision Trail */
+    .decision-trail {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .decision-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 10px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .decision-time {
+      font-size: 11px;
+      color: var(--muted);
+      min-width: 60px;
+    }
+
+    .decision-content {
+      flex: 1;
+    }
+
+    .decision-action {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .decision-reason {
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <span class="material-icons-round">water_drop</span>
+      </div>
+      <div class="logo-text">MembraCon <span>WaterLogic</span></div>
+    </div>
+
+    <nav class="nav-tabs">
+      <div class="nav-tab active" data-view="proposal">
+        <span class="material-icons-outlined">description</span>
+        Proposal Builder
+      </div>
+      <div class="nav-tab" data-view="solutions">
+        <span class="material-icons-outlined">build</span>
+        Solution Design
+      </div>
+      <div class="nav-tab" data-view="pricing">
+        <span class="material-icons-outlined">paid</span>
+        Pricing Intelligence
+      </div>
+      <div class="nav-tab" data-view="esg">
+        <span class="material-icons-outlined">eco</span>
+        ESG Optimization
+      </div>
+      <div class="nav-tab" data-view="generate">
+        <span class="material-icons-outlined">picture_as_pdf</span>
+        Generate Proposal
+      </div>
+      <div class="nav-tab" data-view="docs">
+        <span class="material-icons-outlined">hub</span>
+        System Architecture
+      </div>
+    </nav>
+
+    <div class="header-spacer"></div>
+
+    <div class="user-menu">
+      <span style="font-size:12px;color:var(--muted)">Internal System v1.0</span>
+      <div class="user-avatar">TE</div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined">folder_open</span>
+          Active Projects
+        </div>
+
+        <div class="project-item active">
+          <div class="project-name">Riverside Pharma - Purified Water</div>
+          <div class="project-meta">
+            <span>200 m³/h</span>
+            <span>RO System</span>
+          </div>
+          <div class="project-stage stage-design">In Design</div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-name">Nordic Foods - Wastewater</div>
+          <div class="project-meta">
+            <span>500 m³/h</span>
+            <span>MBR + UV</span>
+          </div>
+          <div class="project-stage stage-pricing">Pricing</div>
+        </div>
+
+        <div class="project-item">
+          <div class="project-name">GreenEnergy - Cooling Tower</div>
+          <div class="project-meta">
+            <span>1000 m³/h</span>
+            <span>UF + RO</span>
+          </div>
+          <div class="project-stage stage-proposal">Proposal Ready</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined">insights</span>
+          Quick Stats
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <div style="display:flex;justify-content:space-between">
+            <span>Active Proposals</span>
+            <span style="color:var(--accent);font-weight:600">12</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span>Avg. Win Rate</span>
+            <span style="color:var(--success);font-weight:600">67%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span>Avg. Turnaround</span>
+            <span style="color:var(--accent2);font-weight:600">2.3 days</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span>ESG Score Avg</span>
+            <span style="color:var(--esg-green);font-weight:600">82</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined">memory</span>
+          System Control
+        </div>
+        <div class="chip-group">
+          <div class="chip" onclick="this.classList.toggle('active')">
+            <span class="material-icons-outlined">tune</span>
+            Override Mode
+          </div>
+          <div class="chip active">
+            <span class="material-icons-outlined">smart_toy</span>
+            AI Assist
+          </div>
+          <div class="chip">
+            <span class="material-icons-outlined">history</span>
+            Audit Trail
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Proposal Builder View -->
+      <div class="view active" id="view-proposal">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Proposal Builder</h1>
+          <p class="workflow-subtitle">End-to-end intelligent proposal generation workflow</p>
+        </div>
+
+        <!-- Workflow Steps -->
+        <div class="workflow-steps">
+          <div class="workflow-step completed" data-step="intake">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">check</span>
+              </div>
+              <span class="step-name">1. Intake</span>
+            </div>
+            <div class="step-desc">Customer requirements captured</div>
+          </div>
+          <div class="workflow-step active" data-step="design">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">architecture</span>
+              </div>
+              <span class="step-name">2. Solution Design</span>
+            </div>
+            <div class="step-desc">AI-optimized technical solution</div>
+          </div>
+          <div class="workflow-step" data-step="pricing">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">calculate</span>
+              </div>
+              <span class="step-name">3. Pricing</span>
+            </div>
+            <div class="step-desc">CapEx & OpEx modeling</div>
+          </div>
+          <div class="workflow-step" data-step="esg">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">eco</span>
+              </div>
+              <span class="step-name">4. ESG Analysis</span>
+            </div>
+            <div class="step-desc">Sustainability optimization</div>
+          </div>
+          <div class="workflow-step" data-step="generate">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">auto_awesome</span>
+              </div>
+              <span class="step-name">5. Generate</span>
+            </div>
+            <div class="step-desc">Final proposal output</div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <!-- Input Specifications Panel -->
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">input</span>
+                Input Specifications
+              </div>
+              <span class="panel-badge">Step 1</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Industry Sector</label>
+              <select class="form-input" id="sector">
+                <option value="pharmaceutical">Pharmaceutical</option>
+                <option value="foodBeverage">Food & Beverage</option>
+                <option value="power">Power Generation</option>
+                <option value="municipal">Municipal</option>
+                <option value="oilGas">Oil & Gas</option>
+                <option value="semiconductor">Semiconductor</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Flow Rate (m³/h)</label>
+                <input type="number" class="form-input" id="flowRate" value="200" placeholder="Enter flow rate">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Operating Hours</label>
+                <input type="number" class="form-input" id="opHours" value="8000" placeholder="Hours/year">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Feed Water Quality</label>
+              <div class="form-row three-cols">
+                <input type="number" class="form-input" placeholder="TDS (mg/L)" value="1500">
+                <input type="number" class="form-input" placeholder="TSS (mg/L)" value="50">
+                <input type="number" class="form-input" placeholder="BOD (mg/L)" value="120">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Required Output Quality</label>
+              <div class="form-row three-cols">
+                <input type="number" class="form-input" placeholder="TDS (mg/L)" value="10">
+                <input type="number" class="form-input" placeholder="TSS (mg/L)" value="0.1">
+                <input type="number" class="form-input" placeholder="BOD (mg/L)" value="1">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Installation Type</label>
+              <div class="chip-group">
+                <div class="chip active">
+                  <span class="material-icons-outlined">domain</span>
+                  Fixed Installation
+                </div>
+                <div class="chip">
+                  <span class="material-icons-outlined">view_in_ar</span>
+                  Containerized
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optional Modules</label>
+              <div class="chip-group">
+                <div class="chip active">UV Disinfection</div>
+                <div class="chip">Pre-filtration</div>
+                <div class="chip active">Chemical Dosing</div>
+                <div class="chip">Remote Monitoring</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Solution Design Panel -->
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">smart_toy</span>
+                AI Solution Design
+              </div>
+              <span class="panel-badge">Optimizing</span>
+            </div>
+
+            <div class="ai-processing">
+              <div class="ai-spinner"></div>
+              <span class="ai-text">Analyzing 847 possible configurations...</span>
+            </div>
+
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">
+              Recommended technology train based on your specifications:
+            </p>
+
+            <div class="tech-grid">
+              <div class="tech-card recommended selected">
+                <div class="tech-name">UF</div>
+                <div class="tech-full">Ultrafiltration</div>
+                <div class="tech-stats">
+                  <div class="tech-stat">TSS: <span class="tech-stat-value">99%</span></div>
+                  <div class="tech-stat">Energy: <span class="tech-stat-value">0.3 kWh/m³</span></div>
+                </div>
+              </div>
+              <div class="tech-card selected">
+                <div class="tech-name">RO</div>
+                <div class="tech-full">Reverse Osmosis</div>
+                <div class="tech-stats">
+                  <div class="tech-stat">TDS: <span class="tech-stat-value">97%</span></div>
+                  <div class="tech-stat">Energy: <span class="tech-stat-value">2.5 kWh/m³</span></div>
+                </div>
+              </div>
+              <div class="tech-card selected">
+                <div class="tech-name">UV</div>
+                <div class="tech-full">UV Disinfection</div>
+                <div class="tech-stats">
+                  <div class="tech-stat">Log: <span class="tech-stat-value">4-6</span></div>
+                  <div class="tech-stat">Energy: <span class="tech-stat-value">0.1 kWh/m³</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:18px">check_circle</span>
+                <span style="font-size:13px;font-weight:600;color:var(--success)">Solution Validated</span>
+              </div>
+              <p style="font-size:12px;color:var(--muted);margin:0">
+                UF + RO + UV train meets all output quality requirements with 89% confidence.
+                Expected water recovery: 82%. Total energy: 2.9 kWh/m³.
+              </p>
+            </div>
+
+            <!-- Engineer Override -->
+            <div class="override-panel">
+              <div class="override-header">
+                <span class="material-icons-outlined">engineering</span>
+                <span class="override-title">Engineer Override</span>
+              </div>
+              <textarea class="override-note" placeholder="Add manual adjustments or override AI recommendations..."></textarea>
+            </div>
+          </div>
+
+          <!-- Decision Trail Panel -->
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">account_tree</span>
+                Decision Trail
+              </div>
+              <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">
+                <span class="material-icons-outlined" style="font-size:14px">download</span>
+                Export Audit
+              </button>
+            </div>
+
+            <div class="decision-trail">
+              <div class="decision-item">
+                <div class="decision-time">14:32:01</div>
+                <div class="decision-content">
+                  <div class="decision-action">Selected UF as pre-treatment</div>
+                  <div class="decision-reason">High TSS in feed water (50 mg/L) requires membrane protection. UF provides 99% TSS removal.</div>
+                </div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-time">14:32:02</div>
+                <div class="decision-content">
+                  <div class="decision-action">Selected RO for desalination</div>
+                  <div class="decision-reason">TDS reduction requirement (1500 → 10 mg/L) requires 99.3% rejection. RO achieves 97% per pass.</div>
+                </div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-time">14:32:03</div>
+                <div class="decision-content">
+                  <div class="decision-action">Added UV disinfection</div>
+                  <div class="decision-reason">Pharmaceutical sector requires validated disinfection. UV selected per customer module preference.</div>
+                </div>
+              </div>
+              <div class="decision-item">
+                <div class="decision-time">14:32:04</div>
+                <div class="decision-content">
+                  <div class="decision-action">Rejected MBR option</div>
+                  <div class="decision-reason">BOD/COD removal not primary concern for this application. UF + RO more cost-effective.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary">
+            <span class="material-icons-outlined">arrow_back</span>
+            Previous Step
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary">Save Draft</button>
+            <button class="btn btn-primary" onclick="nextStep()">
+              Continue to Pricing
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solutions View -->
+      <div class="view" id="view-solutions">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Solution Design & Comparison</h1>
+          <p class="workflow-subtitle">Compare and rank optimized treatment solutions</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Solutions Analyzed</div>
+            <div class="metric-value accent">847</div>
+            <div class="metric-change positive">
+              <span class="material-icons-outlined" style="font-size:14px">trending_up</span>
+              Multi-objective optimization
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Top Confidence</div>
+            <div class="metric-value success">89%</div>
+            <div class="metric-change positive">
+              <span class="material-icons-outlined" style="font-size:14px">verified</span>
+              Auto-approve threshold
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Best Water Recovery</div>
+            <div class="metric-value accent2">85%</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">water_drop</span>
+              Above industry avg
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Min Energy</div>
+            <div class="metric-value warning">2.8 kWh/m³</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">bolt</span>
+              Optimized selection
+            </div>
+          </div>
+        </div>
+
+        <div class="content-panel full-width">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="material-icons-outlined">compare</span>
+              Ranked Solutions
+            </div>
+          </div>
+
+          <table class="solution-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Technology Train</th>
+                <th>CapEx Est.</th>
+                <th>OpEx/yr</th>
+                <th>Water Recovery</th>
+                <th>Energy</th>
+                <th>ESG Score</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="solution-rank rank-1">1</span></td>
+                <td><strong>UF + RO + UV</strong></td>
+                <td>£1.2M</td>
+                <td>£185K</td>
+                <td>82%</td>
+                <td>2.9 kWh/m³</td>
+                <td style="color:var(--esg-green)">85</td>
+                <td>
+                  <div class="confidence-bar"><div class="confidence-fill confidence-high" style="width:89%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">89%</span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="solution-rank rank-2">2</span></td>
+                <td><strong>MBR + RO</strong></td>
+                <td>£1.45M</td>
+                <td>£210K</td>
+                <td>78%</td>
+                <td>3.3 kWh/m³</td>
+                <td style="color:var(--esg-green)">82</td>
+                <td>
+                  <div class="confidence-bar"><div class="confidence-fill confidence-high" style="width:82%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">82%</span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="solution-rank rank-3">3</span></td>
+                <td><strong>DAF + UF + RO</strong></td>
+                <td>£1.35M</td>
+                <td>£195K</td>
+                <td>80%</td>
+                <td>2.85 kWh/m³</td>
+                <td style="color:var(--esg-green)">79</td>
+                <td>
+                  <div class="confidence-bar"><div class="confidence-fill confidence-medium" style="width:76%"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">76%</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="content-grid" style="margin-top:20px">
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">tune</span>
+                Vendor Selection
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+              Include or exclude specific vendors in the solution:
+            </p>
+            <div class="chip-group">
+              <div class="chip active">Pentair</div>
+              <div class="chip active">Koch</div>
+              <div class="chip active">Dow FilmTec</div>
+              <div class="chip">Toray</div>
+              <div class="chip active">Suez</div>
+              <div class="chip">Xylem</div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">balance</span>
+                Optimization Weights
+              </div>
+            </div>
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Cost Priority</span>
+                <span class="range-value">40%</span>
+              </div>
+              <input type="range" value="40" min="0" max="100">
+            </div>
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">ESG Priority</span>
+                <span class="range-value">35%</span>
+              </div>
+              <input type="range" value="35" min="0" max="100">
+            </div>
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Technical Risk</span>
+                <span class="range-value">25%</span>
+              </div>
+              <input type="range" value="25" min="0" max="100">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing View -->
+      <div class="view" id="view-pricing">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Pricing Intelligence</h1>
+          <p class="workflow-subtitle">Dynamic CapEx & OpEx modeling with market intelligence</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Total CapEx</div>
+            <div class="metric-value accent">£1.24M</div>
+            <div class="metric-change">Base equipment + installation</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Annual OpEx</div>
+            <div class="metric-value warning">£185K</div>
+            <div class="metric-change">Energy + chemicals + labor</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">10yr NPV</div>
+            <div class="metric-value accent2">£2.89M</div>
+            <div class="metric-change">At 8% discount rate</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Recommended Price</div>
+            <div class="metric-value success">£1.49M</div>
+            <div class="metric-change positive">20% margin</div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">pie_chart</span>
+                CapEx Breakdown
+              </div>
+            </div>
+
+            <div class="cost-bar">
+              <div class="cost-segment" style="width:45%;background:var(--accent)">Equipment</div>
+              <div class="cost-segment" style="width:25%;background:var(--accent2)">Install</div>
+              <div class="cost-segment" style="width:15%;background:var(--accent3)">Controls</div>
+              <div class="cost-segment" style="width:15%;background:var(--warning)">Other</div>
+            </div>
+
+            <div class="cost-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent)"></div>
+                <span>Equipment £558K</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent2)"></div>
+                <span>Installation £310K</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent3)"></div>
+                <span>Controls £186K</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--warning)"></div>
+                <span>Other £186K</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">trending_up</span>
+                OpEx Projection (10yr)
+              </div>
+            </div>
+
+            <div id="opex-chart" style="height:200px;display:flex;align-items:flex-end;gap:8px;padding:20px 0">
+              <!-- Simple bar chart -->
+            </div>
+
+            <div class="cost-legend" style="margin-top:16px">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent)"></div>
+                <span>Energy (42%)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent2)"></div>
+                <span>Chemicals (28%)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--warning)"></div>
+                <span>Maintenance (18%)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--muted)"></div>
+                <span>Labor (12%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">sell</span>
+                Pricing Strategy
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Contract Model</label>
+              <div class="chip-group">
+                <div class="chip active">CapEx Sale</div>
+                <div class="chip">BOO</div>
+                <div class="chip">BOT</div>
+                <div class="chip">Service</div>
+              </div>
+            </div>
+
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Target Margin</span>
+                <span class="range-value">20%</span>
+              </div>
+              <input type="range" value="20" min="10" max="40">
+            </div>
+
+            <div style="padding:12px;background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.3)">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Win Probability Model</div>
+              <div style="font-size:18px;font-weight:700;color:var(--accent)">72% @ £1.49M</div>
+              <div style="font-size:11px;color:var(--muted)">Based on segment history + competitive positioning</div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">analytics</span>
+                Component Pricing
+              </div>
+            </div>
+
+            <table class="solution-table" style="font-size:12px">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Vendor</th>
+                  <th>Unit Cost</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>UF Modules</td>
+                  <td>Pentair</td>
+                  <td>£12,500</td>
+                  <td>16</td>
+                  <td>£200,000</td>
+                </tr>
+                <tr>
+                  <td>RO Membranes</td>
+                  <td>Dow FilmTec</td>
+                  <td>£850</td>
+                  <td>120</td>
+                  <td>£102,000</td>
+                </tr>
+                <tr>
+                  <td>HP Pumps</td>
+                  <td>Grundfos</td>
+                  <td>£28,000</td>
+                  <td>4</td>
+                  <td>£112,000</td>
+                </tr>
+                <tr>
+                  <td>UV System</td>
+                  <td>Trojan</td>
+                  <td>£45,000</td>
+                  <td>2</td>
+                  <td>£90,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESG View -->
+      <div class="view" id="view-esg">
+        <div class="workflow-header">
+          <h1 class="workflow-title">ESG Optimization</h1>
+          <p class="workflow-subtitle">Environmental, Social, and Governance analysis</p>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">speed</span>
+                ESG Performance Dashboard
+              </div>
+            </div>
+
+            <div class="esg-gauges">
+              <div class="esg-gauge water">
+                <div class="gauge-ring">
+                  <svg viewBox="0 0 80 80">
+                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
+                    <circle class="gauge-fill" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="36"></circle>
+                  </svg>
+                  <div class="gauge-value" style="color:var(--esg-blue)">82%</div>
+                </div>
+                <div class="esg-label">Water Recovery</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px">
+                  328K m³/yr saved
+                </div>
+              </div>
+
+              <div class="esg-gauge carbon">
+                <div class="gauge-ring">
+                  <svg viewBox="0 0 80 80">
+                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
+                    <circle class="gauge-fill" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="50"></circle>
+                  </svg>
+                  <div class="gauge-value" style="color:var(--esg-green)">75%</div>
+                </div>
+                <div class="esg-label">Carbon Reduction</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px">
+                  1,240 tCO₂e/yr avoided
+                </div>
+              </div>
+
+              <div class="esg-gauge energy">
+                <div class="gauge-ring">
+                  <svg viewBox="0 0 80 80">
+                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
+                    <circle class="gauge-fill" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="42"></circle>
+                  </svg>
+                  <div class="gauge-value" style="color:var(--esg-purple)">79%</div>
+                </div>
+                <div class="esg-label">Energy Efficiency</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:4px">
+                  2.9 kWh/m³ vs 4.5 baseline
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">balance</span>
+                ESG Priority Weights
+              </div>
+            </div>
+
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Water Stewardship</span>
+                <span class="range-value">40%</span>
+              </div>
+              <input type="range" value="40" min="0" max="100">
+            </div>
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Carbon Footprint</span>
+                <span class="range-value">35%</span>
+              </div>
+              <input type="range" value="35" min="0" max="100">
+            </div>
+            <div class="range-group">
+              <div class="range-header">
+                <span class="range-label">Energy Intensity</span>
+                <span class="range-value">25%</span>
+              </div>
+              <input type="range" value="25" min="0" max="100">
+            </div>
+
+            <button class="btn btn-secondary" style="width:100%;margin-top:16px">
+              <span class="material-icons-outlined">refresh</span>
+              Recalculate with New Weights
+            </button>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">verified</span>
+                ESG Compliance
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
+                <span style="font-size:12px">ISO 14001 Aligned</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
+                <span style="font-size:12px">GRI Standards Ready</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
+                <span style="font-size:12px">CDP Water Security</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,0.1);border-radius:8px;border:1px solid rgba(245,158,11,0.3)">
+                <span class="material-icons-outlined" style="color:var(--warning)">info</span>
+                <span style="font-size:12px">SASB Metrics: Partial</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">compare_arrows</span>
+                Trade-off Analysis
+              </div>
+            </div>
+
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+              Compare cost-optimized vs ESG-optimized solutions:
+            </p>
+
+            <table class="solution-table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>CapEx</th>
+                  <th>OpEx/yr</th>
+                  <th>Water Recovery</th>
+                  <th>Carbon</th>
+                  <th>ESG Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Cost Optimized</strong></td>
+                  <td>£1.15M</td>
+                  <td>£175K</td>
+                  <td>78%</td>
+                  <td>1,450 tCO₂e</td>
+                  <td style="color:var(--warning)">68</td>
+                </tr>
+                <tr style="background:rgba(34,197,94,0.08)">
+                  <td><strong>Balanced (Selected)</strong></td>
+                  <td>£1.24M</td>
+                  <td>£185K</td>
+                  <td>82%</td>
+                  <td>1,240 tCO₂e</td>
+                  <td style="color:var(--esg-green)">85</td>
+                </tr>
+                <tr>
+                  <td><strong>ESG Maximized</strong></td>
+                  <td>£1.45M</td>
+                  <td>£165K</td>
+                  <td>88%</td>
+                  <td>980 tCO₂e</td>
+                  <td style="color:var(--success)">94</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generate Proposal View -->
+      <div class="view" id="view-generate">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Generate Proposal</h1>
+          <p class="workflow-subtitle">Review and export your complete technical and commercial proposal</p>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">checklist</span>
+                Pre-flight Checklist
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Customer Requirements</div>
+                  <div style="font-size:11px;color:var(--muted)">All specifications captured</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Technical Solution</div>
+                  <div style="font-size:11px;color:var(--muted)">UF + RO + UV train validated (89% confidence)</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Pricing Complete</div>
+                  <div style="font-size:11px;color:var(--muted)">CapEx: £1.49M | OpEx: £185K/yr</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600">ESG Analysis</div>
+                  <div style="font-size:11px;color:var(--muted)">Score: 85/100 | Carbon: 1,240 tCO₂e avoided</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.3)">
+                <span class="material-icons-outlined" style="color:var(--accent);font-size:20px">info</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600">Engineer Override</div>
+                  <div style="font-size:11px;color:var(--muted)">No manual overrides applied</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">download</span>
+                Export Options
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="exportProposal('pdf')">
+                <span class="material-icons-outlined">picture_as_pdf</span>
+                Export as PDF
+              </button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;padding:14px" onclick="exportProposal('word')">
+                <span class="material-icons-outlined">description</span>
+                Export as Word Document
+              </button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;padding:14px" onclick="exportProposal('json')">
+                <span class="material-icons-outlined">data_object</span>
+                Export as JSON (API)
+              </button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;padding:14px" onclick="exportProposal('email')">
+                <span class="material-icons-outlined">email</span>
+                Send via Email
+              </button>
+            </div>
+
+            <div style="margin-top:20px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Template Selection</div>
+              <select class="form-input">
+                <option>MembraCon Standard Template</option>
+                <option>Technical Detail Template</option>
+                <option>Executive Summary Only</option>
+                <option>ESG-Focused Template</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">preview</span>
+                Proposal Preview
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">
+                  <span class="material-icons-outlined" style="font-size:14px">edit</span>
+                  Edit
+                </button>
+                <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">
+                  <span class="material-icons-outlined" style="font-size:14px">fullscreen</span>
+                  Full Screen
+                </button>
+              </div>
+            </div>
+
+            <div class="proposal-preview">
+              <div style="text-align:center;margin-bottom:24px">
+                <div style="font-size:28px;font-weight:700;color:#1e40af">MembraCon</div>
+                <div style="font-size:14px;color:#6b7280">Water Treatment Solutions</div>
+              </div>
+
+              <h1>Technical Proposal</h1>
+              <p style="color:#6b7280">
+                <strong>Client:</strong> Riverside Pharmaceuticals Ltd<br>
+                <strong>Reference:</strong> PROP-2026-00142<br>
+                <strong>Date:</strong> 21 January 2026
+              </p>
+
+              <h2>Executive Summary</h2>
+              <p>
+                Based on your requirements for <strong>200 m³/h</strong> purified water production,
+                we propose a comprehensive <strong>UF + RO + UV</strong> treatment system.
+                This solution achieves pharmaceutical-grade water quality with 99.3% TDS rejection
+                and validated disinfection, while maintaining excellent water recovery of 82%.
+              </p>
+              <p>
+                The proposed system offers a compelling ESG profile with 1,240 tonnes CO₂e annual
+                carbon savings and industry-leading energy efficiency at 2.9 kWh/m³.
+              </p>
+
+              <h2>Technical Solution</h2>
+              <table>
+                <tr>
+                  <th>Stage</th>
+                  <th>Technology</th>
+                  <th>Function</th>
+                  <th>Vendor</th>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>Ultrafiltration (UF)</td>
+                  <td>Pre-treatment, particle removal</td>
+                  <td>Pentair X-Flow</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Reverse Osmosis (RO)</td>
+                  <td>Desalination, demineralization</td>
+                  <td>Dow FilmTec BW30</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>UV Disinfection</td>
+                  <td>Validated pathogen inactivation</td>
+                  <td>Trojan UV Swift</td>
+                </tr>
+              </table>
+
+              <h2>Water Quality Performance</h2>
+              <table>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Feed Water</th>
+                  <th>Target</th>
+                  <th>Guaranteed</th>
+                </tr>
+                <tr>
+                  <td>TDS (mg/L)</td>
+                  <td>1,500</td>
+                  <td>&lt;10</td>
+                  <td style="color:#16a34a;font-weight:600">&lt;10</td>
+                </tr>
+                <tr>
+                  <td>TSS (mg/L)</td>
+                  <td>50</td>
+                  <td>&lt;0.1</td>
+                  <td style="color:#16a34a;font-weight:600">&lt;0.1</td>
+                </tr>
+                <tr>
+                  <td>BOD (mg/L)</td>
+                  <td>120</td>
+                  <td>&lt;1</td>
+                  <td style="color:#16a34a;font-weight:600">&lt;1</td>
+                </tr>
+              </table>
+
+              <h2>Commercial Summary</h2>
+              <table>
+                <tr>
+                  <td style="width:70%">Capital Investment (CapEx)</td>
+                  <td style="font-size:18px;font-weight:700;color:#1e40af">£1,490,000</td>
+                </tr>
+                <tr>
+                  <td>Annual Operating Cost (OpEx)</td>
+                  <td style="font-weight:600">£185,000</td>
+                </tr>
+                <tr>
+                  <td>10-Year Total Cost of Ownership</td>
+                  <td style="font-weight:600">£2,890,000</td>
+                </tr>
+                <tr>
+                  <td>Estimated Payback Period</td>
+                  <td style="font-weight:600">3.2 years</td>
+                </tr>
+              </table>
+
+              <h2>ESG Impact</h2>
+              <table>
+                <tr>
+                  <th>Metric</th>
+                  <th>Value</th>
+                  <th>Benchmark</th>
+                </tr>
+                <tr>
+                  <td>Water Recovery</td>
+                  <td>82%</td>
+                  <td style="color:#16a34a">Above industry avg (75%)</td>
+                </tr>
+                <tr>
+                  <td>Carbon Reduction</td>
+                  <td>1,240 tCO₂e/yr</td>
+                  <td style="color:#16a34a">75% vs baseline</td>
+                </tr>
+                <tr>
+                  <td>Energy Efficiency</td>
+                  <td>2.9 kWh/m³</td>
+                  <td style="color:#16a34a">36% better than baseline</td>
+                </tr>
+                <tr style="background:#dbeafe">
+                  <td><strong>Overall ESG Score</strong></td>
+                  <td colspan="2"><strong style="font-size:18px;color:#1e40af">85/100</strong></td>
+                </tr>
+              </table>
+
+              <div style="margin-top:32px;padding:16px;background:#f0fdf4;border-radius:8px;border:1px solid #86efac">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="color:#16a34a;font-size:20px">&#10003;</span>
+                  <strong style="color:#166534">AI Confidence: 89%</strong>
+                </div>
+                <p style="margin:0;font-size:13px;color:#166534">
+                  This proposal was generated by the MembraCon WaterLogic AI system with high confidence.
+                  All technical parameters have been validated against industry standards and historical performance data.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary">
+            <span class="material-icons-outlined">arrow_back</span>
+            Back to ESG
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary">
+              <span class="material-icons-outlined">save</span>
+              Save to Projects
+            </button>
+            <button class="btn btn-success" onclick="finalizeProposal()">
+              <span class="material-icons-outlined">send</span>
+              Finalize & Send
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentation View -->
+      <div class="view" id="view-docs">
+        <div class="workflow-header">
+          <h1 class="workflow-title">System Architecture</h1>
+          <p class="workflow-subtitle">Interactive visualization and documentation for the AI Proposal System</p>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel" style="cursor:pointer" onclick="window.open('ai-proposal-d3.html', '_blank')">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">hub</span>
+                Decision Intelligence Network
+              </div>
+              <span class="material-icons-outlined" style="color:var(--accent)">open_in_new</span>
+            </div>
+            <div style="padding:20px;background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.08));border-radius:12px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
+                <div style="text-align:center">
+                  <div style="font-size:28px;font-weight:700;color:var(--accent)">18</div>
+                  <div style="font-size:11px;color:var(--muted)">Decision Nodes</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:28px;font-weight:700;color:var(--accent2)">26</div>
+                  <div style="font-size:11px;color:var(--muted)">Data Flows</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:28px;font-weight:700;color:var(--accent3)">6</div>
+                  <div style="font-size:11px;color:var(--muted)">Perspectives</div>
+                </div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--muted);margin:0">
+              Interactive D3.js visualization showing the complete system architecture including inputs, core processing, governance, and learning agents.
+            </p>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">description</span>
+                Documentation
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <a href="AI-PROPOSAL-SYSTEM.md" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,0.15);border-radius:10px;border:1px solid var(--line);text-decoration:none;color:var(--text);transition:all 0.15s ease">
+                <span class="material-icons-outlined" style="color:var(--accent)">article</span>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">System Overview</div>
+                  <div style="font-size:11px;color:var(--muted)">Complete architecture documentation</div>
+                </div>
+                <span class="material-icons-outlined" style="font-size:16px;color:var(--muted)">chevron_right</span>
+              </a>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,0.15);border-radius:10px;border:1px solid var(--line)">
+                <span class="material-icons-outlined" style="color:var(--accent2)">calculate</span>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Mathematical Framework</div>
+                  <div style="font-size:11px;color:var(--muted)">Equations & optimization models</div>
+                </div>
+                <span class="material-icons-outlined" style="font-size:16px;color:var(--muted)">chevron_right</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,0.15);border-radius:10px;border:1px solid var(--line)">
+                <span class="material-icons-outlined" style="color:var(--warning)">science</span>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">Technology Catalog</div>
+                  <div style="font-size:11px;color:var(--muted)">UF, MBR, RO, UV, AOP specs</div>
+                </div>
+                <span class="material-icons-outlined" style="font-size:16px;color:var(--muted)">chevron_right</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(0,0,0,0.15);border-radius:10px;border:1px solid var(--line)">
+                <span class="material-icons-outlined" style="color:var(--esg-green)">eco</span>
+                <div style="flex:1">
+                  <div style="font-size:13px;font-weight:600">ESG Framework</div>
+                  <div style="font-size:11px;color:var(--muted)">Sustainability metrics & reporting</div>
+                </div>
+                <span class="material-icons-outlined" style="font-size:16px;color:var(--muted)">chevron_right</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">layers</span>
+                System Components
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+              <div style="padding:16px;background:rgba(99,102,241,0.1);border-radius:12px;border:1px solid rgba(99,102,241,0.3)">
+                <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Inputs Layer</div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px;line-height:1.8">
+                  <li>Customer Case Inputs</li>
+                  <li>Existing Artifacts</li>
+                  <li>Technology Catalog</li>
+                  <li>Historical Context</li>
+                  <li>ESG Framework</li>
+                </ul>
+              </div>
+              <div style="padding:16px;background:rgba(168,85,247,0.1);border-radius:12px;border:1px solid rgba(168,85,247,0.3)">
+                <div style="font-size:13px;font-weight:700;color:var(--accent3);margin-bottom:8px">Core Processing</div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px;line-height:1.8">
+                  <li>Knowledge Graph</li>
+                  <li>Decision Nodes</li>
+                  <li>Simulators</li>
+                  <li>AI Engine</li>
+                  <li>Pricing & ESG</li>
+                </ul>
+              </div>
+              <div style="padding:16px;background:rgba(245,158,11,0.1);border-radius:12px;border:1px solid rgba(245,158,11,0.3)">
+                <div style="font-size:13px;font-weight:700;color:var(--warning);margin-bottom:8px">Governance</div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px;line-height:1.8">
+                  <li>Decision Ledger</li>
+                  <li>Policy Enforcement</li>
+                  <li>Approval Workflows</li>
+                  <li>Audit Trail</li>
+                  <li>Compliance Checks</li>
+                </ul>
+              </div>
+              <div style="padding:16px;background:rgba(34,211,238,0.1);border-radius:12px;border:1px solid rgba(34,211,238,0.3)">
+                <div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:8px">Learning Agents</div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px;line-height:1.8">
+                  <li>Win/Loss Agent</li>
+                  <li>Pricing Agent</li>
+                  <li>Tech Performance</li>
+                  <li>ESG Tracking</li>
+                  <li>Knowledge Ingestion</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update tabs
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update views
+        const viewId = 'view-' + tab.dataset.view;
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+      });
+    });
+
+    // Workflow steps
+    document.querySelectorAll('.workflow-step').forEach(step => {
+      step.addEventListener('click', () => {
+        document.querySelectorAll('.workflow-step').forEach(s => s.classList.remove('active'));
+        step.classList.add('active');
+      });
+    });
+
+    // Technology cards
+    document.querySelectorAll('.tech-card').forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('selected');
+        updateSolutionValidation();
+      });
+    });
+
+    // Chips
+    document.querySelectorAll('.chip').forEach(chip => {
+      if (!chip.closest('.sidebar-section')) { // Don't toggle sidebar chips
+        chip.addEventListener('click', () => {
+          chip.classList.toggle('active');
+        });
+      }
+    });
+
+    // Range sliders
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+      slider.addEventListener('input', (e) => {
+        const value = e.target.value;
+        const label = e.target.parentElement.querySelector('.range-value');
+        if (label) label.textContent = value + '%';
+      });
+    });
+
+    function updateSolutionValidation() {
+      const selected = document.querySelectorAll('.tech-card.selected').length;
+      // Update validation message based on selection
+    }
+
+    function nextStep() {
+      const steps = document.querySelectorAll('.workflow-step');
+      let activeIndex = -1;
+      steps.forEach((step, i) => {
+        if (step.classList.contains('active')) activeIndex = i;
+      });
+
+      if (activeIndex >= 0 && activeIndex < steps.length - 1) {
+        steps[activeIndex].classList.remove('active');
+        steps[activeIndex].classList.add('completed');
+        steps[activeIndex].querySelector('.step-icon').innerHTML =
+          '<span class="material-icons-outlined">check</span>';
+        steps[activeIndex + 1].classList.add('active');
+      }
+    }
+
+    // Initialize OpEx chart
+    function initOpexChart() {
+      const container = document.getElementById('opex-chart');
+      if (!container) return;
+
+      const years = [185, 191, 197, 203, 209, 215, 222, 229, 236, 243];
+      const maxVal = Math.max(...years);
+
+      container.innerHTML = '';
+      years.forEach((val, i) => {
+        const bar = document.createElement('div');
+        bar.style.cssText = `
+          flex: 1;
+          background: linear-gradient(180deg, var(--accent), var(--accent2));
+          border-radius: 4px 4px 0 0;
+          height: ${(val / maxVal) * 100}%;
+          position: relative;
+          transition: all 0.3s ease;
+        `;
+        bar.title = `Year ${i + 1}: £${val}K`;
+
+        // Add year label
+        const label = document.createElement('div');
+        label.style.cssText = `
+          position: absolute;
+          bottom: -20px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 10px;
+          color: var(--muted);
+        `;
+        label.textContent = `Y${i + 1}`;
+        bar.appendChild(label);
+
+        container.appendChild(bar);
+      });
+    }
+
+    // Export proposal
+    function exportProposal(format) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        border-radius: 12px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      `;
+
+      const icons = {
+        pdf: 'picture_as_pdf',
+        word: 'description',
+        json: 'data_object',
+        email: 'email'
+      };
+
+      const labels = {
+        pdf: 'Generating PDF...',
+        word: 'Creating Word document...',
+        json: 'Exporting JSON data...',
+        email: 'Opening email client...'
+      };
+
+      notification.innerHTML = `
+        <span class="material-icons-outlined">${icons[format]}</span>
+        ${labels[format]}
+      `;
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.innerHTML = `
+          <span class="material-icons-outlined">check_circle</span>
+          Export complete!
+        `;
+        notification.style.background = 'var(--success)';
+
+        setTimeout(() => {
+          notification.remove();
+        }, 2000);
+      }, 1500);
+    }
+
+    // Finalize proposal
+    function finalizeProposal() {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      `;
+
+      modal.innerHTML = `
+        <div style="
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          padding: 32px;
+          max-width: 480px;
+          text-align: center;
+          animation: slideIn 0.3s ease;
+        ">
+          <div style="
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--success), #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+          ">
+            <span class="material-icons-outlined" style="font-size:32px;color:#fff">check</span>
+          </div>
+          <h2 style="font-size:20px;margin-bottom:12px">Proposal Finalized!</h2>
+          <p style="font-size:14px;color:var(--muted);margin-bottom:24px">
+            Your proposal has been saved and logged to the decision ledger.
+            Reference: PROP-2026-00142
+          </p>
+          <div style="display:flex;gap:12px;justify-content:center">
+            <button class="btn btn-secondary" onclick="this.closest('div').parentElement.remove()">
+              Close
+            </button>
+            <button class="btn btn-primary" onclick="window.print()">
+              <span class="material-icons-outlined">print</span>
+              Print
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+      });
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initOpexChart();
+
+      // Simulate AI processing
+      setTimeout(() => {
+        const processing = document.querySelector('.ai-processing');
+        if (processing) {
+          processing.innerHTML = `
+            <span class="material-icons-outlined" style="color:var(--success);font-size:24px">check_circle</span>
+            <span class="ai-text" style="color:var(--success)">Optimization complete - 3 solutions ranked</span>
+          `;
+        }
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
