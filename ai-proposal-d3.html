@@ -95,6 +95,34 @@
       letter-spacing:.2px;
       color:rgba(234,240,255,.92);
     }
+    .flow-toggle{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:5px 10px;
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:8px;
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+      transition: all .15s ease;
+      margin-left:auto;
+      margin-right:8px;
+    }
+    .flow-toggle:hover{
+      background:rgba(255,255,255,.1);
+      color:var(--text);
+    }
+    .flow-toggle.active{
+      background:linear-gradient(135deg, rgba(124,92,255,.25), rgba(53,208,186,.20));
+      border-color:rgba(124,92,255,.5);
+      color:var(--text);
+    }
+    .flow-toggle .material-icons-outlined{
+      font-size:14px;
+    }
     .panel .content{
       padding:12px;
       overflow:auto;
@@ -1073,6 +1101,29 @@
       stroke-width: 1.4;
       stroke-dasharray: 6 3;
     }
+
+    /* Flow particle animations */
+    .flow-particle {
+      pointer-events: none;
+    }
+    .flow-particle.context {
+      fill: rgba(159, 176, 208, 0.9);
+    }
+    .flow-particle.core {
+      fill: rgba(124, 92, 255, 0.95);
+    }
+    .flow-particle.gov {
+      fill: rgba(255, 183, 77, 0.9);
+    }
+    .flow-particle.learning {
+      fill: rgba(53, 208, 186, 0.95);
+    }
+
+    @keyframes particle-pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
     .node .shape{
       filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
       cursor: pointer;
@@ -1280,6 +1331,10 @@
     <section class="panel" id="graphPanel">
       <div class="top">
         <h2>Execution Flow Sequence</h2>
+        <button id="flowToggle" class="flow-toggle active" title="Toggle flow animation">
+          <span class="material-icons-outlined">waves</span>
+          <span class="label">Flow</span>
+        </button>
         <span class="badge" id="statusBadge">Ready</span>
       </div>
       <div class="content" style="padding:0;">
@@ -2729,6 +2784,194 @@
       event.subject.fy = null;
     }
 
+    // ---------- Flow Animation System ----------
+    // Creates animated particles flowing along edges to show data/information flow
+    const flowParticlesGroup = g.append("g").attr("class", "flow-particles");
+    let flowAnimationActive = true;
+    let flowVisibleNodes = null; // null means all nodes visible, Set means filtered
+
+    // Particle configuration per link type
+    const PARTICLE_CONFIG = {
+      context: { speed: 2200, interval: 1800, radius: 3, trail: true },
+      core: { speed: 1800, interval: 1200, radius: 4, trail: true },
+      gov: { speed: 2500, interval: 2200, radius: 3, trail: false },
+      learning: { speed: 2000, interval: 1500, radius: 3.5, trail: true }
+    };
+
+    // Get the path element for a specific link
+    function getLinkPath(linkData) {
+      return linkSel.filter(d => d.key === linkData.key).node();
+    }
+
+    // Animate a single particle along a path
+    function animateParticle(linkData) {
+      if (!flowAnimationActive) return;
+
+      // Skip if either endpoint is not visible in current perspective
+      if (flowVisibleNodes !== null) {
+        const srcId = typeof linkData.source === 'object' ? linkData.source.id : linkData.source;
+        const tgtId = typeof linkData.target === 'object' ? linkData.target.id : linkData.target;
+        if (!flowVisibleNodes.has(srcId) || !flowVisibleNodes.has(tgtId)) {
+          return;
+        }
+      }
+
+      const pathEl = getLinkPath(linkData);
+      if (!pathEl) return;
+
+      const config = PARTICLE_CONFIG[linkData.type] || PARTICLE_CONFIG.context;
+      const pathLength = pathEl.getTotalLength();
+      if (pathLength < 10) return;
+
+      // Create particle with glow effect
+      const particle = flowParticlesGroup.append("circle")
+        .attr("class", `flow-particle ${linkData.type}`)
+        .attr("r", config.radius)
+        .attr("filter", "url(#particle-glow)");
+
+      // Optional trailing particle for emphasis
+      let trail = null;
+      if (config.trail) {
+        trail = flowParticlesGroup.append("circle")
+          .attr("class", `flow-particle ${linkData.type}`)
+          .attr("r", config.radius * 0.6)
+          .attr("opacity", 0.5);
+      }
+
+      // Animate from start (source) to end (target)
+      const startTime = performance.now();
+      const duration = config.speed;
+
+      function updateParticle(currentTime) {
+        if (!flowAnimationActive) {
+          particle.remove();
+          if (trail) trail.remove();
+          return;
+        }
+
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease-in-out for smoother flow
+        const easedProgress = progress < 0.5
+          ? 2 * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        try {
+          const point = pathEl.getPointAtLength(easedProgress * pathLength);
+          particle.attr("cx", point.x).attr("cy", point.y);
+
+          // Fade in/out at endpoints
+          const fadeZone = 0.15;
+          let opacity = 1;
+          if (progress < fadeZone) opacity = progress / fadeZone;
+          else if (progress > 1 - fadeZone) opacity = (1 - progress) / fadeZone;
+          particle.attr("opacity", opacity);
+
+          // Trail follows slightly behind
+          if (trail) {
+            const trailProgress = Math.max(0, easedProgress - 0.08);
+            const trailPoint = pathEl.getPointAtLength(trailProgress * pathLength);
+            trail.attr("cx", trailPoint.x).attr("cy", trailPoint.y);
+            trail.attr("opacity", opacity * 0.4);
+          }
+        } catch(e) {
+          // Path may have changed during drag
+          particle.remove();
+          if (trail) trail.remove();
+          return;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(updateParticle);
+        } else {
+          particle.remove();
+          if (trail) trail.remove();
+        }
+      }
+
+      requestAnimationFrame(updateParticle);
+    }
+
+    // Spawn particles at intervals for each link
+    const particleIntervals = [];
+
+    function startFlowAnimation() {
+      flowAnimationActive = true;
+      links.forEach(linkData => {
+        const config = PARTICLE_CONFIG[linkData.type] || PARTICLE_CONFIG.context;
+        // Stagger start times to avoid synchronization
+        const initialDelay = Math.random() * config.interval;
+
+        setTimeout(() => {
+          if (!flowAnimationActive) return;
+          animateParticle(linkData);
+
+          const intervalId = setInterval(() => {
+            if (flowAnimationActive) {
+              animateParticle(linkData);
+            }
+          }, config.interval + Math.random() * 400); // Add jitter
+
+          particleIntervals.push(intervalId);
+        }, initialDelay);
+      });
+    }
+
+    function stopFlowAnimation() {
+      flowAnimationActive = false;
+      particleIntervals.forEach(id => clearInterval(id));
+      particleIntervals.length = 0;
+      flowParticlesGroup.selectAll(".flow-particle").remove();
+    }
+
+    // Update which nodes are visible for flow animation (called by perspective changes)
+    function updateFlowVisibility(visibleNodeSet) {
+      flowVisibleNodes = visibleNodeSet;
+      // Clear existing particles immediately when perspective changes
+      flowParticlesGroup.selectAll(".flow-particle").remove();
+    }
+
+    // Add glow filter for particles
+    defs.append("filter")
+      .attr("id", "particle-glow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%")
+      .html(`
+        <feGaussianBlur stdDeviation="2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      `);
+
+    // Start animation after initial layout stabilizes
+    simulation.on("end", () => {
+      startFlowAnimation();
+    });
+
+    // Also start after a timeout in case simulation doesn't fully settle
+    setTimeout(() => {
+      if (!particleIntervals.length) {
+        startFlowAnimation();
+      }
+    }, 2000);
+
+    // Flow animation toggle button
+    const flowToggleBtn = document.getElementById("flowToggle");
+    flowToggleBtn.addEventListener("click", () => {
+      flowToggleBtn.classList.toggle("active");
+      if (flowToggleBtn.classList.contains("active")) {
+        startFlowAnimation();
+        showToast("Flow animation enabled");
+      } else {
+        stopFlowAnimation();
+        showToast("Flow animation paused");
+      }
+    });
+
     // Background click clears selection
     svg.on("click", () => clearSelection());
 
@@ -2916,6 +3159,9 @@
           return base + emph;
         });
 
+      // Update flow animation visibility
+      updateFlowVisibility(mode === "full" ? null : visible);
+
       // Nudge simulation to settle
       simulation.alpha(0.35).restart();
     }
@@ -3064,6 +3310,8 @@
         nodeSel.attr("display", null).attr("opacity", 1);
         linkSel.attr("display", null);
         layerDescription.style.display = "none";
+        // Enable flow animation on all edges
+        updateFlowVisibility(null);
       } else {
         const visibleNodes = new Set(perspData.nodes);
 
@@ -3084,6 +3332,9 @@
 
         // Update layer description panel
         updateLayerDescription(perspData);
+
+        // Filter flow animation to only visible edges
+        updateFlowVisibility(visibleNodes);
       }
 
       showToast(`Perspective: ${perspData.name}`);
