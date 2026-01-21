@@ -6122,13 +6122,57 @@
       CHLOR: { name: 'Chlorination', recovery: 1.0, energy: 0.05, capex: 20, color: '#f0e68c' }
     };
 
+    // Decision Tree Use Case Scenarios
+    const DECISION_SCENARIOS = [
+      {
+        id: 'food-bev',
+        name: 'Food & Beverage',
+        icon: '🍺',
+        desc: 'High solids, moderate salinity',
+        tss: 200, tds: 800, flow: 150,
+        path: 'DAF → NF → UV'
+      },
+      {
+        id: 'semiconductor',
+        name: 'Semiconductor',
+        icon: '💾',
+        desc: 'Ultra-pure water needed',
+        tss: 30, tds: 3500, flow: 80,
+        path: 'Direct → RO → UV'
+      },
+      {
+        id: 'municipal',
+        name: 'Municipal Reuse',
+        icon: '🏙️',
+        desc: 'Secondary effluent polishing',
+        tss: 80, tds: 1200, flow: 500,
+        path: 'UF → NF → UV'
+      },
+      {
+        id: 'mining',
+        name: 'Mining Wastewater',
+        icon: '⛏️',
+        desc: 'Heavy metals, high TDS',
+        tss: 350, tds: 5000, flow: 200,
+        path: 'DAF → RO → UV'
+      },
+      {
+        id: 'pharma',
+        name: 'Pharmaceutical',
+        icon: '💊',
+        desc: 'WFI-grade water',
+        tss: 15, tds: 400, flow: 50,
+        path: 'Direct → Polish → UV'
+      }
+    ];
+
     function renderDecisionTree(inputs, solution) {
       const container = document.getElementById('sim-pane-decision');
       if (!container) { console.warn('Decision container not found'); return; }
 
       const width = 780, height = 500;
-      const margin = { top: 60, right: 30, bottom: 30, left: 30 };
-      const nodeRadius = 22;
+      const margin = { top: 100, right: 30, bottom: 30, left: 30 };
+      const nodeRadius = 20;
       const tss = inputs.tss || 150;
       const tds = inputs.tds || 2500;
 
@@ -6137,6 +6181,61 @@
       const svg = d3.select(container).append('svg')
         .attr('width', '100%').attr('height', '100%')
         .attr('viewBox', `0 0 ${width} ${height}`);
+
+      // Scenario buttons panel
+      const scenarioPanel = svg.append('g').attr('transform', 'translate(20, 28)');
+      scenarioPanel.append('text').attr('fill', '#6a7a8a').attr('font-size', '10px')
+        .text('USE CASES:');
+
+      DECISION_SCENARIOS.forEach((scenario, i) => {
+        const btnX = 75 + i * 138;
+        const btn = scenarioPanel.append('g')
+          .attr('transform', `translate(${btnX}, -8)`)
+          .attr('cursor', 'pointer')
+          .attr('class', 'scenario-btn');
+
+        // Button background
+        const isActive = Math.abs(tss - scenario.tss) < 20 && Math.abs(tds - scenario.tds) < 200;
+        btn.append('rect')
+          .attr('width', 130).attr('height', 32).attr('rx', 6)
+          .attr('fill', isActive ? 'rgba(0,212,170,.2)' : 'rgba(255,255,255,.05)')
+          .attr('stroke', isActive ? '#00d4aa' : 'rgba(255,255,255,.15)')
+          .attr('stroke-width', isActive ? 2 : 1);
+
+        // Icon and name
+        btn.append('text').attr('x', 8).attr('y', 14)
+          .attr('font-size', '12px').text(scenario.icon);
+        btn.append('text').attr('x', 26).attr('y', 13)
+          .attr('fill', isActive ? '#00d4aa' : '#afc4d8')
+          .attr('font-size', '10px').attr('font-weight', 'bold')
+          .text(scenario.name);
+
+        // Path description
+        btn.append('text').attr('x', 26).attr('y', 25)
+          .attr('fill', '#6a7a8a').attr('font-size', '8px')
+          .text(scenario.path);
+
+        // Click handler - update simulator and re-render
+        btn.on('click', () => {
+          // Update simulator inputs
+          document.getElementById('simTSS').value = scenario.tss;
+          document.getElementById('simTDS').value = scenario.tds;
+          document.getElementById('simFlow').value = scenario.flow;
+          // Re-run simulation
+          runSimulation();
+        });
+
+        // Hover effect
+        btn.on('mouseenter', function() {
+          d3.select(this).select('rect')
+            .transition().duration(150)
+            .attr('fill', 'rgba(0,212,170,.15)');
+        }).on('mouseleave', function() {
+          d3.select(this).select('rect')
+            .transition().duration(150)
+            .attr('fill', isActive ? 'rgba(0,212,170,.2)' : 'rgba(255,255,255,.05)');
+        });
+      });
 
       // Defs
       const defs = svg.append('defs');
@@ -6158,13 +6257,13 @@
       leafGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(255,165,0,.9)');
       leafGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(255,165,0,.6)');
 
-      // Title
-      svg.append('text').attr('x', 20).attr('y', 28).attr('fill', '#afc4d8')
-        .attr('font-size', '14px').attr('font-weight', 'bold')
+      // Title (below scenario buttons)
+      svg.append('text').attr('x', 20).attr('y', 62).attr('fill', '#afc4d8')
+        .attr('font-size', '13px').attr('font-weight', 'bold')
         .text('AI Decision Tree — Technology Selection');
-      svg.append('text').attr('x', 20).attr('y', 48).attr('fill', '#6a7a8a')
-        .attr('font-size', '11px')
-        .text(`TSS: ${tss} mg/L, TDS: ${tds} mg/L — Recommended path highlighted`);
+      svg.append('text').attr('x', 20).attr('y', 78).attr('fill', '#6a7a8a')
+        .attr('font-size', '10px')
+        .text(`Current: TSS=${tss} mg/L, TDS=${tds} mg/L — Click a use case above to explore different paths`);
 
       const mainGroup = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
       const innerWidth = width - margin.left - margin.right;
