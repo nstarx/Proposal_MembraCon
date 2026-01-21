@@ -8,6 +8,9 @@
   <!-- D3 -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+
   <style>
     :root{
       --bg:#0b1020;
@@ -164,6 +167,853 @@
       color:var(--muted);
     }
 
+    /* Perspective tabs */
+    .perspective-tabs{
+      display:flex;
+      gap:4px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:2;
+    }
+    .perspective-tab{
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size:11px;
+      font-weight:600;
+      color:var(--muted);
+      cursor:pointer;
+      transition: all .15s ease;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      pointer-events:auto;
+      position:relative;
+      z-index:1;
+    }
+    .perspective-tab:hover{
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+    }
+    .perspective-tab.active{
+      background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(53,208,186,.20));
+      border-color: rgba(124,92,255,.5);
+      color:var(--text);
+      box-shadow: 0 0 12px rgba(124,92,255,.2);
+    }
+    .perspective-tab .icon{
+      font-size:16px;
+      vertical-align:middle;
+      margin-top:-2px;
+    }
+    .material-icons-outlined, .material-icons, .material-icons-round{
+      font-size:inherit;
+      vertical-align:middle;
+    }
+
+    /* Layer interest panel */
+    .layer-panel{
+      background: rgba(17,27,61,.85);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .layer-panel h4{
+      margin:0 0 8px 0;
+      font-size:12px;
+      font-weight:700;
+      color:var(--accent);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .layer-panel .desc{
+      font-size:12px;
+      line-height:1.55;
+      color:var(--muted);
+      margin:0 0 10px 0;
+    }
+    .layer-panel .nodes-list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .layer-panel .node-chip{
+      padding:5px 10px;
+      border-radius:8px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:11px;
+      color:var(--text);
+      cursor:pointer;
+      transition: all .12s ease;
+    }
+    .layer-panel .node-chip:hover{
+      background: rgba(124,92,255,.2);
+      border-color: rgba(124,92,255,.4);
+    }
+    .layer-panel .node-chip.highlighted{
+      background: rgba(124,92,255,.3);
+      border-color: rgba(124,92,255,.6);
+    }
+
+    /* Perspective details card */
+    .perspective-detail{
+      background: linear-gradient(145deg, rgba(124,92,255,.08), rgba(53,208,186,.05));
+      border:1px solid rgba(124,92,255,.25);
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+    }
+    .perspective-detail h5{
+      margin:0 0 6px 0;
+      font-size:11px;
+      font-weight:700;
+      color:var(--accent2);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .perspective-detail p{
+      margin:0;
+      font-size:12px;
+      line-height:1.5;
+      color:var(--text);
+    }
+
+    /* Simulator Styles */
+    .simulator-overlay{
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      background:rgba(11,16,32,.95);
+      z-index:1000;
+      display:none;
+      overflow:auto;
+    }
+    .simulator-overlay.active{
+      display:block;
+    }
+    .simulator-container{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px;
+    }
+    .simulator-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:16px 0;
+      border-bottom:1px solid rgba(255,255,255,.1);
+      margin-bottom:20px;
+    }
+    .simulator-header h2{
+      margin:0;
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .simulator-close{
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);
+      border-radius:8px;
+      color:var(--text);
+      padding:8px 16px;
+      cursor:pointer;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .simulator-close:hover{
+      background:rgba(255,255,255,.15);
+    }
+    .simulator-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:16px;
+    }
+    .sim-panel{
+      background:rgba(17,27,61,.7);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:14px;
+      padding:16px;
+    }
+    .sim-panel h3{
+      margin:0 0 12px 0;
+      font-size:13px;
+      font-weight:700;
+      color:var(--accent);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .sim-panel h4{
+      margin:16px 0 8px 0;
+      font-size:11px;
+      font-weight:700;
+      color:var(--accent2);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .sim-panel:first-child h3{color:var(--accent);}
+    .sim-panel:nth-child(2) h3{color:var(--warn);}
+    .sim-panel:nth-child(3) h3{color:var(--accent2);}
+
+    .input-group{
+      margin-bottom:12px;
+    }
+    .input-group label{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .input-group input, .input-group select{
+      width:100%;
+      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:8px;
+      background:rgba(0,0,0,.3);
+      color:var(--text);
+      font-size:12px;
+    }
+    .input-group input:focus, .input-group select:focus{
+      outline:none;
+      border-color:var(--accent);
+    }
+    .input-group input[type="range"]{
+      padding:0;
+      height:6px;
+      -webkit-appearance:none;
+      background:rgba(255,255,255,.1);
+      border-radius:3px;
+    }
+    .input-group input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:16px;height:16px;
+      border-radius:50%;
+      background:var(--accent);
+      cursor:pointer;
+    }
+    /* Input field change animations */
+    .input-group input.value-changed,
+    .input-group select.value-changed {
+      animation: inputFlash 0.6s ease-out;
+      border-color: var(--accent2) !important;
+    }
+    @keyframes inputFlash {
+      0% { background: rgba(53,208,186,.2); box-shadow: 0 0 10px rgba(53,208,186,.4); }
+      50% { background: rgba(53,208,186,.4); box-shadow: 0 0 20px rgba(53,208,186,.6); }
+      100% { background: rgba(0,0,0,.3); box-shadow: none; }
+    }
+    .input-group.metric-changed {
+      animation: labelPulse 0.5s ease-out;
+    }
+    @keyframes labelPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .range-labels{
+      display:flex;
+      justify-content:space-between;
+      font-size:10px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .input-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .equation-box{
+      background:rgba(0,0,0,.3);
+      border:1px solid rgba(124,92,255,.3);
+      border-radius:10px;
+      padding:12px;
+      margin:10px 0;
+      font-family:ui-monospace, monospace;
+      font-size:12px;
+      color:var(--accent);
+      overflow-x:auto;
+    }
+    .equation-box .label{
+      font-size:10px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-family:inherit;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .equation-box .result{
+      color:var(--accent2);
+      font-weight:700;
+    }
+
+    .output-metric{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px;
+      margin-bottom:8px;
+    }
+    .output-metric .name{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .output-metric .value{
+      font-size:14px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .output-metric .value.good{color:var(--ok);}
+    .output-metric .value.warn{color:var(--warn);}
+    .output-metric .value.bad{color:var(--bad);}
+
+    .progress-bar{
+      height:8px;
+      background:rgba(255,255,255,.1);
+      border-radius:4px;
+      overflow:hidden;
+      margin-top:6px;
+    }
+    .progress-bar .fill{
+      height:100%;
+      border-radius:4px;
+      transition:width .3s ease;
+    }
+    .progress-bar .fill.green{background:linear-gradient(90deg,var(--ok),var(--accent2));}
+    .progress-bar .fill.yellow{background:linear-gradient(90deg,var(--warn),#f59e0b);}
+    .progress-bar .fill.purple{background:linear-gradient(90deg,var(--accent),#a855f7);}
+    .progress-bar .fill.blue{background:linear-gradient(90deg,#3b82f6,var(--accent2));}
+
+    .tech-recommendation{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px;
+      background:linear-gradient(135deg,rgba(124,92,255,.15),rgba(53,208,186,.1));
+      border:1px solid rgba(124,92,255,.3);
+      border-radius:12px;
+      margin-bottom:10px;
+    }
+    .tech-recommendation .rank{
+      width:28px;height:28px;
+      border-radius:50%;
+      background:var(--accent);
+      color:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:12px;
+    }
+    .tech-recommendation .info{flex:1;}
+    .tech-recommendation .tech-name{
+      font-weight:700;
+      font-size:13px;
+      color:var(--text);
+    }
+    .tech-recommendation .tech-score{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .tech-recommendation .confidence{
+      font-size:12px;
+      font-weight:600;
+      color:var(--accent2);
+    }
+
+    .constraint-status{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:8px;
+      margin-bottom:6px;
+      font-size:11px;
+    }
+    .constraint-status.pass{
+      background:rgba(74,222,128,.1);
+      border:1px solid rgba(74,222,128,.3);
+      color:var(--ok);
+    }
+    .constraint-status.fail{
+      background:rgba(251,113,133,.1);
+      border:1px solid rgba(251,113,133,.3);
+      color:var(--bad);
+    }
+    .constraint-status .material-icons-outlined{font-size:16px;}
+
+    .sim-button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),#a855f7);
+      color:white;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top:16px;
+      transition:transform .1s ease, box-shadow .2s ease;
+    }
+    .sim-button:hover{
+      transform:translateY(-1px);
+      box-shadow:0 4px 20px rgba(124,92,255,.4);
+    }
+
+    .vector-display{
+      display:flex;
+      flex-wrap:wrap;
+      gap:4px;
+      margin:8px 0;
+    }
+    .vector-display .v{
+      padding:4px 8px;
+      background:rgba(124,92,255,.2);
+      border:1px solid rgba(124,92,255,.4);
+      border-radius:6px;
+      font-family:monospace;
+      font-size:10px;
+      color:var(--accent);
+    }
+
+    /* Blinking/Change animation effects */
+    @keyframes valuePulse {
+      0% { background: rgba(53,208,186,.4); transform: scale(1); }
+      50% { background: rgba(53,208,186,.7); transform: scale(1.05); }
+      100% { background: rgba(53,208,186,.4); transform: scale(1); }
+    }
+    @keyframes valueFlash {
+      0% { color: var(--accent2); text-shadow: 0 0 10px var(--accent2); }
+      50% { color: #fff; text-shadow: 0 0 20px var(--accent2), 0 0 30px var(--accent); }
+      100% { color: var(--accent2); text-shadow: 0 0 10px var(--accent2); }
+    }
+    @keyframes borderGlow {
+      0% { border-color: rgba(53,208,186,.4); box-shadow: 0 0 5px rgba(53,208,186,.2); }
+      50% { border-color: rgba(53,208,186,.9); box-shadow: 0 0 15px rgba(53,208,186,.5); }
+      100% { border-color: rgba(53,208,186,.4); box-shadow: 0 0 5px rgba(53,208,186,.2); }
+    }
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateX(-10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    .value-changed {
+      animation: valueFlash 0.6s ease-out;
+    }
+    .box-changed {
+      animation: borderGlow 0.8s ease-out;
+    }
+    .metric-changed {
+      animation: valuePulse 0.5s ease-out;
+    }
+    .vector-changed {
+      animation: slideIn 0.3s ease-out;
+    }
+    .constraint-changed {
+      animation: borderGlow 0.5s ease-out;
+    }
+
+    /* Scenario player */
+    .scenario-player {
+      background: linear-gradient(135deg, rgba(124,92,255,.15), rgba(53,208,186,.1));
+      border: 1px solid rgba(124,92,255,.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .scenario-player h4 {
+      margin: 0 0 10px 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scenario-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .scenario-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .15s ease;
+    }
+    .scenario-btn:hover {
+      background: rgba(255,255,255,.1);
+    }
+    .scenario-btn.active {
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-color: transparent;
+    }
+    .scenario-btn .material-icons-outlined {
+      font-size: 16px;
+    }
+    .scenario-timeline {
+      position: relative;
+      height: 6px;
+      background: rgba(255,255,255,.1);
+      border-radius: 3px;
+      margin: 12px 0;
+      cursor: pointer;
+    }
+    .scenario-timeline .progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+    .scenario-timeline .marker {
+      position: absolute;
+      top: -4px;
+      width: 14px;
+      height: 14px;
+      background: var(--accent2);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      cursor: grab;
+      transition: transform 0.1s ease;
+    }
+    .scenario-timeline .marker:hover {
+      transform: translateX(-50%) scale(1.2);
+    }
+    .scenario-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .scenario-presets {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .preset-btn {
+      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 6px;
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 10px;
+      cursor: pointer;
+      transition: all .12s ease;
+    }
+    .preset-btn:hover {
+      background: rgba(124,92,255,.2);
+      border-color: rgba(124,92,255,.4);
+      color: var(--text);
+    }
+    .preset-btn.active {
+      background: linear-gradient(135deg, rgba(124,92,255,.4), rgba(53,208,186,.3));
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: 0 0 8px rgba(124,92,255,.3);
+    }
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .speed-control input {
+      flex: 1;
+    }
+
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(74,222,128,.15);
+      border: 1px solid rgba(74,222,128,.4);
+      border-radius: 20px;
+      font-size: 10px;
+      color: var(--ok);
+    }
+    .live-indicator .dot {
+      width: 8px;
+      height: 8px;
+      background: var(--ok);
+      border-radius: 50%;
+      animation: livePulse 1s infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Role-specific view selector */
+    .role-selector {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: rgba(17,27,61,.6);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+    }
+    .role-selector-label {
+      width: 100%;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .role-tab {
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .role-tab:hover {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+    }
+    .role-tab.active {
+      background: linear-gradient(135deg, rgba(124,92,255,.3), rgba(53,208,186,.2));
+      border-color: var(--accent);
+      color: var(--text);
+      box-shadow: 0 0 10px rgba(124,92,255,.25);
+    }
+    .role-tab .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    /* Role-based section visibility */
+    .sim-section {
+      transition: all .3s ease;
+    }
+    .sim-section.dimmed {
+      opacity: 0.25;
+      transform: scale(0.98);
+      pointer-events: none;
+    }
+    .sim-section.highlighted {
+      position: relative;
+    }
+    .sim-section.highlighted::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -8px;
+      right: -8px;
+      bottom: -4px;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
+      opacity: 0.4;
+      pointer-events: none;
+      animation: highlightPulse 2s infinite;
+    }
+    @keyframes highlightPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .role-badge.business { background: rgba(255,176,32,.2); color: #ffb020; }
+    .role-badge.technical { background: rgba(100,149,237,.2); color: #6495ed; }
+    .role-badge.sales { background: rgba(50,205,50,.2); color: #32cd32; }
+    .role-badge.esg { background: rgba(53,208,186,.2); color: #35d0ba; }
+    .role-badge.compliance { background: rgba(255,193,37,.2); color: #ffc125; }
+    .role-badge.operations { background: rgba(0,206,209,.2); color: #00ced1; }
+
+    /* Glossary overlay */
+    .glossary-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(11,16,32,.95);
+      z-index: 1000;
+      display: none;
+      overflow: auto;
+    }
+    .glossary-overlay.active {
+      display: block;
+    }
+    .glossary-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .glossary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      margin-bottom: 24px;
+    }
+    .glossary-header h2 {
+      margin: 0;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent2);
+    }
+    .glossary-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .glossary-section {
+      background: rgba(17,27,61,.6);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .glossary-section h3 {
+      margin: 0 0 16px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .glossary-item {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      padding: 12px;
+      transition: all .15s ease;
+    }
+    .glossary-item:hover {
+      background: rgba(255,255,255,.06);
+      border-color: rgba(124,92,255,.3);
+    }
+    .glossary-item .acronym {
+      display: inline-block;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, rgba(124,92,255,.3), rgba(53,208,186,.2));
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-right: 10px;
+    }
+    .glossary-item .term {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .glossary-item p {
+      margin: 8px 0 0 0;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    /* Acronym tooltips */
+    .acronym-tooltip {
+      position: relative;
+      display: inline;
+      border-bottom: 1px dotted var(--accent2);
+      cursor: help;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .acronym-tooltip::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      background: rgba(17,27,61,.98);
+      border: 1px solid rgba(124,92,255,.4);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text);
+      white-space: nowrap;
+      max-width: 280px;
+      white-space: normal;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all .2s ease;
+      z-index: 1000;
+      pointer-events: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    }
+    .acronym-tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      border: 6px solid transparent;
+      border-top-color: rgba(124,92,255,.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: all .2s ease;
+      z-index: 1001;
+    }
+    .acronym-tooltip:hover::after,
+    .acronym-tooltip:hover::before {
+      opacity: 1;
+      visibility: visible;
+    }
+    .acronym-tooltip:hover::after {
+      transform: translateX(-50%) translateY(-6px);
+    }
+    .acronym-tooltip:hover::before {
+      transform: translateX(-50%) translateY(2px);
+    }
+
     .kbd{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size:11px;
@@ -308,7 +1158,7 @@
     <h1>AI-Native Solution Design & Pricing System — Geodesic Blockchain AI (MembraCon UK)</h1>
     <div class="spacer"></div>
     <div class="hint">
-      Drag nodes · Click a node for details · <span class="kbd">F</span> focus path · <span class="kbd">R</span> reset
+      Drag nodes · Click a node for details · Use Perspective tabs for stakeholder views · <span class="kbd">F</span> focus · <span class="kbd">R</span> reset
     </div>
   </header>
 
@@ -334,6 +1184,48 @@
             <div class="pill" data-mode="learning">Autonomous Agents</div>
             <div class="pill" data-mode="roadmap">Roadmap</div>
           </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="sim-button" id="openSimulator" style="flex:1;">
+              <span class="material-icons-outlined">calculate</span>
+              Math Sim
+            </button>
+            <button class="sim-button" id="openGlossary" style="flex:1;background:linear-gradient(135deg,rgba(53,208,186,.25),rgba(100,149,237,.2));">
+              <span class="material-icons-outlined">menu_book</span>
+              Glossary
+            </button>
+          </div>
+        </div>
+
+        <!-- Layers of Interest Section -->
+        <div class="card">
+          <h3>Layers of Interest</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0 0 10px 0;">
+            View the system from different stakeholder perspectives. Each layer highlights relevant components with role-specific descriptions.
+          </p>
+          <div class="perspective-tabs" id="perspectiveTabs">
+            <div class="perspective-tab active" data-perspective="all">
+              <span class="material-icons-outlined icon">apps</span> All
+            </div>
+            <div class="perspective-tab" data-perspective="business">
+              <span class="material-icons-outlined icon">trending_up</span> Business
+            </div>
+            <div class="perspective-tab" data-perspective="technical">
+              <span class="material-icons-outlined icon">memory</span> Technical
+            </div>
+            <div class="perspective-tab" data-perspective="sales">
+              <span class="material-icons-outlined icon">track_changes</span> Sales
+            </div>
+            <div class="perspective-tab" data-perspective="esg">
+              <span class="material-icons-outlined icon">eco</span> ESG
+            </div>
+            <div class="perspective-tab" data-perspective="compliance">
+              <span class="material-icons-outlined icon">verified_user</span> Compliance
+            </div>
+            <div class="perspective-tab" data-perspective="operations">
+              <span class="material-icons-outlined icon">engineering</span> Operations
+            </div>
+          </div>
+          <div id="layerDescription" class="layer-panel" style="display:none;"></div>
         </div>
 
         <div class="card">
@@ -342,7 +1234,7 @@
             <li><b>Inputs</b>: sector, water analysis, constraints, ESG priorities</li>
             <li><b>Structural intelligence</b>: decision nodes, rules, constraints, simulators</li>
             <li><b>AI engine</b>: multi-objective optimization (cost/margin/ESG/compliance)</li>
-            <li><b>Ledger</b>: immutable “why” trail (explainability, governance, audit)</li>
+            <li><b>Ledger</b>: immutable "why" trail (explainability, governance, audit)</li>
             <li><b>Agents</b>: win/loss, pricing, tech performance, ESG tracking, ingestion</li>
           </ul>
         </div>
@@ -373,10 +1265,12 @@
         </div>
 
         <div class="card">
-          <h3>Keyboard</h3>
+          <h3>Navigation</h3>
           <ul>
-            <li><span class="kbd">F</span> Focus: show only the primary “proposal generation” path</li>
-            <li><span class="kbd">R</span> Reset: show full map again</li>
+            <li><span class="kbd">F</span> Focus: show only the primary "proposal generation" path</li>
+            <li><span class="kbd">R</span> Reset: show full map and clear all filters</li>
+            <li><b>Perspectives:</b> Use tabs above to filter by stakeholder view</li>
+            <li><b>Click nodes:</b> View detailed role descriptions from current perspective</li>
           </ul>
         </div>
       </div>
@@ -426,6 +1320,462 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- SIMULATOR OVERLAY -->
+  <div class="simulator-overlay" id="simulatorOverlay">
+    <div class="simulator-container">
+      <div class="simulator-header">
+        <h2>
+          <span class="material-icons-outlined">calculate</span>
+          Mathematical Simulator — Proposal Generation Engine
+        </h2>
+        <button class="simulator-close" id="closeSimulator">
+          <span class="material-icons-outlined">close</span>
+          Close
+        </button>
+      </div>
+
+      <!-- ROLE SELECTOR -->
+      <div class="role-selector">
+        <div class="role-selector-label">View outputs for:</div>
+        <button class="role-tab active" data-role="all">
+          <span class="material-icons-outlined">apps</span> All
+        </button>
+        <button class="role-tab" data-role="business">
+          <span class="material-icons-outlined">trending_up</span> Business
+        </button>
+        <button class="role-tab" data-role="technical">
+          <span class="material-icons-outlined">memory</span> Technical
+        </button>
+        <button class="role-tab" data-role="sales">
+          <span class="material-icons-outlined">handshake</span> Sales
+        </button>
+        <button class="role-tab" data-role="esg">
+          <span class="material-icons-outlined">eco</span> ESG
+        </button>
+        <button class="role-tab" data-role="compliance">
+          <span class="material-icons-outlined">verified_user</span> Compliance
+        </button>
+        <button class="role-tab" data-role="operations">
+          <span class="material-icons-outlined">engineering</span> Operations
+        </button>
+      </div>
+
+      <!-- SCENARIO PLAYER -->
+      <div class="scenario-player">
+        <h4>
+          <span class="material-icons-outlined">play_circle</span>
+          Interactive Scenario Player
+          <span class="live-indicator" id="liveIndicator" style="display:none;">
+            <span class="dot"></span> LIVE
+          </span>
+        </h4>
+        <div class="scenario-controls">
+          <button class="scenario-btn" id="scenarioPlay">
+            <span class="material-icons-outlined">play_arrow</span> Play
+          </button>
+          <button class="scenario-btn" id="scenarioPause">
+            <span class="material-icons-outlined">pause</span> Pause
+          </button>
+          <button class="scenario-btn" id="scenarioReset">
+            <span class="material-icons-outlined">replay</span> Reset
+          </button>
+          <button class="scenario-btn" id="scenarioStep">
+            <span class="material-icons-outlined">skip_next</span> Step
+          </button>
+        </div>
+        <div class="scenario-timeline" id="scenarioTimeline">
+          <div class="progress" id="scenarioProgress" style="width:0%"></div>
+          <div class="marker" id="scenarioMarker" style="left:0%"></div>
+        </div>
+        <div class="scenario-info">
+          <span id="scenarioTime">0:00</span>
+          <span id="scenarioPhase">Ready</span>
+          <span id="scenarioDuration">Duration: 30s</span>
+        </div>
+        <div class="scenario-presets">
+          <button class="preset-btn" data-scenario="ramp-flow">Ramp Flow Rate</button>
+          <button class="preset-btn" data-scenario="quality-change">Quality Variation</button>
+          <button class="preset-btn" data-scenario="budget-sweep">Budget Sweep</button>
+          <button class="preset-btn" data-scenario="esg-priority">ESG Priority Shift</button>
+          <button class="preset-btn" data-scenario="full-demo">Full Demo</button>
+        </div>
+        <div class="speed-control">
+          <span>Speed:</span>
+          <input type="range" id="scenarioSpeed" min="0.5" max="3" step="0.5" value="1">
+          <span id="speedValue">1x</span>
+        </div>
+      </div>
+
+      <div class="simulator-grid">
+        <!-- INPUT PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">input</span> Input Vector X</h3>
+
+          <div class="input-group">
+            <label>Industry Sector</label>
+            <select id="simSector">
+              <option value="1">Pharmaceutical</option>
+              <option value="2">Food & Beverage</option>
+              <option value="3">Power Generation</option>
+              <option value="4">Municipal</option>
+              <option value="5">Oil & Gas</option>
+              <option value="6">Semiconductor</option>
+            </select>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Flow Rate (m³/h)</label>
+              <input type="number" id="simFlow" value="100" min="1" max="10000">
+            </div>
+            <div class="input-group">
+              <label>Operating Hours/Year</label>
+              <input type="number" id="simHours" value="8000" min="1000" max="8760">
+            </div>
+          </div>
+
+          <h4>Influent Water Quality</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Total Suspended Solids — Particles in water">TSS</span> (mg/L)</label>
+              <input type="number" id="simTSS" value="150" min="0" max="1000">
+            </div>
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Total Dissolved Solids — Dissolved minerals/salts">TDS</span> (mg/L)</label>
+              <input type="number" id="simTDS" value="2500" min="0" max="50000">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Biochemical Oxygen Demand — Organic pollution indicator">BOD</span> (mg/L)</label>
+              <input type="number" id="simBOD" value="200" min="0" max="5000">
+            </div>
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Chemical Oxygen Demand — Total oxidizable matter">COD</span> (mg/L)</label>
+              <input type="number" id="simCOD" value="350" min="0" max="10000">
+            </div>
+          </div>
+
+          <h4>Target Effluent Quality</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Total Suspended Solids — Particles in water">TSS</span> Target (mg/L)</label>
+              <input type="number" id="simTSSTarget" value="5" min="0" max="100">
+            </div>
+            <div class="input-group">
+              <label><span class="acronym-tooltip" data-tooltip="Total Dissolved Solids — Dissolved minerals/salts">TDS</span> Target (mg/L)</label>
+              <input type="number" id="simTDSTarget" value="500" min="0" max="5000">
+            </div>
+          </div>
+
+          <h4><span class="acronym-tooltip" data-tooltip="Environmental, Social, Governance — Sustainability framework">ESG</span> Priority Weights</h4>
+          <div class="input-group">
+            <label>Water Recovery Priority: <span id="waterPriorityVal">50%</span></label>
+            <input type="range" id="simWaterPriority" value="50" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Carbon Reduction Priority: <span id="carbonPriorityVal">30%</span></label>
+            <input type="range" id="simCarbonPriority" value="30" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Energy Efficiency Priority: <span id="energyPriorityVal">20%</span></label>
+            <input type="range" id="simEnergyPriority" value="20" min="0" max="100">
+          </div>
+
+          <h4>Constraints</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Max Footprint (m²)</label>
+              <input type="number" id="simFootprint" value="500" min="10" max="10000">
+            </div>
+            <div class="input-group">
+              <label>Max Budget (£k)</label>
+              <input type="number" id="simBudget" value="2000" min="100" max="50000">
+            </div>
+          </div>
+
+          <button class="sim-button" id="runSimulation">
+            <span class="material-icons-outlined">play_arrow</span>
+            Run Optimization
+          </button>
+        </div>
+
+        <!-- PROCESSING PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">settings</span> Processing & Equations</h3>
+
+          <div class="sim-section" data-roles="technical">
+            <h4>Input Vector Encoding <span class="role-badge technical">Tech</span></h4>
+            <div class="equation-box">
+              <div class="label">X = [x₁, x₂, x₃, ..., xₙ]</div>
+              <div class="vector-display" id="inputVector"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,compliance">
+            <h4>Constraint Satisfaction g(s) ≤ 0 <span class="role-badge technical">Tech</span><span class="role-badge compliance">Comply</span></h4>
+            <div id="constraintChecks"></div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations">
+            <h4>Mass Balance <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span></h4>
+            <div class="equation-box">
+              <div class="label">Qᵢₙ × Cᵢₙ = Qₒᵤₜ × Cₒᵤₜ + Qᵣₑⱼₑ꜀ₜ × Cᵣₑⱼₑ꜀ₜ</div>
+              <div id="massBalanceResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations,esg">
+            <h4>Energy Calculation <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span><span class="role-badge esg">ESG</span></h4>
+            <div class="equation-box">
+              <div class="label"><span class="acronym-tooltip" data-tooltip="Specific Energy — kWh per m³ of water treated">SE</span> = E_total / Q_treated (kWh/m³)</div>
+              <div id="energyResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="business,operations">
+            <h4><span class="acronym-tooltip" data-tooltip="Operational Expenditure — Ongoing running costs">OPEX</span> Estimation <span class="role-badge business">Biz</span><span class="role-badge operations">Ops</span></h4>
+            <div class="equation-box">
+              <div class="label"><span class="acronym-tooltip" data-tooltip="Operational Expenditure — Ongoing running costs">OPEX</span> = (<span class="acronym-tooltip" data-tooltip="Specific Energy — kWh per m³">SE</span> × rate × Q × hours) + Chem + Maint</div>
+              <div id="opexResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,business">
+            <h4>Multi-Objective Optimization <span class="role-badge technical">Tech</span><span class="role-badge business">Biz</span></h4>
+            <div class="equation-box">
+              <div class="label">F(s) = w₁f₁ + w₂f₂ + w₃f₃ + w₄f₄</div>
+              <div id="optimizationResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="sales,business">
+            <h4>Win Probability Model <span class="role-badge sales">Sales</span><span class="role-badge business">Biz</span></h4>
+            <div class="equation-box">
+              <div class="label">P(win) = 1 / (1 + e^(-z))</div>
+              <div id="winProbResult"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">output</span> Output — Proposal P</h3>
+
+          <div class="sim-section" data-roles="technical,sales,operations">
+            <h4>Recommended Technologies <span class="role-badge technical">Tech</span><span class="role-badge sales">Sales</span><span class="role-badge operations">Ops</span></h4>
+            <div id="techRecommendations"></div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations">
+            <h4>System Metrics <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span></h4>
+            <div id="systemMetrics"></div>
+          </div>
+
+          <div class="sim-section" data-roles="business,sales">
+            <h4>Pricing Strategy <span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span></h4>
+            <div id="pricingOutput"></div>
+          </div>
+
+          <div class="sim-section" data-roles="esg,business,sales">
+            <h4><span class="acronym-tooltip" data-tooltip="Environmental, Social, Governance — Sustainability framework">ESG</span> Score <span class="role-badge esg">ESG</span><span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span></h4>
+            <div class="output-metric">
+              <span class="name"><span class="acronym-tooltip" data-tooltip="Environmental, Social, Governance">ESG</span> Composite Score</span>
+              <span class="value good" id="esgScoreOutput">--</span>
+            </div>
+            <div class="progress-bar">
+              <div class="fill green" id="esgBar" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="business,sales,compliance">
+            <h4>Confidence Score <span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span><span class="role-badge compliance">Comply</span></h4>
+            <div class="output-metric">
+              <span class="name">Recommendation Confidence</span>
+              <span class="value" id="confidenceOutput">--</span>
+            </div>
+            <div class="progress-bar">
+              <div class="fill purple" id="confidenceBar" style="width:0%"></div>
+            </div>
+            <div id="confidenceDecision" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
+          </div>
+
+          <div class="sim-section" data-roles="compliance">
+            <h4>Decision Ledger Entry <span class="role-badge compliance">Comply</span></h4>
+            <div class="equation-box" style="border-color:rgba(255,193,37,.4);">
+              <div class="label" style="color:var(--warn);">Blockchain Record Hash</div>
+              <div id="ledgerHash" style="font-size:10px;word-break:break-all;color:var(--muted);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY OVERLAY -->
+  <div class="glossary-overlay" id="glossaryOverlay">
+    <div class="glossary-container">
+      <div class="glossary-header">
+        <h2>
+          <span class="material-icons-outlined">menu_book</span>
+          Glossary of Acronyms
+        </h2>
+        <button class="simulator-close" id="closeGlossary">
+          <span class="material-icons-outlined">close</span>
+          Close
+        </button>
+      </div>
+
+      <div class="glossary-content">
+        <!-- Water Treatment Technologies -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">water_drop</span> Water Treatment Technologies</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item">
+              <span class="acronym">UF</span>
+              <span class="term">Ultrafiltration</span>
+              <p>Membrane filtration process that removes particles, bacteria, and some viruses using pore sizes of 0.01-0.1 microns.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">MBR</span>
+              <span class="term">Membrane Bioreactor</span>
+              <p>Combines biological treatment with membrane filtration for wastewater, integrating activated sludge process with membrane separation.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">RO</span>
+              <span class="term">Reverse Osmosis</span>
+              <p>High-pressure membrane process that removes dissolved salts, minerals, and contaminants at the molecular level.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">UV</span>
+              <span class="term">Ultraviolet</span>
+              <p>Disinfection method using UV light (254nm wavelength) to inactivate pathogens by damaging their DNA.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">AOP</span>
+              <span class="term">Advanced Oxidation Process</span>
+              <p>Chemical treatment using strong oxidants (hydroxyl radicals) to break down organic contaminants and micropollutants.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">TSS</span>
+              <span class="term">Total Suspended Solids</span>
+              <p>Measure of particles suspended in water, typically measured in mg/L. Key indicator of water quality.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">TDS</span>
+              <span class="term">Total Dissolved Solids</span>
+              <p>Measure of dissolved minerals and salts in water, measured in mg/L or ppm. Indicates salinity level.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">BOD</span>
+              <span class="term">Biochemical Oxygen Demand</span>
+              <p>Measure of oxygen required by microorganisms to decompose organic matter. Indicates organic pollution level.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">COD</span>
+              <span class="term">Chemical Oxygen Demand</span>
+              <p>Measure of oxygen required to chemically oxidize organic and inorganic matter. Broader than BOD.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Business & Finance -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">account_balance</span> Business & Finance</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item">
+              <span class="acronym">BOO</span>
+              <span class="term">Build-Own-Operate</span>
+              <p>Contract model where the provider builds, owns, and operates the system. Customer pays for service, not assets.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">BOT</span>
+              <span class="term">Build-Operate-Transfer</span>
+              <p>Provider builds and operates for a period, then transfers ownership to client. Hybrid financing model.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">CAPEX</span>
+              <span class="term">Capital Expenditure</span>
+              <p>Upfront costs for equipment, installation, and commissioning. One-time investment in assets.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">OPEX</span>
+              <span class="term">Operational Expenditure</span>
+              <p>Ongoing costs for running and maintaining the system: energy, chemicals, labor, maintenance.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">ROI</span>
+              <span class="term">Return on Investment</span>
+              <p>Measure of profitability relative to investment cost. (Gain - Cost) / Cost × 100%.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">NPV</span>
+              <span class="term">Net Present Value</span>
+              <p>Present value of future cash flows minus initial investment. Used for project valuation.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">KPI</span>
+              <span class="term">Key Performance Indicator</span>
+              <p>Measurable value tracking business objective achievement. Used for performance monitoring.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">CRM</span>
+              <span class="term">Customer Relationship Management</span>
+              <p>Software for managing customer interactions, sales pipeline, and relationship data.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sustainability & Compliance -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">eco</span> Sustainability & Compliance</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item">
+              <span class="acronym">ESG</span>
+              <span class="term">Environmental, Social, Governance</span>
+              <p>Framework for evaluating sustainability and ethical impact. Key criteria for investors and stakeholders.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">GRI</span>
+              <span class="term">Global Reporting Initiative</span>
+              <p>International standards for sustainability reporting. Most widely used framework globally.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">SASB</span>
+              <span class="term">Sustainability Accounting Standards Board</span>
+              <p>Industry-specific sustainability disclosure standards focused on financial materiality.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">CDP</span>
+              <span class="term">Carbon Disclosure Project</span>
+              <p>Global system for environmental impact disclosure. Companies report climate, water, and forest data.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">LCA</span>
+              <span class="term">Life Cycle Assessment</span>
+              <p>Analysis of environmental impact across product/system lifetime from raw materials to disposal.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">SDG</span>
+              <span class="term">Sustainable Development Goals</span>
+              <p>UN's 17 global goals for sustainable development by 2030. Framework for impact measurement.</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">ISO</span>
+              <span class="term">International Organization for Standardization</span>
+              <p>Publishes international standards. ISO 14001 (environmental), ISO 9001 (quality), ISO 50001 (energy).</p>
+            </div>
+            <div class="glossary-item">
+              <span class="acronym">SE</span>
+              <span class="term">Specific Energy</span>
+              <p>Energy consumption per unit of water treated, measured in kWh/m³. Key efficiency metric.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -622,6 +1972,372 @@
         }
       }
     ];
+
+    // ============ LAYERS OF INTEREST - PERSPECTIVE DATA ============
+    const PERSPECTIVES = {
+      all: {
+        name: "All Components",
+        icon: "apps",
+        color: "rgba(159,176,208,.85)",
+        description: "Complete system view showing all components and their relationships.",
+        nodes: null, // null means show all
+        nodeRoles: {}
+      },
+      business: {
+        name: "Business Leadership",
+        icon: "trending_up",
+        color: "rgba(255,176,32,.85)",
+        description: "Strategic view for executives. Focuses on ROI, competitive advantage, risk management, and organizational transformation. These components directly impact revenue, margins, and strategic positioning.",
+        nodes: ["caseInputs", "aiEngine", "pricing", "proposalOut", "outcomes", "roadmap", "agents", "winLoss"],
+        nodeRoles: {
+          caseInputs: {
+            role: "Revenue Pipeline Entry Point",
+            description: "Every customer inquiry represents potential revenue. This standardizes how opportunities enter the system, enabling accurate pipeline forecasting and ensuring no deal falls through the cracks.",
+            keyMetrics: ["Pipeline velocity", "Lead-to-proposal conversion", "Average deal size"],
+            strategicValue: "Enables data-driven sales forecasting and resource allocation"
+          },
+          aiEngine: {
+            role: "Competitive Differentiator",
+            description: "The AI engine is MembraCon's secret weapon—it processes complex water treatment decisions faster and more consistently than competitors relying on manual expertise. This translates to faster quotes, better margins, and higher win rates.",
+            keyMetrics: ["Proposal turnaround time", "Quote accuracy", "Margin optimization"],
+            strategicValue: "Creates sustainable competitive moat through proprietary decision intelligence"
+          },
+          pricing: {
+            role: "Margin Protection Engine",
+            description: "Eliminates guesswork from pricing decisions. Uses market intelligence and historical win/loss data to find the optimal price point that maximizes both win probability and margin protection.",
+            keyMetrics: ["Average margin %", "Discount frequency", "Price-to-win accuracy"],
+            strategicValue: "Protects profitability while maintaining competitiveness"
+          },
+          proposalOut: {
+            role: "Customer Experience Touchpoint",
+            description: "The proposal is often the first tangible deliverable a customer receives. Quality, speed, and professionalism here directly impact brand perception and deal momentum.",
+            keyMetrics: ["Customer satisfaction", "Revision requests", "Time-to-decision"],
+            strategicValue: "Shapes customer perception and accelerates buying decisions"
+          },
+          outcomes: {
+            role: "Executive Dashboard",
+            description: "Provides C-suite visibility into system performance and business impact. Tracks the metrics that matter: revenue growth, operational efficiency, and strategic differentiation.",
+            keyMetrics: ["Revenue per employee", "Win rate trends", "Customer lifetime value"],
+            strategicValue: "Enables evidence-based strategic planning and board reporting"
+          },
+          roadmap: {
+            role: "Investment & Risk Management",
+            description: "Phased deployment minimizes investment risk while delivering incremental value. Each phase builds on proven success, creating momentum and stakeholder buy-in.",
+            keyMetrics: ["Phase completion", "Budget variance", "Value realization"],
+            strategicValue: "De-risks digital transformation through staged value delivery"
+          },
+          agents: {
+            role: "Organizational Learning Engine",
+            description: "The system gets smarter with every deal. This continuous learning creates compounding returns and builds institutional knowledge that doesn't walk out the door.",
+            keyMetrics: ["Model improvement rate", "Knowledge capture velocity", "Prediction accuracy"],
+            strategicValue: "Transforms tacit expertise into scalable organizational asset"
+          },
+          winLoss: {
+            role: "Market Intelligence Source",
+            description: "Systematic win/loss analysis provides strategic insights into market positioning, competitor dynamics, and customer preferences that inform product and go-to-market strategy.",
+            keyMetrics: ["Win rate by segment", "Loss reason analysis", "Competitive wins"],
+            strategicValue: "Drives strategic decisions with empirical market feedback"
+          }
+        }
+      },
+      technical: {
+        name: "Technical Architecture",
+        icon: "memory",
+        color: "rgba(100,149,237,.85)",
+        description: "System architecture view for engineers and architects. Focuses on integration points, data flows, scalability, and technical implementation details.",
+        nodes: ["knowledgeLayer", "decisionNodes", "simulators", "aiEngine", "ledger", "agents", "ingestion", "techPerf"],
+        nodeRoles: {
+          knowledgeLayer: {
+            role: "Knowledge Graph Engine",
+            description: "A semantic knowledge graph built on property graph technology (Neo4j or similar). Encodes domain expertise as nodes, relationships, and traversal rules. Supports SPARQL-like queries and rule-based inference.",
+            techStack: ["Graph database", "Ontology layer", "Inference engine", "Version control"],
+            integrations: ["ERP systems", "Product catalogs", "Regulatory feeds"],
+            scalability: "Horizontal sharding by domain; eventual consistency acceptable"
+          },
+          decisionNodes: {
+            role: "State Machine Orchestrator",
+            description: "Implements the proposal workflow as a directed acyclic graph (DAG) of decision points. Each node encapsulates business logic, validation rules, and transition conditions. Supports branching, parallelism, and rollback.",
+            techStack: ["Workflow engine", "State management", "Event sourcing", "CQRS pattern"],
+            integrations: ["Knowledge layer", "Simulation services", "Approval systems"],
+            scalability: "Stateless workers; state persisted to distributed store"
+          },
+          simulators: {
+            role: "Computation Services Layer",
+            description: "Microservices for domain-specific calculations: mass balance, energy modeling, cost estimation, lifecycle analysis. Each simulator is independently deployable with well-defined APIs.",
+            techStack: ["REST/gRPC APIs", "Containerized services", "Message queues", "Caching"],
+            integrations: ["External modeling tools", "Vendor APIs", "IoT data streams"],
+            scalability: "Auto-scaling based on compute load; GPU support for complex models"
+          },
+          aiEngine: {
+            role: "ML/Optimization Core",
+            description: "Multi-objective optimization combining constraint satisfaction, gradient optimization, and machine learning. Supports ensemble models, A/B testing, and model versioning with MLOps practices.",
+            techStack: ["PyTorch/TensorFlow", "Optuna/Ray", "MLflow", "Feature store"],
+            integrations: ["Training pipelines", "Inference endpoints", "Monitoring"],
+            scalability: "Model serving on Kubernetes; batch and real-time inference"
+          },
+          ledger: {
+            role: "Immutable Audit Infrastructure",
+            description: "Permissioned blockchain or append-only log for decision provenance. Cryptographically signed records ensure tamper-evidence. Supports time-travel queries and compliance reporting.",
+            techStack: ["Hyperledger/similar", "Merkle trees", "Digital signatures", "Event store"],
+            integrations: ["Decision services", "Compliance systems", "Analytics"],
+            scalability: "Partition by proposal ID; archival tier for historical data"
+          },
+          agents: {
+            role: "Autonomous Service Mesh",
+            description: "Collection of specialized agents as independent services. Each has its own data pipeline, learning loop, and deployment lifecycle. Coordinated through event-driven architecture.",
+            techStack: ["Agent framework", "Pub/sub messaging", "ML pipelines", "Monitoring"],
+            integrations: ["Core services", "External data sources", "Alert systems"],
+            scalability: "Independent scaling per agent; circuit breakers for resilience"
+          },
+          ingestion: {
+            role: "Data Integration Hub",
+            description: "ETL/ELT pipelines for continuous ingestion from internal and external sources. Handles regulatory updates, market data, vendor catalogs, and unstructured content with NLP processing.",
+            techStack: ["Apache Kafka", "Airflow/Dagster", "NLP services", "Data lake"],
+            integrations: ["Regulatory APIs", "News feeds", "Vendor portals"],
+            scalability: "Stream and batch modes; backpressure handling; exactly-once semantics"
+          },
+          techPerf: {
+            role: "Observability & Calibration",
+            description: "Monitors actual performance against predictions. Feeds back to improve models. Tracks SLAs, accuracy metrics, and drift detection for all ML components.",
+            techStack: ["Prometheus/Grafana", "ML monitoring", "Anomaly detection", "APM"],
+            integrations: ["Deployed systems", "Support tickets", "Performance DBs"],
+            scalability: "Time-series optimization; aggregation tiers; retention policies"
+          }
+        }
+      },
+      sales: {
+        name: "Sales & Proposals",
+        icon: "track_changes",
+        color: "rgba(50,205,50,.85)",
+        description: "Sales team perspective focusing on proposal generation, pricing strategy, win rate optimization, and customer engagement workflows.",
+        nodes: ["caseInputs", "history", "pricing", "proposalOut", "winLoss", "pricingAgent", "outcomes"],
+        nodeRoles: {
+          caseInputs: {
+            role: "Opportunity Qualification Hub",
+            description: "Where sales reps input customer requirements. System guides structured data collection ensuring all critical info is captured upfront—no more back-and-forth emails or incomplete briefs.",
+            salesBenefit: "Reduces proposal rework by 60% through upfront data validation",
+            userExperience: "Guided forms with smart defaults; auto-fill from CRM; mobile-friendly",
+            timeToValue: "From inquiry to qualified opportunity in under 30 minutes"
+          },
+          history: {
+            role: "Deal Intelligence Library",
+            description: "Your entire team's historical knowledge at your fingertips. See how similar deals were priced, what won, what lost, and why. No more reinventing the wheel or relying on tribal knowledge.",
+            salesBenefit: "Access to team's collective experience for every new deal",
+            userExperience: "Searchable by industry, size, technology, outcome; similarity scoring",
+            timeToValue: "Find relevant precedents in seconds, not hours"
+          },
+          pricing: {
+            role: "Smart Pricing Assistant",
+            description: "Takes the guesswork out of pricing. Suggests optimal price points based on deal characteristics, competitor positioning, and win probability. Helps you defend prices with data-backed rationale.",
+            salesBenefit: "Improves win rates while protecting margin; reduces discounting",
+            userExperience: "Price recommendations with confidence intervals; scenario modeling",
+            timeToValue: "Generate defensible pricing in minutes with clear rationale"
+          },
+          proposalOut: {
+            role: "Proposal Generation Engine",
+            description: "Automatically generates professional, tailored proposals. Consistent branding, accurate specs, compelling narratives. Edit and customize as needed, but heavy lifting is done.",
+            salesBenefit: "Reduce proposal creation time from days to hours",
+            userExperience: "One-click generation; inline editing; version control; collaboration",
+            timeToValue: "Complete proposal draft ready for review same day"
+          },
+          winLoss: {
+            role: "Performance Coach",
+            description: "Learn from every deal—yours and teammates'. System identifies patterns in wins and losses, surfacing insights like 'deals with ESG emphasis win 2x more in manufacturing.'",
+            salesBenefit: "Continuous improvement based on actual outcomes",
+            userExperience: "Personal win/loss dashboard; team benchmarking; trend alerts",
+            timeToValue: "Actionable insights delivered weekly; patterns emerge monthly"
+          },
+          pricingAgent: {
+            role: "Market Intelligence Feed",
+            description: "Keeps pricing calibrated to market reality. Monitors competitive pricing, tracks price sensitivity by segment, alerts you to market shifts affecting your deals.",
+            salesBenefit: "Always competitive; never leaving money on the table",
+            userExperience: "Market alerts; competitor intelligence; price trend dashboards",
+            timeToValue: "Market intelligence integrated into every pricing decision"
+          },
+          outcomes: {
+            role: "Sales Performance Metrics",
+            description: "Your personal and team scoreboard. Track quota attainment, proposal velocity, win rates, and cycle times. Identify what's working and where to focus improvement.",
+            salesBenefit: "Clear visibility into performance drivers",
+            userExperience: "Personalized dashboards; goal tracking; performance trends",
+            timeToValue: "Real-time metrics; daily/weekly/monthly views"
+          }
+        }
+      },
+      esg: {
+        name: "ESG & Sustainability",
+        icon: "eco",
+        color: "rgba(53,208,186,.85)",
+        description: "Environmental, Social, and Governance perspective. Focuses on sustainability metrics, environmental compliance, carbon tracking, and responsible business practices.",
+        nodes: ["esgFramework", "esgOptimize", "esgTrack", "simulators", "proposalOut", "ledger", "outcomes"],
+        nodeRoles: {
+          esgFramework: {
+            role: "Sustainability Standards Hub",
+            description: "Centralizes ESG metrics, reporting frameworks, and sustainability targets. Aligns with GRI, SASB, CDP, and customer-specific requirements. Ensures proposals speak the language of sustainability.",
+            esgImpact: "Standardizes sustainability claims across all proposals",
+            metrics: ["Carbon footprint methodology", "Water stewardship metrics", "Energy standards"],
+            compliance: "Aligned with major reporting frameworks; audit-ready documentation"
+          },
+          esgOptimize: {
+            role: "Sustainability Optimization Engine",
+            description: "Balances environmental impact with technical and economic objectives. Generates scenarios optimized for different priorities: maximum water recovery, minimum carbon, or balanced approaches.",
+            esgImpact: "Quantifies trade-offs between sustainability and other objectives",
+            metrics: ["Water recovery %", "Energy per m³", "Chemical consumption", "Waste reduction"],
+            compliance: "Scenario documentation supports sustainability reporting"
+          },
+          esgTrack: {
+            role: "Impact Verification System",
+            description: "Closes the loop between projected and actual environmental performance. Tracks real-world outcomes to validate claims and improve projections. Essential for avoiding greenwashing.",
+            esgImpact: "Builds credibility through verified sustainability claims",
+            metrics: ["Projected vs actual savings", "Carbon offset verification", "Water reuse tracking"],
+            compliance: "Audit trail for all claims; third-party verifiable"
+          },
+          simulators: {
+            role: "Environmental Impact Calculator",
+            description: "Runs lifecycle assessments, energy modeling, and water balances. Quantifies environmental benefits in customer-meaningful terms: CO2 avoided, water recovered, energy saved.",
+            esgImpact: "Provides quantitative basis for sustainability claims",
+            metrics: ["LCA calculations", "Scope 1/2/3 emissions", "Water stress indices"],
+            compliance: "Methodology documented; assumptions transparent"
+          },
+          proposalOut: {
+            role: "Sustainability Narrative Generator",
+            description: "Translates quantitative ESG data into compelling customer narratives. Generates sustainability sections with appropriate caveats, sources, and visualizations.",
+            esgImpact: "Consistent, professional sustainability messaging",
+            metrics: ["Sustainability alignment score", "Claim accuracy rate"],
+            compliance: "Anti-greenwashing review; claim substantiation documented"
+          },
+          ledger: {
+            role: "ESG Audit Trail",
+            description: "Immutable record of all sustainability claims, their basis, and verification. Provides defensible documentation for customer audits, regulatory inquiries, and certifications.",
+            esgImpact: "Complete transparency and accountability for ESG claims",
+            metrics: ["Claim traceability", "Verification completion rate"],
+            compliance: "GDPR-compliant; supports ISO 14001; enables certifications"
+          },
+          outcomes: {
+            role: "Sustainability Impact Dashboard",
+            description: "Aggregates environmental impact across all proposals and projects. Shows cumulative contribution: total water recovered, carbon avoided, energy saved.",
+            esgImpact: "Demonstrates organizational sustainability commitment",
+            metrics: ["Portfolio carbon footprint", "Aggregate water impact", "SDG contribution"],
+            compliance: "Annual sustainability reporting data; stakeholder communication"
+          }
+        }
+      },
+      compliance: {
+        name: "Governance & Compliance",
+        icon: "verified_user",
+        color: "rgba(255,193,37,.85)",
+        description: "Risk, audit, and compliance view. Focuses on regulatory adherence, approval workflows, audit trails, explainability, and risk management controls.",
+        nodes: ["ledger", "governance", "decisionNodes", "aiEngine", "proposalOut", "ingestion", "esgTrack"],
+        nodeRoles: {
+          ledger: {
+            role: "Compliance Evidence Repository",
+            description: "Single source of truth for regulatory and audit purposes. Every decision, its inputs, rationale, and approvals are cryptographically sealed. Supports litigation hold and e-discovery.",
+            complianceValue: "Eliminates 'we don't know why we did that' scenarios",
+            auditFeatures: ["Time-stamped records", "Cryptographic integrity", "Access logging"],
+            regulations: "GDPR Article 22, sector-specific requirements"
+          },
+          governance: {
+            role: "Policy Enforcement Engine",
+            description: "Implements approval workflows, delegation rules, and policy checks. Ensures proposals meet authority limits, regulatory requirements, and internal policies before reaching customers.",
+            complianceValue: "Automated policy enforcement; reduced compliance violations",
+            auditFeatures: ["Approval chains", "Exception logging", "Policy version control"],
+            regulations: "SOX controls, anti-corruption, export controls"
+          },
+          decisionNodes: {
+            role: "Controlled Decision Points",
+            description: "Each decision node is a control point with defined authority, validation rules, and audit hooks. Enables segregation of duties and ensures critical decisions receive oversight.",
+            complianceValue: "Clear accountability at each decision step",
+            auditFeatures: ["Decision ownership", "Override tracking", "Approval requirements"],
+            regulations: "Internal controls, regulatory approval requirements"
+          },
+          aiEngine: {
+            role: "Explainable AI System",
+            description: "AI decisions must be explainable for regulatory compliance. Provides decision rationale, confidence levels, and ability to understand why specific recommendations were made.",
+            complianceValue: "Meets explainability requirements for automated decisions",
+            auditFeatures: ["Decision decomposition", "Feature importance", "Counterfactuals"],
+            regulations: "EU AI Act, GDPR right to explanation"
+          },
+          proposalOut: {
+            role: "Compliant Output Generator",
+            description: "Ensures proposals meet regulatory requirements: required disclosures, appropriate caveats, terms and conditions. Templates are version-controlled and legal-reviewed.",
+            complianceValue: "Consistent, legally-reviewed proposal content",
+            auditFeatures: ["Template versioning", "Required section validation", "Disclosure checklist"],
+            regulations: "Contract law, advertising standards, disclosure requirements"
+          },
+          ingestion: {
+            role: "Regulatory Intelligence Monitor",
+            description: "Continuously monitors for regulatory changes affecting proposals, pricing, or claims. Flags updates requiring policy review and triggers update workflows.",
+            complianceValue: "Proactive regulatory change management",
+            auditFeatures: ["Change detection logs", "Impact assessments", "Update tracking"],
+            regulations: "Environmental, health, safety, and trade regulations"
+          },
+          esgTrack: {
+            role: "Sustainability Compliance Monitor",
+            description: "Tracks compliance with environmental regulations and sustainability commitments. Monitors for gaps between claims and performance that could create regulatory or reputational risk.",
+            complianceValue: "Prevents greenwashing; ensures claim substantiation",
+            auditFeatures: ["Claim verification", "Performance monitoring", "Variance alerts"],
+            regulations: "Environmental regulations, advertising standards"
+          }
+        }
+      },
+      operations: {
+        name: "Operations & Delivery",
+        icon: "engineering",
+        color: "rgba(186,85,211,.85)",
+        description: "Operational view for delivery teams and operations managers. Focuses on handoff quality, resource planning, field performance, and continuous improvement.",
+        nodes: ["catalog", "simulators", "proposalOut", "techPerf", "agents", "outcomes", "roadmap"],
+        nodeRoles: {
+          catalog: {
+            role: "Product Master Database",
+            description: "Authoritative source for all products, specs, and configurations. Operations owns this data—accurate catalogs mean accurate proposals mean fewer change orders and happier customers.",
+            operationsRole: "Maintain accurate, up-to-date product information",
+            handoffQuality: "Proposals reference valid, available, correctly-specified products",
+            efficiency: "Reduces specification errors; prevents unavailable product quotes"
+          },
+          simulators: {
+            role: "Engineering Validation Layer",
+            description: "Catches engineering issues before they become field problems. Validates that proposed solutions actually work: mass balances close, operating points are achievable, equipment fits.",
+            operationsRole: "Validate proposal feasibility; contribute real-world constraints",
+            handoffQuality: "Proposals are technically sound and deliverable",
+            efficiency: "Reduces engineering rework; catches issues early"
+          },
+          proposalOut: {
+            role: "Project Definition Document",
+            description: "The proposal becomes the project definition. Clear, accurate proposals with proper scope definitions reduce project startup friction and set realistic expectations.",
+            operationsRole: "Review proposals for deliverability; provide scope clarity",
+            handoffQuality: "Smooth sales-to-operations handoff; clear deliverables",
+            efficiency: "Faster project kickoff; reduced scope creep"
+          },
+          techPerf: {
+            role: "Field Performance Feedback",
+            description: "Real-world performance data flows back to improve future proposals. When equipment outperforms or underperforms expectations, that learning improves the next proposal's accuracy.",
+            operationsRole: "Report actual performance; validate or correct assumptions",
+            handoffQuality: "Proposals based on real performance, not optimistic specs",
+            efficiency: "Continuous accuracy improvement; realistic expectations"
+          },
+          agents: {
+            role: "Operational Learning System",
+            description: "Aggregates operational learnings into actionable intelligence. Patterns across projects reveal systemic issues: problematic product lines, recurring challenges, or training gaps.",
+            operationsRole: "Feed operational insights back to system improvement",
+            handoffQuality: "System learns from every project; avoids repeating mistakes",
+            efficiency: "Trend identification; proactive issue resolution"
+          },
+          outcomes: {
+            role: "Operational Metrics Hub",
+            description: "Tracks metrics that matter to operations: project profitability, installation success rates, warranty claims, customer satisfaction. Shows which proposal types lead to smooth projects.",
+            operationsRole: "Monitor project outcomes; identify improvement areas",
+            handoffQuality: "Clear visibility from proposal to project completion",
+            efficiency: "Data-driven operational improvement"
+          },
+          roadmap: {
+            role: "Capability Development Plan",
+            description: "Phases system rollout with operations readiness. New capabilities are piloted before full rollout. Teams are trained before they need to execute against new proposal types.",
+            operationsRole: "Participate in piloting; ensure operational readiness",
+            handoffQuality: "New capabilities are tested before going live",
+            efficiency: "Smooth rollouts; trained teams; prepared processes"
+          }
+        }
+      }
+    };
 
     const LINKS = [
       // Inputs feed the core
@@ -1116,6 +2832,11 @@
       });
 
       showToast(`Selected: ${d.label}`);
+
+      // Apply acronym tooltips to new content
+      setTimeout(() => {
+        if (typeof applyAcronymTooltips === 'function') applyAcronymTooltips();
+      }, 50);
     }
 
     function clearSelection(){
@@ -1321,6 +3042,1353 @@
     }).on("mouseleave", ()=>{
       linkSel.attr("opacity", 1);
     });
+
+    // ============ PERSPECTIVE / LAYERS OF INTEREST HANDLING ============
+    let currentPerspective = "all";
+    const layerDescription = document.getElementById("layerDescription");
+
+    function applyPerspective(perspective) {
+      currentPerspective = perspective;
+      const perspData = PERSPECTIVES[perspective];
+
+      if (!perspData) return;
+
+      // Update tab UI
+      document.querySelectorAll(".perspective-tab").forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.perspective === perspective);
+      });
+
+      // Show/hide nodes based on perspective
+      if (perspData.nodes === null) {
+        // Show all nodes
+        nodeSel.attr("display", null).attr("opacity", 1);
+        linkSel.attr("display", null);
+        layerDescription.style.display = "none";
+      } else {
+        const visibleNodes = new Set(perspData.nodes);
+
+        // Fade non-relevant nodes instead of hiding completely
+        nodeSel
+          .attr("display", null)
+          .attr("opacity", d => visibleNodes.has(d.id) ? 1 : 0.15);
+
+        // Show links only between visible nodes prominently
+        linkSel
+          .attr("display", null)
+          .attr("opacity", l => (visibleNodes.has(l.source.id) && visibleNodes.has(l.target.id)) ? 1 : 0.08);
+
+        // Highlight the visible nodes with perspective color
+        nodeSel.selectAll(".shape")
+          .attr("stroke", d => visibleNodes.has(d.id) ? perspData.color : "rgba(255,255,255,.2)")
+          .attr("stroke-width", d => visibleNodes.has(d.id) ? 2.5 : 1);
+
+        // Update layer description panel
+        updateLayerDescription(perspData);
+      }
+
+      showToast(`Perspective: ${perspData.name}`);
+      if (perspective === "all") {
+        statusBadge.textContent = "Ready";
+      } else {
+        statusBadge.innerHTML = `<span class="material-icons-outlined" style="font-size:12px;vertical-align:middle;margin-right:2px;">${perspData.icon}</span> ${perspData.name}`;
+      }
+    }
+
+    function updateLayerDescription(perspData) {
+      if (!perspData.nodes) {
+        layerDescription.style.display = "none";
+        return;
+      }
+
+      const nodeChips = perspData.nodes.map(nodeId => {
+        const node = nodeById.get(nodeId);
+        const roleInfo = perspData.nodeRoles[nodeId];
+        const roleName = roleInfo ? roleInfo.role : node?.label;
+        return `<span class="node-chip" data-nodeid="${nodeId}" title="${roleName}">${node?.label || nodeId}</span>`;
+      }).join("");
+
+      layerDescription.innerHTML = `
+        <h4><span class="material-icons-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">${perspData.icon}</span> ${perspData.name}</h4>
+        <p class="desc">${perspData.description}</p>
+        <div class="nodes-list">${nodeChips}</div>
+      `;
+      layerDescription.style.display = "block";
+
+      // Add click handlers to node chips
+      layerDescription.querySelectorAll(".node-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const nodeId = chip.dataset.nodeid;
+          const node = nodeById.get(nodeId);
+          if (node) {
+            selectNodeWithPerspective(node, currentPerspective);
+            // Pan to node
+            const transform = d3.zoomTransform(svg.node());
+            const k = transform.k;
+            const x = w/2 - node.x*k;
+            const y = h/2 - node.y*k;
+            svg.transition().duration(400).call(zoom.transform, d3.zoomIdentity.translate(x,y).scale(k));
+          }
+        });
+      });
+    }
+
+    // Enhanced selectNode that shows perspective-specific info
+    function selectNodeWithPerspective(d, perspective) {
+      statusBadge.textContent = "Selected";
+      const typeInfo = NODE_TYPES[d.nodeType] || NODE_TYPES.input;
+      selectedType.textContent = typeInfo.label.toUpperCase();
+
+      // Highlight node
+      nodeSel.selectAll(".shape")
+        .attr("stroke", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return nodeData.id === d.id ? "rgba(255,255,255,.95)" : "rgba(255,255,255,.35)";
+        })
+        .attr("stroke-width", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return nodeData.id === d.id ? 2.5 : 1.5;
+        });
+
+      linkSel
+        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.18);
+
+      const det = d.details ?? {};
+      const perspData = PERSPECTIVES[perspective];
+      const roleInfo = perspData?.nodeRoles?.[d.id];
+
+      // Build the details HTML
+      let html = `
+        <div class="card">
+          <h3>${escapeHtml(d.label)}</h3>
+          <p style="color:var(--muted);font-size:12px;margin:4px 0 0 0;">${escapeHtml(d.sub)}</p>
+        </div>
+      `;
+
+      // Add perspective-specific role information if available
+      if (roleInfo && perspective !== "all") {
+        html += `
+          <div class="card" style="background: linear-gradient(145deg, ${perspData.color.replace('.85', '.15')}, transparent); border-color: ${perspData.color.replace('.85', '.4')};">
+            <h3 style="color:${perspData.color};"><span class="material-icons-outlined" style="font-size:18px;vertical-align:middle;margin-right:4px;">${perspData.icon}</span> ${perspData.name} Perspective</h3>
+            <div style="margin-top:10px;">
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">${escapeHtml(roleInfo.role)}</div>
+              <p style="font-size:12px;line-height:1.55;color:var(--muted);">${escapeHtml(roleInfo.description)}</p>
+            </div>
+            ${generateRoleMetrics(roleInfo, perspective)}
+          </div>
+        `;
+      }
+
+      // Standard concept/value info
+      html += cardHTML("Concept", `<p>${escapeHtml(det.concept ?? "—")}</p>`);
+      html += cardHTML("Strategic Value", `<p>${escapeHtml(det.value ?? "—")}</p>`);
+
+      // Input/Output
+      if (det.io) {
+        html += `
+          <div class="card">
+            <h3>Data Flow</h3>
+            ${ioHTML(det.io)}
+          </div>
+        `;
+      }
+
+      // Connections
+      const outgoing = links.filter(l => l.source.id===d.id).map(l => nodeById.get(l.target.id));
+      const incoming = links.filter(l => l.target.id===d.id).map(l => nodeById.get(l.source.id));
+      html += `
+        <div class="card">
+          <h3>Connections</h3>
+          <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.6;">
+            <b style="color:rgba(234,240,255,.92)">Feeds from:</b> ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+            <br/>
+            <b style="color:rgba(234,240,255,.92)">Feeds to:</b> ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+          </p>
+        </div>
+      `;
+
+      // Show all available perspectives for this node
+      const availablePerspectives = Object.entries(PERSPECTIVES)
+        .filter(([key, p]) => p.nodes && p.nodes.includes(d.id))
+        .map(([key, p]) => `<span class="perspective-tab" data-switch="${key}" style="padding:5px 8px;font-size:10px;cursor:pointer;"><span class="material-icons-outlined" style="font-size:14px;vertical-align:middle;margin-right:2px;">${p.icon}</span> ${p.name}</span>`)
+        .join("");
+
+      if (availablePerspectives) {
+        html += `
+          <div class="card">
+            <h3>View Other Perspectives</h3>
+            <p style="font-size:11px;color:var(--muted);margin:0 0 8px 0;">This component is relevant to:</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              ${availablePerspectives}
+            </div>
+          </div>
+        `;
+      }
+
+      details.innerHTML = html;
+
+      // Add handlers for perspective switches in details panel
+      details.querySelectorAll('[data-switch]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          applyPerspective(btn.dataset.switch);
+          selectNodeWithPerspective(d, btn.dataset.switch);
+        });
+      });
+
+      showToast(`Selected: ${d.label}`);
+
+      // Apply acronym tooltips to new content
+      setTimeout(() => {
+        if (typeof applyAcronymTooltips === 'function') applyAcronymTooltips();
+      }, 50);
+    }
+
+    // Generate metrics HTML based on perspective type
+    function generateRoleMetrics(roleInfo, perspective) {
+      let metricsHtml = '<div style="margin-top:12px;display:grid;gap:8px;">';
+
+      if (perspective === "business") {
+        if (roleInfo.keyMetrics) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Key Metrics</h5>
+              <p>${roleInfo.keyMetrics.join(" · ")}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.strategicValue) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Strategic Value</h5>
+              <p>${escapeHtml(roleInfo.strategicValue)}</p>
+            </div>
+          `;
+        }
+      } else if (perspective === "technical") {
+        if (roleInfo.techStack) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Tech Stack</h5>
+              <p>${roleInfo.techStack.join(" · ")}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.integrations) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Integrations</h5>
+              <p>${roleInfo.integrations.join(" · ")}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.scalability) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Scalability</h5>
+              <p>${escapeHtml(roleInfo.scalability)}</p>
+            </div>
+          `;
+        }
+      } else if (perspective === "sales") {
+        if (roleInfo.salesBenefit) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Sales Benefit</h5>
+              <p>${escapeHtml(roleInfo.salesBenefit)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.userExperience) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>User Experience</h5>
+              <p>${escapeHtml(roleInfo.userExperience)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.timeToValue) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Time to Value</h5>
+              <p>${escapeHtml(roleInfo.timeToValue)}</p>
+            </div>
+          `;
+        }
+      } else if (perspective === "esg") {
+        if (roleInfo.esgImpact) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>ESG Impact</h5>
+              <p>${escapeHtml(roleInfo.esgImpact)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.metrics) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Sustainability Metrics</h5>
+              <p>${roleInfo.metrics.join(" · ")}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.compliance) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Compliance</h5>
+              <p>${escapeHtml(roleInfo.compliance)}</p>
+            </div>
+          `;
+        }
+      } else if (perspective === "compliance") {
+        if (roleInfo.complianceValue) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Compliance Value</h5>
+              <p>${escapeHtml(roleInfo.complianceValue)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.auditFeatures) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Audit Features</h5>
+              <p>${roleInfo.auditFeatures.join(" · ")}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.regulations) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Regulations</h5>
+              <p>${escapeHtml(roleInfo.regulations)}</p>
+            </div>
+          `;
+        }
+      } else if (perspective === "operations") {
+        if (roleInfo.operationsRole) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Operations Role</h5>
+              <p>${escapeHtml(roleInfo.operationsRole)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.handoffQuality) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Handoff Quality</h5>
+              <p>${escapeHtml(roleInfo.handoffQuality)}</p>
+            </div>
+          `;
+        }
+        if (roleInfo.efficiency) {
+          metricsHtml += `
+            <div class="perspective-detail">
+              <h5>Efficiency Impact</h5>
+              <p>${escapeHtml(roleInfo.efficiency)}</p>
+            </div>
+          `;
+        }
+      }
+
+      metricsHtml += '</div>';
+      return metricsHtml;
+    }
+
+    // Override the original node click to use perspective-aware selection
+    nodeSel.on("click", (event, d) => {
+      event.stopPropagation();
+      selectNodeWithPerspective(d, currentPerspective);
+    });
+
+    // Perspective tab event listeners - using event delegation for reliability
+    const perspectiveTabsContainer = document.getElementById("perspectiveTabs");
+    if (perspectiveTabsContainer) {
+      perspectiveTabsContainer.addEventListener("click", (e) => {
+        const tab = e.target.closest(".perspective-tab");
+        if (tab && tab.dataset.perspective) {
+          applyPerspective(tab.dataset.perspective);
+        }
+      });
+    }
+
+    // Also add direct listeners as backup
+    document.querySelectorAll(".perspective-tab").forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        e.stopPropagation();
+        applyPerspective(tab.dataset.perspective);
+      });
+    });
+
+    // Reset also resets perspective
+    const originalResetAll = resetAll;
+    resetAll = function() {
+      originalResetAll();
+      applyPerspective("all");
+    };
+
+    // ============ SIMULATOR LOGIC ============
+    const simulatorOverlay = document.getElementById('simulatorOverlay');
+    const openSimulatorBtn = document.getElementById('openSimulator');
+    const closeSimulatorBtn = document.getElementById('closeSimulator');
+    const runSimulationBtn = document.getElementById('runSimulation');
+
+    // Open/Close simulator
+    openSimulatorBtn.addEventListener('click', () => {
+      simulatorOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeSimulatorBtn.addEventListener('click', () => {
+      simulatorOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // ESC key to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && simulatorOverlay.classList.contains('active')) {
+        simulatorOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Update range slider labels
+    document.getElementById('simWaterPriority').addEventListener('input', (e) => {
+      document.getElementById('waterPriorityVal').textContent = e.target.value + '%';
+    });
+    document.getElementById('simCarbonPriority').addEventListener('input', (e) => {
+      document.getElementById('carbonPriorityVal').textContent = e.target.value + '%';
+    });
+    document.getElementById('simEnergyPriority').addEventListener('input', (e) => {
+      document.getElementById('energyPriorityVal').textContent = e.target.value + '%';
+    });
+
+    // Technology database
+    const TECHNOLOGIES = {
+      UF: { name: 'Ultrafiltration', tssRemoval: 0.99, tdsRemoval: 0.05, energy: 0.3, footprint: 0.8, capexFactor: 1.0 },
+      MBR: { name: 'Membrane Bioreactor', tssRemoval: 0.99, tdsRemoval: 0.1, energy: 0.8, footprint: 0.5, capexFactor: 1.8 },
+      RO: { name: 'Reverse Osmosis', tssRemoval: 0.99, tdsRemoval: 0.97, energy: 2.5, footprint: 1.0, capexFactor: 2.2 },
+      UV: { name: 'UV Disinfection', tssRemoval: 0.0, tdsRemoval: 0.0, energy: 0.1, footprint: 0.2, capexFactor: 0.3 },
+      AOP: { name: 'Advanced Oxidation', tssRemoval: 0.3, tdsRemoval: 0.2, energy: 1.2, footprint: 0.4, capexFactor: 1.5 }
+    };
+
+    // Run simulation
+    runSimulationBtn.addEventListener('click', runSimulation);
+
+    function runSimulation() {
+      // Gather inputs
+      const inputs = {
+        sector: parseInt(document.getElementById('simSector').value),
+        flow: parseFloat(document.getElementById('simFlow').value),
+        hours: parseFloat(document.getElementById('simHours').value),
+        tss: parseFloat(document.getElementById('simTSS').value),
+        tds: parseFloat(document.getElementById('simTDS').value),
+        bod: parseFloat(document.getElementById('simBOD').value),
+        cod: parseFloat(document.getElementById('simCOD').value),
+        tssTarget: parseFloat(document.getElementById('simTSSTarget').value),
+        tdsTarget: parseFloat(document.getElementById('simTDSTarget').value),
+        waterPriority: parseFloat(document.getElementById('simWaterPriority').value) / 100,
+        carbonPriority: parseFloat(document.getElementById('simCarbonPriority').value) / 100,
+        energyPriority: parseFloat(document.getElementById('simEnergyPriority').value) / 100,
+        maxFootprint: parseFloat(document.getElementById('simFootprint').value),
+        maxBudget: parseFloat(document.getElementById('simBudget').value) * 1000
+      };
+
+      // Normalize ESG weights
+      const esgTotal = inputs.waterPriority + inputs.carbonPriority + inputs.energyPriority;
+      if (esgTotal > 0) {
+        inputs.waterPriority /= esgTotal;
+        inputs.carbonPriority /= esgTotal;
+        inputs.energyPriority /= esgTotal;
+      }
+
+      // Display input vector
+      displayInputVector(inputs);
+
+      // Calculate required removal
+      const tssRemovalNeeded = 1 - (inputs.tssTarget / inputs.tss);
+      const tdsRemovalNeeded = 1 - (inputs.tdsTarget / inputs.tds);
+
+      // Evaluate technology combinations
+      const solutions = evaluateTechnologies(inputs, tssRemovalNeeded, tdsRemovalNeeded);
+
+      // Check constraints
+      displayConstraints(inputs, solutions[0]);
+
+      // Display mass balance
+      displayMassBalance(inputs, solutions[0]);
+
+      // Display energy calculation
+      displayEnergy(inputs, solutions[0]);
+
+      // Display OPEX
+      displayOPEX(inputs, solutions[0]);
+
+      // Display optimization
+      displayOptimization(inputs, solutions[0]);
+
+      // Display win probability
+      displayWinProbability(inputs, solutions[0]);
+
+      // Display recommendations
+      displayRecommendations(solutions);
+
+      // Display system metrics
+      displaySystemMetrics(inputs, solutions[0]);
+
+      // Display pricing
+      displayPricing(inputs, solutions[0]);
+
+      // Display ESG score
+      displayESGScore(inputs, solutions[0]);
+
+      // Display confidence
+      displayConfidence(inputs, solutions[0]);
+
+      // Generate ledger hash
+      generateLedgerHash(inputs, solutions[0]);
+    }
+
+    function displayInputVector(inputs) {
+      const vectorEl = document.getElementById('inputVector');
+      vectorEl.innerHTML = `
+        <span class="v">x₁=${inputs.sector}</span>
+        <span class="v">x₂=${inputs.flow}</span>
+        <span class="v">x₃=[${inputs.tss},${inputs.tds},${inputs.bod},${inputs.cod}]</span>
+        <span class="v">x₄=[${inputs.tssTarget},${inputs.tdsTarget}]</span>
+        <span class="v">x₅=[${inputs.maxFootprint},${inputs.maxBudget}]</span>
+        <span class="v">x₆=[${(inputs.waterPriority*100).toFixed(0)}%,${(inputs.carbonPriority*100).toFixed(0)}%,${(inputs.energyPriority*100).toFixed(0)}%]</span>
+      `;
+    }
+
+    function evaluateTechnologies(inputs, tssNeeded, tdsNeeded) {
+      const solutions = [];
+
+      // Determine best technology chain
+      const chains = [
+        { techs: ['UF', 'RO'], name: 'UF + RO' },
+        { techs: ['MBR', 'RO'], name: 'MBR + RO' },
+        { techs: ['UF'], name: 'UF Only' },
+        { techs: ['MBR'], name: 'MBR Only' },
+        { techs: ['UF', 'RO', 'UV'], name: 'UF + RO + UV' }
+      ];
+
+      chains.forEach(chain => {
+        let tssRemoval = 0, tdsRemoval = 0, totalEnergy = 0, totalFootprint = 0, totalCapex = 0;
+
+        chain.techs.forEach(tech => {
+          const t = TECHNOLOGIES[tech];
+          tssRemoval = 1 - (1 - tssRemoval) * (1 - t.tssRemoval);
+          tdsRemoval = 1 - (1 - tdsRemoval) * (1 - t.tdsRemoval);
+          totalEnergy += t.energy;
+          totalFootprint += t.footprint * inputs.flow * 0.5;
+          totalCapex += t.capexFactor * inputs.flow * 1000;
+        });
+
+        // Water recovery (simplified)
+        const recovery = tdsNeeded > 0.5 ? 0.75 : 0.9;
+
+        // Calculate scores
+        const techScore = (tssRemoval >= tssNeeded ? 1 : tssRemoval / tssNeeded) *
+                         (tdsRemoval >= tdsNeeded ? 1 : tdsRemoval / tdsNeeded);
+        const costScore = 1 - Math.min(totalCapex / inputs.maxBudget, 1);
+        const esgScore = (recovery * inputs.waterPriority) +
+                        ((1 - totalEnergy / 5) * inputs.energyPriority) +
+                        ((1 - totalEnergy * 0.5 / 2) * inputs.carbonPriority);
+
+        const overallScore = (techScore * 0.4) + (costScore * 0.3) + (esgScore * 0.3);
+
+        solutions.push({
+          name: chain.name,
+          techs: chain.techs,
+          tssRemoval,
+          tdsRemoval,
+          energy: totalEnergy,
+          footprint: totalFootprint,
+          capex: totalCapex,
+          recovery,
+          techScore,
+          costScore,
+          esgScore,
+          overallScore,
+          feasible: tssRemoval >= tssNeeded && tdsRemoval >= tdsNeeded &&
+                   totalFootprint <= inputs.maxFootprint && totalCapex <= inputs.maxBudget
+        });
+      });
+
+      // Sort by overall score
+      solutions.sort((a, b) => b.overallScore - a.overallScore);
+      return solutions;
+    }
+
+    function displayConstraints(inputs, solution) {
+      const el = document.getElementById('constraintChecks');
+      const constraints = [
+        { name: wrapWithTooltips('TSS') + ' Removal', pass: solution.tssRemoval >= (1 - inputs.tssTarget / inputs.tss),
+          value: `${(solution.tssRemoval * 100).toFixed(1)}% ≥ ${((1 - inputs.tssTarget / inputs.tss) * 100).toFixed(1)}%` },
+        { name: wrapWithTooltips('TDS') + ' Removal', pass: solution.tdsRemoval >= (1 - inputs.tdsTarget / inputs.tds),
+          value: `${(solution.tdsRemoval * 100).toFixed(1)}% ≥ ${((1 - inputs.tdsTarget / inputs.tds) * 100).toFixed(1)}%` },
+        { name: 'Footprint', pass: solution.footprint <= inputs.maxFootprint,
+          value: `${solution.footprint.toFixed(0)} m² ≤ ${inputs.maxFootprint} m²` },
+        { name: 'Budget (' + wrapWithTooltips('CAPEX') + ')', pass: solution.capex <= inputs.maxBudget,
+          value: `£${(solution.capex / 1000).toFixed(0)}k ≤ £${(inputs.maxBudget / 1000).toFixed(0)}k` }
+      ];
+
+      el.innerHTML = constraints.map(c => `
+        <div class="constraint-status ${c.pass ? 'pass' : 'fail'}">
+          <span class="material-icons-outlined">${c.pass ? 'check_circle' : 'cancel'}</span>
+          <span>${c.name}: ${c.value}</span>
+        </div>
+      `).join('');
+    }
+
+    function displayMassBalance(inputs, solution) {
+      const Qout = inputs.flow * solution.recovery;
+      const Qreject = inputs.flow * (1 - solution.recovery);
+      document.getElementById('massBalanceResult').innerHTML = `
+        Qᵢₙ = <span class="result">${inputs.flow} m³/h</span><br>
+        Qₒᵤₜ = <span class="result">${Qout.toFixed(1)} m³/h</span> (${(solution.recovery * 100).toFixed(0)}% recovery)<br>
+        Qᵣₑⱼₑ꜀ₜ = <span class="result">${Qreject.toFixed(1)} m³/h</span>
+      `;
+    }
+
+    function displayEnergy(inputs, solution) {
+      const totalEnergy = solution.energy * inputs.flow;
+      document.getElementById('energyResult').innerHTML = `
+        ${wrapWithTooltips('SE')} = <span class="result">${solution.energy.toFixed(2)} kWh/m³</span><br>
+        E_total = ${solution.energy} × ${inputs.flow} = <span class="result">${totalEnergy.toFixed(0)} kW</span>
+      `;
+    }
+
+    function displayOPEX(inputs, solution) {
+      const electricityRate = 0.15; // £/kWh
+      const energyCost = solution.energy * inputs.flow * inputs.hours * electricityRate;
+      const chemCost = inputs.flow * inputs.hours * 0.02;
+      const maintCost = solution.capex * 0.03;
+      const totalOPEX = energyCost + chemCost + maintCost;
+
+      document.getElementById('opexResult').innerHTML = `
+        Energy: £${(energyCost / 1000).toFixed(0)}k/yr<br>
+        Chemicals: £${(chemCost / 1000).toFixed(0)}k/yr<br>
+        Maintenance: £${(maintCost / 1000).toFixed(0)}k/yr<br>
+        <span class="result">Total ${wrapWithTooltips('OPEX')}: £${(totalOPEX / 1000).toFixed(0)}k/yr</span>
+      `;
+    }
+
+    function displayOptimization(inputs, solution) {
+      const w1 = 0.3, w2 = 0.3, w3 = 0.25, w4 = 0.15;
+      const f1 = 1 - solution.costScore;
+      const f2 = solution.techScore;
+      const f3 = solution.esgScore;
+      const f4 = solution.feasible ? 0.1 : 0.9;
+      const F = w1 * f1 + w2 * (-f2) + w3 * (-f3) + w4 * f4;
+
+      document.getElementById('optimizationResult').innerHTML = `
+        f₁(cost) = ${f1.toFixed(3)}, f₂(tech) = ${f2.toFixed(3)}<br>
+        f₃(esg) = ${f3.toFixed(3)}, f₄(risk) = ${f4.toFixed(3)}<br>
+        <span class="result">F(s) = ${F.toFixed(4)}</span> (minimize)
+      `;
+    }
+
+    function displayWinProbability(inputs, solution) {
+      const priceRatio = solution.capex / inputs.maxBudget;
+      const techFit = solution.techScore;
+      const z = 1.5 - 2.5 * priceRatio + 1.8 * techFit + 0.5 * solution.esgScore;
+      const pWin = 1 / (1 + Math.exp(-z));
+
+      document.getElementById('winProbResult').innerHTML = `
+        z = 1.5 - 2.5(${priceRatio.toFixed(2)}) + 1.8(${techFit.toFixed(2)}) + 0.5(${solution.esgScore.toFixed(2)})<br>
+        z = <span class="result">${z.toFixed(3)}</span><br>
+        <span class="result">P(win) = ${(pWin * 100).toFixed(1)}%</span>
+      `;
+    }
+
+    function displayRecommendations(solutions) {
+      const el = document.getElementById('techRecommendations');
+      el.innerHTML = solutions.slice(0, 3).map((s, i) => `
+        <div class="tech-recommendation" style="${!s.feasible ? 'opacity:0.5;' : ''}">
+          <div class="rank">${i + 1}</div>
+          <div class="info">
+            <div class="tech-name">${wrapWithTooltips(s.name)}</div>
+            <div class="tech-score">Score: ${(s.overallScore * 100).toFixed(0)}% | ${wrapWithTooltips('CAPEX')}: £${(s.capex / 1000).toFixed(0)}k</div>
+          </div>
+          <div class="confidence">${s.feasible ? 'Feasible' : 'Infeasible'}</div>
+        </div>
+      `).join('');
+    }
+
+    function displaySystemMetrics(inputs, solution) {
+      const el = document.getElementById('systemMetrics');
+      el.innerHTML = `
+        <div class="output-metric">
+          <span class="name">Water Recovery</span>
+          <span class="value good">${(solution.recovery * 100).toFixed(0)}%</span>
+        </div>
+        <div class="output-metric">
+          <span class="name">${wrapWithTooltips('SE')} (Specific Energy)</span>
+          <span class="value ${solution.energy < 2 ? 'good' : 'warn'}">${solution.energy.toFixed(2)} kWh/m³</span>
+        </div>
+        <div class="output-metric">
+          <span class="name">Footprint</span>
+          <span class="value">${solution.footprint.toFixed(0)} m²</span>
+        </div>
+      `;
+    }
+
+    function displayPricing(inputs, solution) {
+      const basePrice = solution.capex * 1.25;
+      const valuePrice = solution.capex * 1.4;
+      const el = document.getElementById('pricingOutput');
+      el.innerHTML = `
+        <div class="output-metric">
+          <span class="name">Cost-Plus Price (${wrapWithTooltips('CAPEX')} × 1.25)</span>
+          <span class="value">£${(basePrice / 1000).toFixed(0)}k</span>
+        </div>
+        <div class="output-metric">
+          <span class="name">Value-Based Price</span>
+          <span class="value good">£${(valuePrice / 1000).toFixed(0)}k</span>
+        </div>
+        <div class="output-metric">
+          <span class="name">Target Margin</span>
+          <span class="value">${((valuePrice - solution.capex) / valuePrice * 100).toFixed(0)}%</span>
+        </div>
+      `;
+    }
+
+    function displayESGScore(inputs, solution) {
+      const score = solution.esgScore * 100;
+      document.getElementById('esgScoreOutput').textContent = score.toFixed(0) + '/100';
+      document.getElementById('esgBar').style.width = score + '%';
+    }
+
+    function displayConfidence(inputs, solution) {
+      const dataQuality = 0.85;
+      const modelCertainty = solution.techScore;
+      const constraintMargin = solution.feasible ? 0.9 : 0.3;
+      const confidence = (0.4 * dataQuality + 0.35 * modelCertainty + 0.25 * constraintMargin) * 100;
+
+      const el = document.getElementById('confidenceOutput');
+      el.textContent = confidence.toFixed(0) + '%';
+      el.className = 'value ' + (confidence >= 80 ? 'good' : confidence >= 50 ? 'warn' : 'bad');
+      document.getElementById('confidenceBar').style.width = confidence + '%';
+
+      const decision = confidence >= 80 ? 'Auto-approve recommended' :
+                      confidence >= 50 ? 'Human review recommended' : 'Manual override required';
+      document.getElementById('confidenceDecision').innerHTML = `
+        <span class="material-icons-outlined" style="font-size:14px;vertical-align:middle;">
+          ${confidence >= 80 ? 'check_circle' : confidence >= 50 ? 'warning' : 'error'}
+        </span> ${decision}
+      `;
+    }
+
+    function generateLedgerHash(inputs, solution) {
+      const data = JSON.stringify({ inputs, solution: solution.name, timestamp: Date.now() });
+      let hash = 0;
+      for (let i = 0; i < data.length; i++) {
+        const char = data.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      const hexHash = '0x' + Math.abs(hash).toString(16).padStart(16, '0') +
+                      Math.random().toString(16).substr(2, 48);
+      document.getElementById('ledgerHash').textContent = hexHash;
+    }
+
+    // ============ GLOSSARY SYSTEM ============
+
+    // Acronym definitions for tooltips
+    const ACRONYMS = {
+      'UF': 'Ultrafiltration — Membrane filtration removing particles & bacteria',
+      'MBR': 'Membrane Bioreactor — Biological treatment + membrane filtration',
+      'RO': 'Reverse Osmosis — High-pressure removal of dissolved salts',
+      'UV': 'Ultraviolet — Disinfection using UV light',
+      'AOP': 'Advanced Oxidation Process — Chemical breakdown of contaminants',
+      'TSS': 'Total Suspended Solids — Particles in water (mg/L)',
+      'TDS': 'Total Dissolved Solids — Dissolved minerals/salts (mg/L)',
+      'BOD': 'Biochemical Oxygen Demand — Organic pollution indicator',
+      'COD': 'Chemical Oxygen Demand — Total oxidizable matter',
+      'BOO': 'Build-Own-Operate — Provider owns & operates system',
+      'BOT': 'Build-Operate-Transfer — Transfers to client after period',
+      'CAPEX': 'Capital Expenditure — Upfront equipment costs',
+      'OPEX': 'Operational Expenditure — Ongoing running costs',
+      'ROI': 'Return on Investment — Profitability measure',
+      'NPV': 'Net Present Value — Discounted future cash flows',
+      'KPI': 'Key Performance Indicator — Performance metric',
+      'CRM': 'Customer Relationship Management — Sales/customer software',
+      'ESG': 'Environmental, Social, Governance — Sustainability framework',
+      'GRI': 'Global Reporting Initiative — Sustainability standards',
+      'SASB': 'Sustainability Accounting Standards Board',
+      'CDP': 'Carbon Disclosure Project — Environmental reporting',
+      'LCA': 'Life Cycle Assessment — Cradle-to-grave impact analysis',
+      'SDG': 'Sustainable Development Goals — UN 2030 targets',
+      'ISO': 'International Organization for Standardization',
+      'SE': 'Specific Energy — kWh per m³ of water treated'
+    };
+
+    // Helper function to wrap acronyms with tooltips
+    function wrapWithTooltips(text) {
+      let result = text;
+      // Sort by length to avoid partial replacements (e.g., "CAPEX" before "CAP")
+      const sortedAcronyms = Object.keys(ACRONYMS).sort((a, b) => b.length - a.length);
+      sortedAcronyms.forEach(acronym => {
+        const regex = new RegExp(`\\b(${acronym})\\b`, 'g');
+        result = result.replace(regex, `<span class="acronym-tooltip" data-tooltip="${ACRONYMS[acronym]}">$1</span>`);
+      });
+      return result;
+    }
+
+    // Glossary open/close
+    const glossaryOverlay = document.getElementById('glossaryOverlay');
+    const openGlossaryBtn = document.getElementById('openGlossary');
+    const closeGlossaryBtn = document.getElementById('closeGlossary');
+
+    openGlossaryBtn.addEventListener('click', () => {
+      glossaryOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    closeGlossaryBtn.addEventListener('click', () => {
+      glossaryOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+    // ESC key to close glossary
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && glossaryOverlay.classList.contains('active')) {
+        glossaryOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Apply acronym tooltips to the page
+    function applyAcronymTooltips() {
+      try {
+        // Target elements where we want to apply tooltips
+        // Be specific to avoid modifying containers with D3 SVG or other dynamic content
+        const targetSelectors = [
+          '#details .card p',
+          '#details .card li',
+          '.layer-panel .desc',
+          '.perspective-detail p'
+        ];
+
+        targetSelectors.forEach(selector => {
+          document.querySelectorAll(selector).forEach(el => {
+            try {
+              // Skip if already processed or contains complex elements
+              if (el.dataset.tooltipsApplied) return;
+              if (el.querySelector('svg, canvas, input, select, button, .perspective-tab')) return;
+
+              let html = el.innerHTML;
+
+              // Sort acronyms by length (longest first) to avoid partial replacements
+              const sortedAcronyms = Object.keys(ACRONYMS).sort((a, b) => b.length - a.length);
+
+              sortedAcronyms.forEach(acronym => {
+                // Only match whole words, not already in a tooltip
+                const regex = new RegExp(`\\b(${acronym})\\b(?![^<]*>)`, 'g');
+                html = html.replace(regex, `<span class="acronym-tooltip" data-tooltip="${ACRONYMS[acronym]}">$1</span>`);
+              });
+
+              el.innerHTML = html;
+              el.dataset.tooltipsApplied = 'true';
+            } catch (innerErr) {
+              console.warn('Error applying tooltip to element:', innerErr);
+            }
+          });
+        });
+      } catch (err) {
+        console.warn('Error in applyAcronymTooltips:', err);
+      }
+    }
+
+    // Apply tooltips after initial render (delay to let D3 finish)
+    setTimeout(applyAcronymTooltips, 1500);
+
+    // ============ ROLE-SPECIFIC VIEW SYSTEM ============
+
+    // Current selected role
+    let currentRole = 'all';
+
+    // Role definitions with descriptions
+    const ROLE_VIEWS = {
+      all: {
+        name: 'All Outputs',
+        description: 'Shows all simulator outputs without filtering'
+      },
+      business: {
+        name: 'Business Leadership',
+        description: 'Investment decisions, margins, ROI, and strategic metrics',
+        focus: ['CAPEX', 'OPEX', 'Pricing', 'Win Probability', 'Confidence', 'ESG Score']
+      },
+      technical: {
+        name: 'Technical/Engineering',
+        description: 'System design, process validation, and technical specifications',
+        focus: ['Technology Chain', 'Mass Balance', 'Energy', 'Constraints', 'Input Vector']
+      },
+      sales: {
+        name: 'Sales & Proposals',
+        description: 'Pricing strategy, win probability, and customer-facing outputs',
+        focus: ['Recommendations', 'Pricing', 'Win Probability', 'ESG Score', 'Confidence']
+      },
+      esg: {
+        name: 'ESG/Sustainability',
+        description: 'Environmental metrics, energy efficiency, and sustainability scores',
+        focus: ['ESG Score', 'Energy Calculation', 'Water Recovery']
+      },
+      compliance: {
+        name: 'Compliance/Governance',
+        description: 'Audit trails, constraint validation, and decision provenance',
+        focus: ['Ledger Hash', 'Constraints', 'Confidence Thresholds']
+      },
+      operations: {
+        name: 'Operations',
+        description: 'OPEX breakdown, system specs, and maintenance planning',
+        focus: ['OPEX', 'System Metrics', 'Mass Balance', 'Energy', 'Recommendations']
+      }
+    };
+
+    // Apply role filter to simulator sections
+    function applyRoleFilter(role) {
+      currentRole = role;
+
+      // Update tab active states
+      document.querySelectorAll('.role-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.role === role);
+      });
+
+      // Get all sections with role data
+      const sections = document.querySelectorAll('.sim-section[data-roles]');
+
+      sections.forEach(section => {
+        const roles = section.dataset.roles.split(',');
+
+        if (role === 'all') {
+          // Show all sections
+          section.classList.remove('dimmed', 'highlighted');
+        } else if (roles.includes(role)) {
+          // This section is relevant to the selected role
+          section.classList.remove('dimmed');
+          section.classList.add('highlighted');
+        } else {
+          // This section is not relevant
+          section.classList.add('dimmed');
+          section.classList.remove('highlighted');
+        }
+      });
+
+      // Log role change for debugging
+      console.log(`Role view changed to: ${ROLE_VIEWS[role].name}`);
+    }
+
+    // Event listeners for role tabs
+    document.querySelectorAll('.role-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        applyRoleFilter(tab.dataset.role);
+      });
+    });
+
+    // ============ SCENARIO PLAYER SYSTEM ============
+
+    // Scenario player state
+    const scenarioState = {
+      isPlaying: false,
+      currentTime: 0,
+      duration: 30000, // 30 seconds
+      speed: 1,
+      intervalId: null,
+      currentScenario: null,
+      previousValues: {}
+    };
+
+    // Store previous values for change detection
+    function captureCurrentValues() {
+      return {
+        flow: parseFloat(document.getElementById('simFlow').value),
+        tss: parseFloat(document.getElementById('simTSS').value),
+        tds: parseFloat(document.getElementById('simTDS').value),
+        bod: parseFloat(document.getElementById('simBOD').value),
+        cod: parseFloat(document.getElementById('simCOD').value),
+        tssTarget: parseFloat(document.getElementById('simTSSTarget').value),
+        tdsTarget: parseFloat(document.getElementById('simTDSTarget').value),
+        waterPriority: parseFloat(document.getElementById('simWaterPriority').value),
+        carbonPriority: parseFloat(document.getElementById('simCarbonPriority').value),
+        energyPriority: parseFloat(document.getElementById('simEnergyPriority').value),
+        footprint: parseFloat(document.getElementById('simFootprint').value),
+        budget: parseFloat(document.getElementById('simBudget').value)
+      };
+    }
+
+    // Apply blinking effect to changed elements
+    function highlightChanges(oldValues, newValues) {
+      const mappings = {
+        flow: 'simFlow',
+        tss: 'simTSS',
+        tds: 'simTDS',
+        bod: 'simBOD',
+        cod: 'simCOD',
+        tssTarget: 'simTSSTarget',
+        tdsTarget: 'simTDSTarget',
+        waterPriority: 'simWaterPriority',
+        carbonPriority: 'simCarbonPriority',
+        energyPriority: 'simEnergyPriority',
+        footprint: 'simFootprint',
+        budget: 'simBudget'
+      };
+
+      Object.keys(mappings).forEach(key => {
+        if (oldValues[key] !== newValues[key]) {
+          const el = document.getElementById(mappings[key]);
+          if (el) {
+            el.classList.add('value-changed');
+            el.parentElement.classList.add('metric-changed');
+            setTimeout(() => {
+              el.classList.remove('value-changed');
+              el.parentElement.classList.remove('metric-changed');
+            }, 600);
+          }
+        }
+      });
+
+      // Highlight output sections
+      setTimeout(() => {
+        document.getElementById('inputVector')?.classList.add('vector-changed');
+        document.querySelectorAll('.equation-box').forEach(el => el.classList.add('box-changed'));
+        document.querySelectorAll('.output-metric .value').forEach(el => el.classList.add('value-changed'));
+        document.querySelectorAll('.tech-recommendation').forEach(el => el.classList.add('metric-changed'));
+
+        setTimeout(() => {
+          document.getElementById('inputVector')?.classList.remove('vector-changed');
+          document.querySelectorAll('.equation-box').forEach(el => el.classList.remove('box-changed'));
+          document.querySelectorAll('.output-metric .value').forEach(el => el.classList.remove('value-changed'));
+          document.querySelectorAll('.tech-recommendation').forEach(el => el.classList.remove('metric-changed'));
+        }, 800);
+      }, 100);
+    }
+
+    // Preset scenarios
+    const SCENARIOS = {
+      'ramp-flow': {
+        name: 'Ramp Flow Rate',
+        duration: 20000,
+        description: 'Flow rate increases from 50 to 500 m³/h',
+        keyframes: [
+          { time: 0, values: { flow: 50 } },
+          { time: 0.25, values: { flow: 150 } },
+          { time: 0.5, values: { flow: 300 } },
+          { time: 0.75, values: { flow: 450 } },
+          { time: 1, values: { flow: 500 } }
+        ]
+      },
+      'quality-change': {
+        name: 'Quality Variation',
+        duration: 25000,
+        description: 'Water quality degrades then improves',
+        keyframes: [
+          { time: 0, values: { tss: 100, tds: 1500, bod: 150, cod: 250 } },
+          { time: 0.33, values: { tss: 300, tds: 4000, bod: 400, cod: 700 } },
+          { time: 0.66, values: { tss: 500, tds: 6000, bod: 600, cod: 1000 } },
+          { time: 1, values: { tss: 150, tds: 2500, bod: 200, cod: 350 } }
+        ]
+      },
+      'budget-sweep': {
+        name: 'Budget Sweep',
+        duration: 20000,
+        description: 'Budget varies from £500k to £5000k',
+        keyframes: [
+          { time: 0, values: { budget: 500 } },
+          { time: 0.25, values: { budget: 1500 } },
+          { time: 0.5, values: { budget: 2500 } },
+          { time: 0.75, values: { budget: 4000 } },
+          { time: 1, values: { budget: 5000 } }
+        ]
+      },
+      'esg-priority': {
+        name: 'ESG Priority Shift',
+        duration: 25000,
+        description: 'Priorities shift from cost-focused to sustainability-focused',
+        keyframes: [
+          { time: 0, values: { waterPriority: 20, carbonPriority: 20, energyPriority: 60 } },
+          { time: 0.33, values: { waterPriority: 40, carbonPriority: 30, energyPriority: 30 } },
+          { time: 0.66, values: { waterPriority: 60, carbonPriority: 30, energyPriority: 10 } },
+          { time: 1, values: { waterPriority: 80, carbonPriority: 15, energyPriority: 5 } }
+        ]
+      },
+      'full-demo': {
+        name: 'Full Demo',
+        duration: 45000,
+        description: 'Comprehensive demo with all parameter variations',
+        keyframes: [
+          { time: 0, values: { flow: 100, tss: 150, tds: 2500, budget: 2000, waterPriority: 50, carbonPriority: 30, energyPriority: 20 } },
+          { time: 0.15, values: { flow: 200, tss: 200, tds: 3000 } },
+          { time: 0.3, values: { flow: 300, tss: 300, tds: 4000, budget: 3000 } },
+          { time: 0.45, values: { waterPriority: 70, carbonPriority: 20, energyPriority: 10 } },
+          { time: 0.6, values: { flow: 400, tds: 5000, budget: 4000 } },
+          { time: 0.75, values: { tss: 400, bod: 300, cod: 500 } },
+          { time: 0.9, values: { flow: 500, budget: 5000, waterPriority: 80 } },
+          { time: 1, values: { flow: 250, tss: 150, tds: 2500, budget: 2500, waterPriority: 50, carbonPriority: 30, energyPriority: 20 } }
+        ]
+      }
+    };
+
+    // Interpolate values between keyframes
+    function interpolateValue(keyframes, property, progress) {
+      // Find the surrounding keyframes
+      let prevFrame = keyframes[0];
+      let nextFrame = keyframes[keyframes.length - 1];
+
+      for (let i = 0; i < keyframes.length - 1; i++) {
+        if (progress >= keyframes[i].time && progress <= keyframes[i + 1].time) {
+          prevFrame = keyframes[i];
+          nextFrame = keyframes[i + 1];
+          break;
+        }
+      }
+
+      if (!prevFrame.values.hasOwnProperty(property) && !nextFrame.values.hasOwnProperty(property)) {
+        return null;
+      }
+
+      const prevValue = prevFrame.values[property];
+      const nextValue = nextFrame.values[property];
+
+      if (prevValue === undefined) return nextValue;
+      if (nextValue === undefined) return prevValue;
+
+      // Calculate local progress within this segment
+      const segmentDuration = nextFrame.time - prevFrame.time;
+      const localProgress = segmentDuration > 0 ? (progress - prevFrame.time) / segmentDuration : 0;
+
+      // Linear interpolation
+      return prevValue + (nextValue - prevValue) * localProgress;
+    }
+
+    // Update simulation with animated values
+    function updateScenarioValues(progress) {
+      if (!scenarioState.currentScenario) return;
+
+      const scenario = SCENARIOS[scenarioState.currentScenario];
+      const oldValues = captureCurrentValues();
+      const newValues = {};
+
+      // Interpolate all values
+      ['flow', 'tss', 'tds', 'bod', 'cod', 'tssTarget', 'tdsTarget',
+       'waterPriority', 'carbonPriority', 'energyPriority', 'footprint', 'budget'].forEach(prop => {
+        const value = interpolateValue(scenario.keyframes, prop, progress);
+        if (value !== null) {
+          newValues[prop] = Math.round(value * 10) / 10;
+        }
+      });
+
+      // Apply new values to inputs
+      if (newValues.flow !== undefined) document.getElementById('simFlow').value = newValues.flow;
+      if (newValues.tss !== undefined) document.getElementById('simTSS').value = newValues.tss;
+      if (newValues.tds !== undefined) document.getElementById('simTDS').value = newValues.tds;
+      if (newValues.bod !== undefined) document.getElementById('simBOD').value = newValues.bod;
+      if (newValues.cod !== undefined) document.getElementById('simCOD').value = newValues.cod;
+      if (newValues.tssTarget !== undefined) document.getElementById('simTSSTarget').value = newValues.tssTarget;
+      if (newValues.tdsTarget !== undefined) document.getElementById('simTDSTarget').value = newValues.tdsTarget;
+      if (newValues.waterPriority !== undefined) {
+        document.getElementById('simWaterPriority').value = newValues.waterPriority;
+        document.getElementById('waterPriorityVal').textContent = newValues.waterPriority + '%';
+      }
+      if (newValues.carbonPriority !== undefined) {
+        document.getElementById('simCarbonPriority').value = newValues.carbonPriority;
+        document.getElementById('carbonPriorityVal').textContent = newValues.carbonPriority + '%';
+      }
+      if (newValues.energyPriority !== undefined) {
+        document.getElementById('simEnergyPriority').value = newValues.energyPriority;
+        document.getElementById('energyPriorityVal').textContent = newValues.energyPriority + '%';
+      }
+      if (newValues.footprint !== undefined) document.getElementById('simFootprint').value = newValues.footprint;
+      if (newValues.budget !== undefined) document.getElementById('simBudget').value = newValues.budget;
+
+      // Highlight changes and run simulation
+      highlightChanges(oldValues, captureCurrentValues());
+      runSimulation();
+    }
+
+    // Update timeline UI
+    function updateTimelineUI() {
+      const progress = scenarioState.currentTime / scenarioState.duration;
+      document.getElementById('scenarioProgress').style.width = (progress * 100) + '%';
+      document.getElementById('scenarioMarker').style.left = (progress * 100) + '%';
+
+      const seconds = Math.floor(scenarioState.currentTime / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      document.getElementById('scenarioTime').textContent =
+        `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    // Scenario tick function
+    function scenarioTick() {
+      if (!scenarioState.isPlaying) return;
+
+      const tickInterval = 100; // 100ms per tick
+      scenarioState.currentTime += tickInterval * scenarioState.speed;
+
+      if (scenarioState.currentTime >= scenarioState.duration) {
+        scenarioState.currentTime = scenarioState.duration;
+        stopScenario();
+      }
+
+      const progress = scenarioState.currentTime / scenarioState.duration;
+      updateScenarioValues(progress);
+      updateTimelineUI();
+    }
+
+    // Play scenario
+    function playScenario() {
+      if (!scenarioState.currentScenario) {
+        // Default to full demo if no scenario selected
+        selectScenario('full-demo');
+      }
+
+      scenarioState.isPlaying = true;
+      document.getElementById('scenarioPlay').classList.add('active');
+      document.getElementById('scenarioPause').classList.remove('active');
+      document.getElementById('liveIndicator').style.display = 'inline-flex';
+
+      if (scenarioState.intervalId) clearInterval(scenarioState.intervalId);
+      scenarioState.intervalId = setInterval(scenarioTick, 100);
+    }
+
+    // Pause scenario
+    function pauseScenario() {
+      scenarioState.isPlaying = false;
+      document.getElementById('scenarioPlay').classList.remove('active');
+      document.getElementById('scenarioPause').classList.add('active');
+      document.getElementById('liveIndicator').style.display = 'none';
+
+      if (scenarioState.intervalId) {
+        clearInterval(scenarioState.intervalId);
+        scenarioState.intervalId = null;
+      }
+    }
+
+    // Stop scenario (pause + reset)
+    function stopScenario() {
+      pauseScenario();
+    }
+
+    // Reset scenario
+    function resetScenario() {
+      pauseScenario();
+      scenarioState.currentTime = 0;
+      updateTimelineUI();
+
+      if (scenarioState.currentScenario) {
+        updateScenarioValues(0);
+      }
+    }
+
+    // Step forward
+    function stepScenario() {
+      pauseScenario();
+      const stepSize = scenarioState.duration / 20; // 5% steps
+      scenarioState.currentTime = Math.min(scenarioState.currentTime + stepSize, scenarioState.duration);
+
+      const progress = scenarioState.currentTime / scenarioState.duration;
+      updateScenarioValues(progress);
+      updateTimelineUI();
+    }
+
+    // Select a preset scenario
+    function selectScenario(scenarioId) {
+      scenarioState.currentScenario = scenarioId;
+      const scenario = SCENARIOS[scenarioId];
+
+      if (scenario) {
+        scenarioState.duration = scenario.duration;
+        document.getElementById('scenarioPhase').textContent = scenario.name;
+        document.getElementById('scenarioDuration').textContent =
+          `Duration: ${Math.round(scenario.duration / 1000)}s`;
+
+        // Highlight selected preset button
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.scenario === scenarioId);
+        });
+
+        resetScenario();
+      }
+    }
+
+    // Timeline click/drag handling
+    function handleTimelineInteraction(e) {
+      const timeline = document.getElementById('scenarioTimeline');
+      const rect = timeline.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const progress = Math.max(0, Math.min(1, x / rect.width));
+
+      scenarioState.currentTime = progress * scenarioState.duration;
+      updateScenarioValues(progress);
+      updateTimelineUI();
+    }
+
+    // Speed control
+    function updateSpeed(value) {
+      scenarioState.speed = parseFloat(value);
+      document.getElementById('speedValue').textContent = value + 'x';
+    }
+
+    // Event listeners for scenario player
+    document.getElementById('scenarioPlay').addEventListener('click', playScenario);
+    document.getElementById('scenarioPause').addEventListener('click', pauseScenario);
+    document.getElementById('scenarioReset').addEventListener('click', resetScenario);
+    document.getElementById('scenarioStep').addEventListener('click', stepScenario);
+
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => selectScenario(btn.dataset.scenario));
+    });
+
+    document.getElementById('scenarioTimeline').addEventListener('click', handleTimelineInteraction);
+
+    // Timeline dragging
+    let isDraggingTimeline = false;
+    document.getElementById('scenarioMarker').addEventListener('mousedown', () => {
+      isDraggingTimeline = true;
+      pauseScenario();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (isDraggingTimeline) {
+        handleTimelineInteraction(e);
+      }
+    });
+    document.addEventListener('mouseup', () => {
+      isDraggingTimeline = false;
+    });
+
+    document.getElementById('scenarioSpeed').addEventListener('input', (e) => {
+      updateSpeed(e.target.value);
+    });
+
+    // Also trigger change animation on manual input changes
+    const inputFields = ['simFlow', 'simTSS', 'simTDS', 'simBOD', 'simCOD',
+                        'simTSSTarget', 'simTDSTarget', 'simFootprint', 'simBudget'];
+    inputFields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => {
+          el.classList.add('value-changed');
+          setTimeout(() => el.classList.remove('value-changed'), 600);
+        });
+      }
+    });
+
+    // Priority sliders with live update
+    ['simWaterPriority', 'simCarbonPriority', 'simEnergyPriority'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', () => {
+          const valEl = document.getElementById(id.replace('sim', '').replace('Priority', 'PriorityVal').toLowerCase().replace('priority', 'Priority'));
+          if (valEl) valEl.textContent = el.value + '%';
+        });
+      }
+    });
+
+    // Run initial simulation on load
+    setTimeout(runSimulation, 100);
+
   </script>
 </body>
 </html>
