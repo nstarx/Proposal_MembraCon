@@ -2394,53 +2394,55 @@
       }
     };
 
+    // Flow frequency: how often data flows through each edge
+    // 5 = very high (continuous stream), 4 = high, 3 = medium, 2 = low, 1 = rare
     const LINKS = [
-      // Inputs feed the core
-      { source:"caseInputs", target:"knowledgeLayer", type:"context" },
-      { source:"artifacts", target:"knowledgeLayer", type:"context" },
-      { source:"catalog", target:"knowledgeLayer", type:"context" },
-      { source:"history", target:"agents", type:"learning" },
-      { source:"history", target:"pricing", type:"core" },
-      { source:"esgFramework", target:"esgOptimize", type:"core" },
+      // Inputs feed the core - high frequency as customer data streams in
+      { source:"caseInputs", target:"knowledgeLayer", type:"context", flow: 5 },
+      { source:"artifacts", target:"knowledgeLayer", type:"context", flow: 3 },
+      { source:"catalog", target:"knowledgeLayer", type:"context", flow: 4 },
+      { source:"history", target:"agents", type:"learning", flow: 2 },
+      { source:"history", target:"pricing", type:"core", flow: 3 },
+      { source:"esgFramework", target:"esgOptimize", type:"core", flow: 3 },
 
-      // Core flow
-      { source:"knowledgeLayer", target:"decisionNodes", type:"core" },
-      { source:"decisionNodes", target:"simulators", type:"core" },
-      { source:"simulators", target:"aiEngine", type:"core" },
-      { source:"aiEngine", target:"pricing", type:"core" },
-      { source:"aiEngine", target:"esgOptimize", type:"core" },
-      { source:"pricing", target:"proposalOut", type:"core" },
-      { source:"esgOptimize", target:"proposalOut", type:"core" },
+      // Core flow - highest frequency, main processing pipeline
+      { source:"knowledgeLayer", target:"decisionNodes", type:"core", flow: 5 },
+      { source:"decisionNodes", target:"simulators", type:"core", flow: 5 },
+      { source:"simulators", target:"aiEngine", type:"core", flow: 5 },
+      { source:"aiEngine", target:"pricing", type:"core", flow: 5 },
+      { source:"aiEngine", target:"esgOptimize", type:"core", flow: 4 },
+      { source:"pricing", target:"proposalOut", type:"core", flow: 5 },
+      { source:"esgOptimize", target:"proposalOut", type:"core", flow: 4 },
 
-      // Ledger logging
-      { source:"caseInputs", target:"ledger", type:"gov" },
-      { source:"decisionNodes", target:"ledger", type:"gov" },
-      { source:"aiEngine", target:"ledger", type:"gov" },
-      { source:"pricing", target:"ledger", type:"gov" },
-      { source:"esgOptimize", target:"ledger", type:"gov" },
-      { source:"proposalOut", target:"ledger", type:"gov" },
-      { source:"ledger", target:"governance", type:"gov" },
+      // Ledger logging - medium frequency, logs every decision
+      { source:"caseInputs", target:"ledger", type:"gov", flow: 3 },
+      { source:"decisionNodes", target:"ledger", type:"gov", flow: 4 },
+      { source:"aiEngine", target:"ledger", type:"gov", flow: 4 },
+      { source:"pricing", target:"ledger", type:"gov", flow: 3 },
+      { source:"esgOptimize", target:"ledger", type:"gov", flow: 3 },
+      { source:"proposalOut", target:"ledger", type:"gov", flow: 4 },
+      { source:"ledger", target:"governance", type:"gov", flow: 2 },
 
-      // Learning loop
-      { source:"proposalOut", target:"agents", type:"learning" },
-      { source:"agents", target:"winLoss", type:"learning" },
-      { source:"agents", target:"pricingAgent", type:"learning" },
-      { source:"agents", target:"techPerf", type:"learning" },
-      { source:"agents", target:"esgTrack", type:"learning" },
-      { source:"agents", target:"ingestion", type:"learning" },
+      // Learning loop - lower frequency, batch processing
+      { source:"proposalOut", target:"agents", type:"learning", flow: 3 },
+      { source:"agents", target:"winLoss", type:"learning", flow: 2 },
+      { source:"agents", target:"pricingAgent", type:"learning", flow: 2 },
+      { source:"agents", target:"techPerf", type:"learning", flow: 2 },
+      { source:"agents", target:"esgTrack", type:"learning", flow: 2 },
+      { source:"agents", target:"ingestion", type:"learning", flow: 3 },
 
-      // Back into the system
-      { source:"winLoss", target:"aiEngine", type:"learning" },
-      { source:"pricingAgent", target:"pricing", type:"learning" },
-      { source:"techPerf", target:"simulators", type:"learning" },
-      { source:"esgTrack", target:"esgOptimize", type:"learning" },
-      { source:"ingestion", target:"knowledgeLayer", type:"learning" },
+      // Back into the system - feedback loops, periodic updates
+      { source:"winLoss", target:"aiEngine", type:"learning", flow: 2 },
+      { source:"pricingAgent", target:"pricing", type:"learning", flow: 2 },
+      { source:"techPerf", target:"simulators", type:"learning", flow: 2 },
+      { source:"esgTrack", target:"esgOptimize", type:"learning", flow: 2 },
+      { source:"ingestion", target:"knowledgeLayer", type:"learning", flow: 3 },
 
-      // Outcomes & roadmap
-      { source:"proposalOut", target:"outcomes", type:"context" },
-      { source:"roadmap", target:"knowledgeLayer", type:"context" },
-      { source:"roadmap", target:"ledger", type:"context" },
-      { source:"roadmap", target:"agents", type:"context" }
+      // Outcomes & roadmap - lower frequency, strategic updates
+      { source:"proposalOut", target:"outcomes", type:"context", flow: 3 },
+      { source:"roadmap", target:"knowledgeLayer", type:"context", flow: 1 },
+      { source:"roadmap", target:"ledger", type:"context", flow: 1 },
+      { source:"roadmap", target:"agents", type:"context", flow: 1 }
     ];
 
     // A “primary flow” for focus mode
@@ -2526,6 +2528,7 @@
       source: nodeById.get(l.source),
       target: nodeById.get(l.target),
       type: l.type,
+      flow: l.flow || 3, // default to medium frequency
       key: `${l.source}->${l.target}`
     }));
 
@@ -2823,18 +2826,23 @@
       const pathLength = pathEl.getTotalLength();
       if (pathLength < 10) return;
 
+      // Adjust particle size based on flow frequency (1-5 scale)
+      // Higher flow = slightly larger particles for visual emphasis
+      const flowSizeMultiplier = 0.8 + (linkData.flow * 0.1); // 0.9 to 1.3
+      const adjustedRadius = config.radius * flowSizeMultiplier;
+
       // Create particle with glow effect
       const particle = flowParticlesGroup.append("circle")
         .attr("class", `flow-particle ${linkData.type}`)
-        .attr("r", config.radius)
+        .attr("r", adjustedRadius)
         .attr("filter", "url(#particle-glow)");
 
-      // Optional trailing particle for emphasis
+      // Optional trailing particle for emphasis (only for higher flow)
       let trail = null;
-      if (config.trail) {
+      if (config.trail && linkData.flow >= 3) {
         trail = flowParticlesGroup.append("circle")
           .attr("class", `flow-particle ${linkData.type}`)
-          .attr("r", config.radius * 0.6)
+          .attr("r", adjustedRadius * 0.6)
           .attr("opacity", 0.5);
       }
 
@@ -2900,8 +2908,15 @@
       flowAnimationActive = true;
       links.forEach(linkData => {
         const config = PARTICLE_CONFIG[linkData.type] || PARTICLE_CONFIG.context;
+
+        // Calculate interval based on flow frequency (1-5 scale)
+        // flow=5 -> interval * 0.3 (very frequent)
+        // flow=1 -> interval * 2.5 (rare)
+        const flowMultiplier = 1 + (5 - linkData.flow) * 0.4; // 0.6 to 2.2
+        const adjustedInterval = config.interval * flowMultiplier;
+
         // Stagger start times to avoid synchronization
-        const initialDelay = Math.random() * config.interval;
+        const initialDelay = Math.random() * adjustedInterval;
 
         setTimeout(() => {
           if (!flowAnimationActive) return;
@@ -2911,7 +2926,7 @@
             if (flowAnimationActive) {
               animateParticle(linkData);
             }
-          }, config.interval + Math.random() * 400); // Add jitter
+          }, adjustedInterval + Math.random() * 400); // Add jitter
 
           particleIntervals.push(intervalId);
         }, initialDelay);
