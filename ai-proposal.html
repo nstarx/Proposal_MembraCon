@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon — Digital Twin Proposal System</title>
+
+  <!-- D3.js -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+
+  <!-- Modular CSS -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/simulator.css">
+  <link rel="stylesheet" href="css/visualizations.css">
+</head>
+
+<body>
+  <header>
+    <span class="badge">Digital Twin Visualization</span>
+    <h1>AI-Native Solution Design & Pricing System — MembraCon UK</h1>
+    <div class="spacer"></div>
+    <div class="hint">
+      Drag nodes · Click a node for details · Use Perspective tabs for stakeholder views · <span class="kbd">F</span> focus · <span class="kbd">R</span> reset
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- LEFT: Controls & Summary -->
+    <section class="panel">
+      <div class="top">
+        <h2>Concept Controls</h2>
+        <span class="badge" id="modeBadge">Mode: Full Map</span>
+      </div>
+      <div class="content">
+        <div class="card">
+          <h3>What this shows</h3>
+          <p>
+            A sequential execution flow showing how proposals are generated:
+            <b>Inputs → Knowledge → Decisions → Simulation → AI Engine → Strategy → Output → Governance</b>.
+            Learning agents provide feedback loops to continuously improve the system.
+          </p>
+          <div class="row" style="margin-top:10px;">
+            <div class="pill active" data-mode="full">Full Map</div>
+            <div class="pill" data-mode="flow">Decision Flow</div>
+            <div class="pill" data-mode="architecture">Architecture</div>
+            <div class="pill" data-mode="learning">Autonomous Agents</div>
+            <div class="pill" data-mode="roadmap">Roadmap</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="sim-button" id="openSimulator" style="flex:1;">
+              <span class="material-icons-outlined">calculate</span>
+              Math Sim
+            </button>
+            <button class="sim-button" id="openGlossary" style="flex:1;background:linear-gradient(135deg,rgba(53,208,186,.25),rgba(100,149,237,.2));">
+              <span class="material-icons-outlined">menu_book</span>
+              Glossary
+            </button>
+          </div>
+        </div>
+
+        <!-- Layers of Interest Section -->
+        <div class="card">
+          <h3>Layers of Interest</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0 0 10px 0;">
+            View the system from different stakeholder perspectives.
+          </p>
+          <div class="perspective-tabs" id="perspectiveTabs">
+            <div class="perspective-tab active" data-perspective="all">
+              <span class="material-icons-outlined icon">apps</span> All
+            </div>
+            <div class="perspective-tab" data-perspective="business">
+              <span class="material-icons-outlined icon">trending_up</span> Business
+            </div>
+            <div class="perspective-tab" data-perspective="technical">
+              <span class="material-icons-outlined icon">memory</span> Technical
+            </div>
+            <div class="perspective-tab" data-perspective="sales">
+              <span class="material-icons-outlined icon">track_changes</span> Sales
+            </div>
+            <div class="perspective-tab" data-perspective="esg">
+              <span class="material-icons-outlined icon">eco</span> ESG
+            </div>
+            <div class="perspective-tab" data-perspective="compliance">
+              <span class="material-icons-outlined icon">verified_user</span> Compliance
+            </div>
+            <div class="perspective-tab" data-perspective="operations">
+              <span class="material-icons-outlined icon">engineering</span> Operations
+            </div>
+          </div>
+          <div id="layerDescription" class="layer-panel" style="display:none;"></div>
+        </div>
+
+        <div class="card">
+          <h3>Legend</h3>
+          <ul>
+            <li><b>Inputs</b>: sector, water analysis, constraints, ESG priorities</li>
+            <li><b>Structural intelligence</b>: decision nodes, rules, constraints, simulators</li>
+            <li><b>AI engine</b>: multi-objective optimization (cost/margin/ESG/compliance)</li>
+            <li><b>Ledger</b>: immutable "why" trail (explainability, governance, audit)</li>
+            <li><b>Agents</b>: win/loss, pricing, tech performance, ESG tracking, ingestion</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Quick highlights</h3>
+          <div class="mini" data-jump="proposalFlow">
+            <div>
+              <div class="t">Structured Decision Framework</div>
+              <div class="s">raw water → stages → sizing → cost → pricing → ESG → narrative</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+          <div class="mini" data-jump="ledger">
+            <div>
+              <div class="t">Blockchain Decision Ledger</div>
+              <div class="s">tamper-proof rationale, approvals, policy checks</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+          <div class="mini" data-jump="agents">
+            <div>
+              <div class="t">Continuous Learning Loop</div>
+              <div class="s">outcomes feed back → better next proposal</div>
+            </div>
+            <div class="kbd">↗</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Navigation</h3>
+          <ul>
+            <li><span class="kbd">F</span> Focus: show only the primary "proposal generation" path</li>
+            <li><span class="kbd">R</span> Reset: show full map and clear all filters</li>
+            <li><b>Perspectives:</b> Use tabs above to filter by stakeholder view</li>
+            <li><b>Click nodes:</b> View detailed role descriptions from current perspective</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER: Graph / Visualizations -->
+    <section class="panel" id="graphPanel">
+      <div class="top">
+        <h2>Execution Flow Sequence</h2>
+        <button id="flowToggle" class="flow-toggle active" title="Toggle flow animation">
+          <span class="material-icons-outlined">waves</span>
+          <span class="label">Flow</span>
+        </button>
+        <span class="badge" id="statusBadge">Ready</span>
+      </div>
+      <div class="content" style="padding:0;position:relative;">
+        <div class="toast" id="toast"></div>
+
+        <!-- Visualization tabs -->
+        <div class="viz-tabs">
+          <button class="viz-tab active" data-viz="flow-graph">
+            <span class="material-icons-outlined">account_tree</span> Flow Graph
+          </button>
+          <button class="viz-tab" data-viz="scada-dashboard">
+            <span class="material-icons-outlined">speed</span> Dashboard
+          </button>
+          <button class="viz-tab" data-viz="decision-tree">
+            <span class="material-icons-outlined">fork_right</span> Decisions
+          </button>
+          <button class="viz-tab" data-viz="treatment-train">
+            <span class="material-icons-outlined">water_drop</span> Train
+          </button>
+          <button class="viz-tab" data-viz="sankey">
+            <span class="material-icons-outlined">stacked_bar_chart</span> Sankey
+          </button>
+          <button class="viz-tab" data-viz="carbon-clock">
+            <span class="material-icons-outlined">timer</span> Carbon
+          </button>
+          <button class="viz-tab" data-viz="isometric-plant">
+            <span class="material-icons-outlined">view_in_ar</span> 3D Plant
+          </button>
+          <button class="viz-tab" data-viz="optimization-3d">
+            <span class="material-icons-outlined">insights</span> Optimize
+          </button>
+          <button class="viz-tab" data-viz="molecule-journey">
+            <span class="material-icons-outlined">bubble_chart</span> Journey
+          </button>
+        </div>
+
+        <!-- Main visualization container -->
+        <div id="viz-container" class="viz-container">
+          <!-- SVG will be injected here by flow-graph.js -->
+        </div>
+
+        <div class="legend" aria-hidden="true">
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><path d="M2,7 L9,2 L16,7 L9,12 Z" fill="rgba(255,165,0,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Decision</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="14" height="8" fill="rgba(64,224,208,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Process</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="9,1 16,4 16,10 9,13 2,10 2,4" fill="rgba(186,85,211,.90)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> AI Engine</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="14" height="8" rx="3" fill="rgba(50,205,50,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Strategy</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="4,3 16,3 14,11 2,11" fill="rgba(100,149,237,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Input/Output</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><ellipse cx="9" cy="7" rx="7" ry="5" fill="rgba(255,193,37,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Governance</div>
+          <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="5,1 13,1 17,5 17,9 13,13 5,13 1,9 1,5" fill="rgba(0,206,209,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Agent</div>
+          <div class="tag"><span style="width:20px;height:2px;display:inline-block;vertical-align:middle;margin-right:4px;border-top:2px dashed rgba(0,206,209,.80)"></span> Feedback</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Details -->
+    <section class="panel">
+      <div class="top">
+        <h2>Selected Node</h2>
+        <span class="badge" id="selectedType">None</span>
+      </div>
+      <div class="content" id="details">
+        <div class="card">
+          <h3>Click a node</h3>
+          <p>
+            You'll see what it represents in the proposal (concept), why it exists (value),
+            and what it consumes/produces (inputs/outputs). Use the left modes to filter.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Implementation Roadmap (overview)</h3>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SIMULATOR OVERLAY -->
+  <div class="simulator-overlay" id="simulatorOverlay">
+    <div class="simulator-container">
+      <div class="simulator-header">
+        <h2>
+          <span class="material-icons-outlined">calculate</span>
+          Mathematical Simulator — Proposal Generation Engine
+        </h2>
+        <button class="simulator-close" id="closeSimulator">
+          <span class="material-icons-outlined">close</span>
+          Close
+        </button>
+      </div>
+
+      <!-- ROLE SELECTOR -->
+      <div class="role-selector">
+        <div class="role-selector-label">View outputs for:</div>
+        <button class="role-tab active" data-role="all">
+          <span class="material-icons-outlined">apps</span> All
+        </button>
+        <button class="role-tab" data-role="business">
+          <span class="material-icons-outlined">trending_up</span> Business
+        </button>
+        <button class="role-tab" data-role="technical">
+          <span class="material-icons-outlined">memory</span> Technical
+        </button>
+        <button class="role-tab" data-role="sales">
+          <span class="material-icons-outlined">handshake</span> Sales
+        </button>
+        <button class="role-tab" data-role="esg">
+          <span class="material-icons-outlined">eco</span> ESG
+        </button>
+        <button class="role-tab" data-role="compliance">
+          <span class="material-icons-outlined">verified_user</span> Compliance
+        </button>
+        <button class="role-tab" data-role="operations">
+          <span class="material-icons-outlined">engineering</span> Operations
+        </button>
+      </div>
+
+      <div class="simulator-grid">
+        <!-- INPUT PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">input</span> Input Vector X</h3>
+
+          <div class="input-group">
+            <label>Industry Sector</label>
+            <select id="simSector">
+              <option value="1">Pharmaceutical</option>
+              <option value="2">Food & Beverage</option>
+              <option value="3">Power Generation</option>
+              <option value="4">Municipal</option>
+              <option value="5">Oil & Gas</option>
+              <option value="6">Semiconductor</option>
+            </select>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Flow Rate (m³/h)</label>
+              <input type="number" id="simFlow" value="100" min="1" max="10000">
+            </div>
+            <div class="input-group">
+              <label>Operating Hours/Year</label>
+              <input type="number" id="simHours" value="8000" min="1000" max="8760">
+            </div>
+          </div>
+
+          <h4>Influent Water Quality</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label>TSS (mg/L)</label>
+              <input type="number" id="simTSS" value="150" min="0" max="1000">
+            </div>
+            <div class="input-group">
+              <label>TDS (mg/L)</label>
+              <input type="number" id="simTDS" value="2500" min="0" max="50000">
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>BOD (mg/L)</label>
+              <input type="number" id="simBOD" value="200" min="0" max="5000">
+            </div>
+            <div class="input-group">
+              <label>COD (mg/L)</label>
+              <input type="number" id="simCOD" value="350" min="0" max="10000">
+            </div>
+          </div>
+
+          <h4>Target Effluent Quality</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label>TSS Target (mg/L)</label>
+              <input type="number" id="simTSSTarget" value="5" min="0" max="100">
+            </div>
+            <div class="input-group">
+              <label>TDS Target (mg/L)</label>
+              <input type="number" id="simTDSTarget" value="500" min="0" max="5000">
+            </div>
+          </div>
+
+          <h4>ESG Priority Weights</h4>
+          <div class="input-group">
+            <label>Water Recovery Priority: <span id="waterPriorityVal">50%</span></label>
+            <input type="range" id="simWaterPriority" value="50" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Carbon Reduction Priority: <span id="carbonPriorityVal">30%</span></label>
+            <input type="range" id="simCarbonPriority" value="30" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label>Energy Efficiency Priority: <span id="energyPriorityVal">20%</span></label>
+            <input type="range" id="simEnergyPriority" value="20" min="0" max="100">
+          </div>
+
+          <h4>Constraints</h4>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Max Footprint (m²)</label>
+              <input type="number" id="simFootprint" value="500" min="10" max="10000">
+            </div>
+            <div class="input-group">
+              <label>Max Budget (£k)</label>
+              <input type="number" id="simBudget" value="2000" min="100" max="50000">
+            </div>
+          </div>
+
+          <button class="sim-button" id="runSimulation">
+            <span class="material-icons-outlined">play_arrow</span>
+            Run Optimization
+          </button>
+        </div>
+
+        <!-- PROCESSING PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">settings</span> Processing & Equations</h3>
+
+          <div class="sim-section" data-roles="technical">
+            <h4>Input Vector Encoding <span class="role-badge technical">Tech</span></h4>
+            <div class="equation-box">
+              <div class="label">X = [x₁, x₂, x₃, ..., xₙ]</div>
+              <div class="vector-display" id="inputVector"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,compliance">
+            <h4>Constraint Satisfaction g(s) ≤ 0 <span class="role-badge technical">Tech</span><span class="role-badge compliance">Comply</span></h4>
+            <div id="constraintChecks"></div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations">
+            <h4>Mass Balance <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span></h4>
+            <div class="equation-box">
+              <div class="label">Qᵢₙ × Cᵢₙ = Qₒᵤₜ × Cₒᵤₜ + Qᵣₑⱼₑ꜀ₜ × Cᵣₑⱼₑ꜀ₜ</div>
+              <div id="massBalanceResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations,esg">
+            <h4>Energy Calculation <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span><span class="role-badge esg">ESG</span></h4>
+            <div class="equation-box">
+              <div class="label">SE = E_total / Q_treated (kWh/m³)</div>
+              <div id="energyResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="business,operations">
+            <h4>OPEX Estimation <span class="role-badge business">Biz</span><span class="role-badge operations">Ops</span></h4>
+            <div class="equation-box">
+              <div class="label">OPEX = (SE × rate × Q × hours) + Chem + Maint</div>
+              <div id="opexResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,business">
+            <h4>Multi-Objective Optimization <span class="role-badge technical">Tech</span><span class="role-badge business">Biz</span></h4>
+            <div class="equation-box">
+              <div class="label">F(s) = w₁f₁ + w₂f₂ + w₃f₃ + w₄f₄</div>
+              <div id="optimizationResult"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="sales,business">
+            <h4>Win Probability Model <span class="role-badge sales">Sales</span><span class="role-badge business">Biz</span></h4>
+            <div class="equation-box">
+              <div class="label">P(win) = 1 / (1 + e^(-z))</div>
+              <div id="winProbResult"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT PANEL -->
+        <div class="sim-panel">
+          <h3><span class="material-icons-outlined">output</span> Output — Proposal P</h3>
+
+          <div class="sim-section" data-roles="technical,sales,operations">
+            <h4>Recommended Technologies <span class="role-badge technical">Tech</span><span class="role-badge sales">Sales</span><span class="role-badge operations">Ops</span></h4>
+            <div id="techRecommendations"></div>
+          </div>
+
+          <div class="sim-section" data-roles="technical,operations">
+            <h4>System Metrics <span class="role-badge technical">Tech</span><span class="role-badge operations">Ops</span></h4>
+            <div id="systemMetrics"></div>
+          </div>
+
+          <div class="sim-section" data-roles="business,sales">
+            <h4>Pricing Strategy <span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span></h4>
+            <div id="pricingOutput"></div>
+          </div>
+
+          <div class="sim-section" data-roles="esg,business,sales">
+            <h4>ESG Score <span class="role-badge esg">ESG</span><span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span></h4>
+            <div class="output-metric">
+              <span class="name">ESG Composite Score</span>
+              <span class="value good" id="esgScoreOutput">--</span>
+            </div>
+            <div class="progress-bar">
+              <div class="fill green" id="esgBar" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="sim-section" data-roles="business,sales,compliance">
+            <h4>Confidence Score <span class="role-badge business">Biz</span><span class="role-badge sales">Sales</span><span class="role-badge compliance">Comply</span></h4>
+            <div class="output-metric">
+              <span class="name">Recommendation Confidence</span>
+              <span class="value" id="confidenceOutput">--</span>
+            </div>
+            <div class="progress-bar">
+              <div class="fill purple" id="confidenceBar" style="width:0%"></div>
+            </div>
+            <div id="confidenceDecision" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
+          </div>
+
+          <div class="sim-section" data-roles="compliance">
+            <h4>Decision Ledger Entry <span class="role-badge compliance">Comply</span></h4>
+            <div class="equation-box" style="border-color:rgba(255,193,37,.4);">
+              <div class="label" style="color:var(--warn);">Blockchain Record Hash</div>
+              <div id="ledgerHash" style="font-size:10px;word-break:break-all;color:var(--muted);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY OVERLAY -->
+  <div class="glossary-overlay" id="glossaryOverlay">
+    <div class="glossary-container">
+      <div class="glossary-header">
+        <h2>
+          <span class="material-icons-outlined">menu_book</span>
+          Glossary of Acronyms
+        </h2>
+        <button class="simulator-close" id="closeGlossary">
+          <span class="material-icons-outlined">close</span>
+          Close
+        </button>
+      </div>
+
+      <div class="glossary-content">
+        <!-- Water Treatment Technologies -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">water_drop</span> Water Treatment Technologies</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item"><span class="acronym">UF</span><span class="term">Ultrafiltration</span><p>Membrane filtration removing particles & bacteria (0.01-0.1 µm).</p></div>
+            <div class="glossary-item"><span class="acronym">MBR</span><span class="term">Membrane Bioreactor</span><p>Biological treatment + membrane filtration for wastewater.</p></div>
+            <div class="glossary-item"><span class="acronym">RO</span><span class="term">Reverse Osmosis</span><p>High-pressure removal of dissolved salts (97%+ rejection).</p></div>
+            <div class="glossary-item"><span class="acronym">UV</span><span class="term">UV Disinfection</span><p>Pathogen inactivation using ultraviolet light.</p></div>
+            <div class="glossary-item"><span class="acronym">AOP</span><span class="term">Advanced Oxidation</span><p>Hydroxyl radicals break down organic micropollutants.</p></div>
+            <div class="glossary-item"><span class="acronym">NF</span><span class="term">Nanofiltration</span><p>Between UF and RO, removes divalent ions and organics.</p></div>
+          </div>
+        </div>
+
+        <!-- Water Quality Parameters -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">science</span> Water Quality Parameters</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item"><span class="acronym">TSS</span><span class="term">Total Suspended Solids</span><p>Particles in water, measured in mg/L.</p></div>
+            <div class="glossary-item"><span class="acronym">TDS</span><span class="term">Total Dissolved Solids</span><p>Dissolved minerals and salts, measured in mg/L.</p></div>
+            <div class="glossary-item"><span class="acronym">BOD</span><span class="term">Biochemical Oxygen Demand</span><p>Organic pollution indicator (biodegradable).</p></div>
+            <div class="glossary-item"><span class="acronym">COD</span><span class="term">Chemical Oxygen Demand</span><p>Total oxidizable matter including BOD.</p></div>
+            <div class="glossary-item"><span class="acronym">SE</span><span class="term">Specific Energy</span><p>Energy per unit water treated (kWh/m³).</p></div>
+          </div>
+        </div>
+
+        <!-- Business & Commercial -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">business</span> Business & Commercial</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item"><span class="acronym">CAPEX</span><span class="term">Capital Expenditure</span><p>Upfront equipment and installation costs.</p></div>
+            <div class="glossary-item"><span class="acronym">OPEX</span><span class="term">Operational Expenditure</span><p>Ongoing running costs (energy, chemicals, maintenance).</p></div>
+            <div class="glossary-item"><span class="acronym">BOO</span><span class="term">Build-Own-Operate</span><p>Provider builds, owns, and operates the system.</p></div>
+            <div class="glossary-item"><span class="acronym">BOT</span><span class="term">Build-Operate-Transfer</span><p>Ownership transfers to client after contract period.</p></div>
+            <div class="glossary-item"><span class="acronym">TCO</span><span class="term">Total Cost of Ownership</span><p>Lifetime cost: CAPEX + OPEX over system life.</p></div>
+          </div>
+        </div>
+
+        <!-- ESG & Sustainability -->
+        <div class="glossary-section">
+          <h3><span class="material-icons-outlined">eco</span> ESG & Sustainability</h3>
+          <div class="glossary-grid">
+            <div class="glossary-item"><span class="acronym">ESG</span><span class="term">Environmental, Social, Governance</span><p>Framework for measuring sustainability performance.</p></div>
+            <div class="glossary-item"><span class="acronym">GRI</span><span class="term">Global Reporting Initiative</span><p>International sustainability reporting standards.</p></div>
+            <div class="glossary-item"><span class="acronym">LCA</span><span class="term">Life Cycle Assessment</span><p>Cradle-to-grave environmental impact analysis.</p></div>
+            <div class="glossary-item"><span class="acronym">SDG</span><span class="term">Sustainable Development Goals</span><p>UN's 17 global goals for 2030.</p></div>
+            <div class="glossary-item"><span class="acronym">ZLD</span><span class="term">Zero Liquid Discharge</span><p>All water recovered; no liquid waste output.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load application as ES6 module -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

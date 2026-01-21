@@ -1200,6 +1200,77 @@
     }
 
     a{ color: inherit; }
+
+    /* Simulator Visualization Section */
+    .sim-viz-section {
+      margin-top: 16px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 12px;
+    }
+    .sim-viz-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 0 0 12px 0;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .sim-viz-tab {
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sim-viz-tab:hover { background: rgba(255,255,255,.08); color: var(--text); }
+    .sim-viz-tab.active {
+      background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(53,208,186,.20));
+      border-color: rgba(124,92,255,.5);
+      color: var(--text);
+    }
+    .sim-viz-tab .material-icons-outlined { font-size: 14px; }
+    .sim-viz-container {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      background: linear-gradient(180deg, rgba(11,16,32,1), rgba(17,27,61,1));
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .sim-viz-pane {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: none;
+    }
+    .sim-viz-pane.active { display: block; }
+    .sim-viz-pane svg { width: 100%; height: 100%; }
+
+    /* Sankey */
+    .sankey-link { fill: none; stroke-opacity: 0.4; }
+    .sankey-link:hover { stroke-opacity: 0.7; }
+
+    /* Isometric Plant */
+    .isometric-equipment { cursor: pointer; transition: filter 0.2s ease; }
+    .isometric-equipment:hover { filter: brightness(1.2); }
+    .isometric-pipe { stroke-linecap: round; stroke-linejoin: round; }
+    .isometric-label { font-size: 9px; fill: #afc4d8; pointer-events: none; }
+
+    /* Treatment Train */
+    .treatment-stage { cursor: pointer; transition: filter 0.2s ease; }
+    .treatment-stage:hover { filter: brightness(1.15); }
+
+    /* Decision Tree */
+    .decision-node { cursor: pointer; }
+    .decision-node:hover .node-box { filter: brightness(1.2); }
+    .decision-link { fill: none; stroke-width: 2; }
   </style>
 </head>
 
@@ -1337,8 +1408,9 @@
         </button>
         <span class="badge" id="statusBadge">Ready</span>
       </div>
-      <div class="content" style="padding:0;">
+      <div class="content" style="padding:0;display:flex;flex-direction:column;">
         <div class="toast" id="toast"></div>
+
         <svg id="viz" role="img" aria-label="D3 concept map"></svg>
 
         <div class="legend" aria-hidden="true">
@@ -1664,6 +1736,38 @@
               <div id="ledgerHash" style="font-size:10px;word-break:break-all;color:var(--muted);"></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- VISUALIZATION SECTION -->
+      <div class="sim-viz-section">
+        <div class="sim-viz-tabs">
+          <button class="sim-viz-tab active" data-viz="scada">
+            <span class="material-icons-outlined">speed</span> Dashboard
+          </button>
+          <button class="sim-viz-tab" data-viz="sankey">
+            <span class="material-icons-outlined">stacked_bar_chart</span> Sankey
+          </button>
+          <button class="sim-viz-tab" data-viz="carbon">
+            <span class="material-icons-outlined">timer</span> Carbon
+          </button>
+          <button class="sim-viz-tab" data-viz="isometric">
+            <span class="material-icons-outlined">view_in_ar</span> 3D Plant
+          </button>
+          <button class="sim-viz-tab" data-viz="treatment">
+            <span class="material-icons-outlined">water_drop</span> Train
+          </button>
+          <button class="sim-viz-tab" data-viz="decision">
+            <span class="material-icons-outlined">account_tree</span> Decisions
+          </button>
+        </div>
+        <div class="sim-viz-container">
+          <div class="sim-viz-pane active" id="sim-pane-scada"></div>
+          <div class="sim-viz-pane" id="sim-pane-sankey"></div>
+          <div class="sim-viz-pane" id="sim-pane-carbon"></div>
+          <div class="sim-viz-pane" id="sim-pane-isometric"></div>
+          <div class="sim-viz-pane" id="sim-pane-treatment"></div>
+          <div class="sim-viz-pane" id="sim-pane-decision"></div>
         </div>
       </div>
     </div>
@@ -3702,6 +3806,8 @@
     openSimulatorBtn.addEventListener('click', () => {
       simulatorOverlay.classList.add('active');
       document.body.style.overflow = 'hidden';
+      // Run simulation on open to populate visualizations
+      setTimeout(runSimulation, 100);
     });
 
     closeSimulatorBtn.addEventListener('click', () => {
@@ -3812,6 +3918,9 @@
 
       // Generate ledger hash
       generateLedgerHash(inputs, solutions[0]);
+
+      // Update all visualizations with simulation results
+      updateAllVisualizations(inputs, solutions[0]);
     }
 
     function displayInputVector(inputs) {
@@ -4652,8 +4761,1588 @@
       }
     });
 
-    // Run initial simulation on load
-    setTimeout(runSimulation, 100);
+    // ============================================================
+    // SIMULATOR VISUALIZATION TAB SWITCHING
+    // ============================================================
+    // Store last inputs/solution for tab switching re-renders
+    let lastSimInputs = null, lastSimSolution = null;
+
+    document.querySelectorAll('.sim-viz-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        document.querySelectorAll('.sim-viz-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Update active pane
+        const vizId = tab.dataset.viz;
+        document.querySelectorAll('.sim-viz-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById('sim-pane-' + vizId)?.classList.add('active');
+
+        // Re-render the visualization after the pane becomes visible
+        setTimeout(() => {
+          if (lastSimInputs && lastSimSolution) {
+            switch(vizId) {
+              case 'scada': renderSCADA(lastSimInputs, lastSimSolution); break;
+              case 'sankey': renderSankey(lastSimInputs, lastSimSolution); break;
+              case 'carbon': renderCarbonClock(lastSimInputs, lastSimSolution); break;
+              case 'isometric': renderIsometricPlant(lastSimInputs, lastSimSolution); break;
+              case 'treatment': renderTreatmentTrain(lastSimInputs, lastSimSolution); break;
+              case 'decision': renderDecisionTree(lastSimInputs, lastSimSolution); break;
+            }
+          }
+        }, 50);
+      });
+    });
+
+    // ============================================================
+    // SCADA DASHBOARD
+    // ============================================================
+    // SCADA Dashboard State
+    const SCADA_STATE = {
+      history: { flow: [], energy: [], recovery: [] },
+      maxHistory: 20
+    };
+
+    function renderSCADA(inputs, solution) {
+      const container = document.getElementById('sim-pane-scada');
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 800, 780);
+      const height = Math.max(rect.height || 500, 500);
+
+      container.innerHTML = '';
+      const svg = d3.select(container).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      // Calculate metrics
+      const flow = inputs.flow || 0;
+      const recovery = (solution?.recovery || 0.85) * 100;
+      const energy = solution?.energy || 2.5;
+      const tssRemoval = inputs.tss > 0 ? Math.max(0, ((inputs.tss - inputs.tssTarget) / inputs.tss) * 100) : 0;
+      const tdsRemoval = inputs.tds > 0 ? Math.max(0, ((inputs.tds - inputs.tdsTarget) / inputs.tds) * 100) : 0;
+
+      // Update history for sparklines
+      SCADA_STATE.history.flow.push(flow);
+      SCADA_STATE.history.energy.push(energy);
+      SCADA_STATE.history.recovery.push(recovery);
+      Object.keys(SCADA_STATE.history).forEach(k => {
+        if (SCADA_STATE.history[k].length > SCADA_STATE.maxHistory) {
+          SCADA_STATE.history[k] = SCADA_STATE.history[k].slice(-SCADA_STATE.maxHistory);
+        }
+      });
+
+      // Create gradient definitions
+      const defs = svg.append('defs');
+      [
+        { id: 'scada-good', colors: ['#00d4aa', '#00a885'] },
+        { id: 'scada-warn', colors: ['#ffc107', '#ff9800'] },
+        { id: 'scada-danger', colors: ['#ff5252', '#d32f2f'] },
+        { id: 'scada-bg', colors: ['#2a3a4a', '#1a2a3a'] },
+        { id: 'scada-track', colors: ['#3a4a5a', '#2a3a4a'] }
+      ].forEach(g => {
+        const gradient = defs.append('linearGradient').attr('id', g.id)
+          .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+        gradient.append('stop').attr('offset', '0%').attr('stop-color', g.colors[0]);
+        gradient.append('stop').attr('offset', '100%').attr('stop-color', g.colors[1]);
+      });
+
+      // Glow filter
+      const filter = defs.append('filter').attr('id', 'scada-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+      const feMerge = filter.append('feMerge');
+      feMerge.append('feMergeNode').attr('in', 'blur');
+      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Title
+      svg.append('text').attr('x', 20).attr('y', 25).attr('fill', '#afc4d8')
+        .attr('font-size', '14px').attr('font-weight', 'bold').text('SCADA Dashboard — Real-time Metrics');
+
+      // Radial Gauge configurations
+      const gaugeConfigs = [
+        { id: 'flow', x: 130, label: 'Flow Rate', value: flow, max: 500, unit: 'm³/h', thresholds: [300, 400] },
+        { id: 'recovery', x: 320, label: 'Recovery', value: recovery, max: 100, unit: '%', thresholds: [70, 85] },
+        { id: 'energy', x: 510, label: 'Energy', value: energy, max: 5, unit: 'kWh/m³', thresholds: [2, 3.5], invert: true }
+      ];
+
+      // Draw radial gauges
+      const gaugeY = 120;
+      const gaugeRadius = 75;
+      gaugeConfigs.forEach(config => {
+        const g = svg.append('g').attr('transform', `translate(${config.x}, ${gaugeY})`);
+        const pct = Math.min(1, Math.max(0, config.value / config.max));
+        const endAngle = -Math.PI * 0.75 + pct * Math.PI * 1.5;
+
+        // Determine color based on thresholds
+        let gradientId = 'scada-good';
+        if (config.thresholds) {
+          const [warn, good] = config.thresholds;
+          if (config.invert) {
+            if (config.value > good) gradientId = 'scada-danger';
+            else if (config.value > warn) gradientId = 'scada-warn';
+          } else {
+            if (config.value < warn) gradientId = 'scada-warn';
+            if (config.value > config.max * 0.95) gradientId = 'scada-danger';
+          }
+        }
+
+        // Background circle
+        g.append('circle').attr('r', gaugeRadius)
+          .attr('fill', 'url(#scada-bg)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+
+        // Track arc
+        const trackArc = d3.arc().innerRadius(gaugeRadius - 14).outerRadius(gaugeRadius - 4)
+          .startAngle(-Math.PI * 0.75).endAngle(Math.PI * 0.75);
+        g.append('path').attr('d', trackArc).attr('fill', 'url(#scada-track)');
+
+        // Value arc with animation
+        const valueArc = d3.arc().innerRadius(gaugeRadius - 14).outerRadius(gaugeRadius - 4)
+          .startAngle(-Math.PI * 0.75).endAngle(endAngle);
+        g.append('path').attr('d', valueArc).attr('fill', `url(#${gradientId})`).attr('filter', 'url(#scada-glow)');
+
+        // Value text
+        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.1em')
+          .attr('fill', '#fff').attr('font-size', '18px').attr('font-weight', 'bold')
+          .text(config.id === 'energy' ? config.value.toFixed(2) : Math.round(config.value));
+        g.append('text').attr('text-anchor', 'middle').attr('y', 18)
+          .attr('fill', '#8fa4b8').attr('font-size', '9px').text(config.unit);
+        g.append('text').attr('text-anchor', 'middle').attr('y', gaugeRadius + 20)
+          .attr('fill', '#8fa4b8').attr('font-size', '11px').text(config.label);
+
+        // Min/max labels
+        g.append('text').attr('x', -gaugeRadius + 8).attr('y', gaugeRadius - 5)
+          .attr('fill', '#5a6a7a').attr('font-size', '8px').text('0');
+        g.append('text').attr('x', gaugeRadius - 20).attr('y', gaugeRadius - 5)
+          .attr('fill', '#5a6a7a').attr('font-size', '8px').text(config.max);
+      });
+
+      // Linear gauges
+      const linearY = 240;
+      const linearConfigs = [
+        { id: 'tss', label: 'TSS Removal', value: Math.min(100, tssRemoval), y: linearY, thresholds: [80, 95] },
+        { id: 'tds', label: 'TDS Removal', value: Math.min(100, tdsRemoval), y: linearY + 55, thresholds: [70, 90] }
+      ];
+      const linearWidth = 280;
+
+      linearConfigs.forEach(config => {
+        const g = svg.append('g').attr('transform', `translate(50, ${config.y})`);
+        const pct = Math.min(1, config.value / 100);
+
+        // Determine color
+        let gradientId = 'scada-good';
+        const [warn, good] = config.thresholds;
+        if (config.value < warn) gradientId = 'scada-danger';
+        else if (config.value < good) gradientId = 'scada-warn';
+
+        // Label
+        g.append('text').attr('y', -6).attr('fill', '#8fa4b8').attr('font-size', '10px').text(config.label);
+
+        // Track
+        g.append('rect').attr('width', linearWidth).attr('height', 18).attr('rx', 3).attr('fill', 'url(#scada-track)');
+
+        // Value bar
+        g.append('rect').attr('width', linearWidth * pct).attr('height', 18).attr('rx', 3).attr('fill', `url(#${gradientId})`);
+
+        // Threshold markers
+        config.thresholds.forEach((t, i) => {
+          g.append('line').attr('x1', linearWidth * t / 100).attr('x2', linearWidth * t / 100)
+            .attr('y1', 0).attr('y2', 18)
+            .attr('stroke', i === 0 ? '#ffc107' : '#00d4aa').attr('stroke-width', 2).attr('stroke-dasharray', '3,2');
+        });
+
+        // Value text
+        g.append('text').attr('x', linearWidth + 10).attr('y', 13)
+          .attr('fill', '#fff').attr('font-size', '12px').attr('font-weight', 'bold')
+          .text(config.value.toFixed(0) + '%');
+      });
+
+      // Digital displays
+      const digitalConfigs = [
+        { id: 'inlet_tss', label: 'Inlet TSS', value: inputs.tss || 0, unit: 'mg/L', x: 380, y: 240 },
+        { id: 'outlet_tss', label: 'Outlet TSS', value: inputs.tssTarget || 0, unit: 'mg/L', x: 490, y: 240 },
+        { id: 'inlet_tds', label: 'Inlet TDS', value: inputs.tds || 0, unit: 'mg/L', x: 380, y: 295 },
+        { id: 'outlet_tds', label: 'Outlet TDS', value: inputs.tdsTarget || 0, unit: 'mg/L', x: 490, y: 295 }
+      ];
+
+      digitalConfigs.forEach(config => {
+        const g = svg.append('g').attr('transform', `translate(${config.x}, ${config.y})`);
+        g.append('rect').attr('width', 75).attr('height', 32).attr('rx', 4)
+          .attr('fill', '#1a2530').attr('stroke', '#3a4a5a').attr('stroke-width', 1);
+        g.append('text').attr('x', 37).attr('y', -5).attr('text-anchor', 'middle')
+          .attr('fill', '#6a7a8a').attr('font-size', '8px').text(config.label);
+        g.append('text').attr('x', 37).attr('y', 17).attr('text-anchor', 'middle')
+          .attr('fill', '#00d4aa').attr('font-size', '14px').attr('font-family', 'monospace')
+          .text(Math.round(config.value));
+        g.append('text').attr('x', 37).attr('y', 28).attr('text-anchor', 'middle')
+          .attr('fill', '#5a6a7a').attr('font-size', '7px').text(config.unit);
+      });
+
+      // Sparklines
+      const sparkY = 380;
+      const sparkWidth = 160;
+      const sparkHeight = 50;
+      const sparkConfigs = [
+        { id: 'flow', label: 'Flow Trend', data: SCADA_STATE.history.flow, x: 60 },
+        { id: 'energy', label: 'Energy Trend', data: SCADA_STATE.history.energy, x: 260 },
+        { id: 'recovery', label: 'Recovery Trend', data: SCADA_STATE.history.recovery, x: 460 }
+      ];
+
+      sparkConfigs.forEach(config => {
+        const g = svg.append('g').attr('transform', `translate(${config.x}, ${sparkY})`);
+        g.append('text').attr('y', -5).attr('fill', '#8fa4b8').attr('font-size', '9px').text(config.label);
+        g.append('rect').attr('width', sparkWidth).attr('height', sparkHeight).attr('rx', 3)
+          .attr('fill', '#1a2530').attr('stroke', '#2a3a4a').attr('stroke-width', 1);
+
+        if (config.data.length > 1) {
+          const xScale = d3.scaleLinear().domain([0, SCADA_STATE.maxHistory - 1]).range([2, sparkWidth - 2]);
+          const extent = d3.extent(config.data);
+          const yMin = extent[0] * 0.9;
+          const yMax = (extent[1] * 1.1) || 1;
+          const yScale = d3.scaleLinear().domain([yMin, yMax]).range([sparkHeight - 3, 3]);
+
+          const line = d3.line()
+            .x((d, i) => xScale(i + (SCADA_STATE.maxHistory - config.data.length)))
+            .y(d => yScale(d)).curve(d3.curveMonotoneX);
+          const area = d3.area()
+            .x((d, i) => xScale(i + (SCADA_STATE.maxHistory - config.data.length)))
+            .y0(sparkHeight - 3).y1(d => yScale(d)).curve(d3.curveMonotoneX);
+
+          g.append('path').datum(config.data).attr('d', area).attr('fill', 'rgba(0,212,170,0.1)');
+          g.append('path').datum(config.data).attr('d', line)
+            .attr('fill', 'none').attr('stroke', '#00d4aa').attr('stroke-width', 1.5);
+
+          const lastX = xScale(SCADA_STATE.maxHistory - 1);
+          const lastY = yScale(config.data[config.data.length - 1]);
+          g.append('circle').attr('cx', lastX).attr('cy', lastY).attr('r', 3)
+            .attr('fill', '#00d4aa').attr('filter', 'url(#scada-glow)');
+        }
+      });
+
+      // Alert panel
+      const alertG = svg.append('g').attr('transform', `translate(${width - 95}, 40)`);
+      alertG.append('rect').attr('width', 80).attr('height', 115).attr('rx', 5)
+        .attr('fill', '#1a2530').attr('stroke', '#2a3a4a').attr('stroke-width', 1);
+      alertG.append('text').attr('x', 40).attr('y', 18).attr('text-anchor', 'middle')
+        .attr('fill', '#8fa4b8').attr('font-size', '9px').text('STATUS');
+
+      const alerts = {
+        system: 'ok',
+        flow: flow > 400 ? 'warn' : 'ok',
+        quality: (tssRemoval < 80 || tdsRemoval < 70) ? 'warn' : 'ok',
+        energy: energy > 3 ? 'warn' : 'ok'
+      };
+      const statusColors = { ok: '#00d4aa', warn: '#ffc107', danger: '#ff5252' };
+
+      [
+        { id: 'system', label: 'System', y: 38 },
+        { id: 'flow', label: 'Flow', y: 58 },
+        { id: 'quality', label: 'Quality', y: 78 },
+        { id: 'energy', label: 'Energy', y: 98 }
+      ].forEach(ind => {
+        alertG.append('circle').attr('cx', 15).attr('cy', ind.y).attr('r', 5)
+          .attr('fill', statusColors[alerts[ind.id]]);
+        alertG.append('text').attr('x', 25).attr('y', ind.y + 3)
+          .attr('fill', '#8fa4b8').attr('font-size', '9px').text(ind.label);
+      });
+    }
+
+    // ============================================================
+    // SANKEY DIAGRAM (Full Implementation with Custom Layout)
+    // ============================================================
+    const SANKEY_COLORS = {
+      water: { node: 'rgba(0,180,220,.8)', link: 'rgba(0,180,220,.4)' },
+      waste: { node: 'rgba(139,90,43,.8)', link: 'rgba(139,90,43,.3)' },
+      process: { node: 'rgba(124,92,255,.8)', link: 'rgba(124,92,255,.3)' },
+      output: { node: 'rgba(0,212,170,.8)', link: 'rgba(0,212,170,.4)' }
+    };
+
+    // Custom Sankey Layout (alternative to d3-sankey)
+    class SankeyLayout {
+      constructor(options = {}) {
+        this.nodeWidth = options.nodeWidth || 20;
+        this.nodePadding = options.nodePadding || 15;
+        this.extent = options.extent || [[0, 0], [1, 1]];
+      }
+      setExtent(ext) { this.extent = ext; return this; }
+
+      compute(data) {
+        const { nodes, links } = JSON.parse(JSON.stringify(data));
+        const nodeMap = new Map();
+        nodes.forEach((n, i) => {
+          n.index = i; n.sourceLinks = []; n.targetLinks = []; n.value = 0;
+          nodeMap.set(n.id, n);
+        });
+        links.forEach((link, i) => {
+          link.index = i;
+          link.source = nodeMap.get(link.source);
+          link.target = nodeMap.get(link.target);
+          link.source.sourceLinks.push(link);
+          link.target.targetLinks.push(link);
+        });
+        nodes.forEach(n => {
+          n.value = Math.max(d3.sum(n.sourceLinks, l => l.value), d3.sum(n.targetLinks, l => l.value));
+        });
+        this.computeNodeDepths(nodes);
+        this.computeNodeHeights(nodes);
+        this.computeLinkPaths(links);
+        return { nodes, links };
+      }
+
+      computeNodeDepths(nodes) {
+        let remaining = new Set(nodes);
+        const sources = nodes.filter(n => n.targetLinks.length === 0);
+        if (sources.length === 0 && nodes.length > 0) sources.push(nodes[0]);
+        sources.forEach(n => { n.depth = 0; remaining.delete(n); });
+
+        let depth = 0, current = sources;
+        while (current.length > 0 && depth < 100) {
+          const next = [];
+          current.forEach(n => {
+            n.sourceLinks.forEach(link => {
+              if (remaining.has(link.target)) {
+                link.target.depth = depth + 1;
+                remaining.delete(link.target);
+                next.push(link.target);
+              }
+            });
+          });
+          depth++; current = next;
+        }
+        remaining.forEach(n => { n.depth = depth; });
+
+        const maxDepth = d3.max(nodes, n => n.depth) || 1;
+        const [[x0, y0], [x1, y1]] = this.extent;
+        const kx = (x1 - x0 - this.nodeWidth) / maxDepth;
+        nodes.forEach(n => { n.x0 = x0 + n.depth * kx; n.x1 = n.x0 + this.nodeWidth; });
+      }
+
+      computeNodeHeights(nodes) {
+        const [[x0, y0], [x1, y1]] = this.extent;
+        const columns = d3.groups(nodes, n => n.depth).sort((a, b) => a[0] - b[0]).map(d => d[1]);
+        columns.forEach(column => {
+          const totalValue = d3.sum(column, n => n.value);
+          const totalPadding = (column.length - 1) * this.nodePadding;
+          const scale = ((y1 - y0) - totalPadding) / totalValue;
+          let y = y0;
+          column.forEach(n => { n.y0 = y; n.y1 = y + n.value * scale; y = n.y1 + this.nodePadding; });
+        });
+      }
+
+      computeLinkPaths(links) {
+        links.forEach(link => {
+          let sy0 = link.source.y0;
+          const sourceIdx = link.source.sourceLinks.indexOf(link);
+          for (let i = 0; i < sourceIdx; i++) {
+            const l = link.source.sourceLinks[i];
+            sy0 += (link.source.y1 - link.source.y0) * (l.value / link.source.value);
+          }
+          const sh = (link.source.y1 - link.source.y0) * (link.value / link.source.value);
+          link.y0 = sy0 + sh / 2;
+          link.width = sh;
+
+          let ty0 = link.target.y0;
+          const targetIdx = link.target.targetLinks.indexOf(link);
+          for (let i = 0; i < targetIdx; i++) {
+            const l = link.target.targetLinks[i];
+            ty0 += (link.target.y1 - link.target.y0) * (l.value / link.target.value);
+          }
+          link.y1 = ty0 + sh / 2;
+        });
+      }
+    }
+
+    function renderSankey(inputs, solution) {
+      const container = document.getElementById('sim-pane-sankey');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 800, 780);
+      const height = Math.max(rect.height || 500, 500);
+      const margin = { top: 50, right: 140, bottom: 30, left: 30 };
+
+      container.innerHTML = '';
+      const svg = d3.select(container).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      // Create gradients and filters
+      const defs = svg.append('defs');
+
+      // Enhanced gradients for each flow type
+      const gradientConfigs = {
+        water: { colors: ['#00b4dc', '#0099cc', '#0077aa'], opacity: [0.7, 0.8, 0.7] },
+        process: { colors: ['#7c5cff', '#6a4fd4', '#5840b0'], opacity: [0.7, 0.8, 0.7] },
+        output: { colors: ['#00d4aa', '#00b894', '#009975'], opacity: [0.8, 0.9, 0.8] },
+        waste: { colors: ['#b87333', '#a06030', '#885020'], opacity: [0.6, 0.7, 0.6] }
+      };
+
+      Object.entries(gradientConfigs).forEach(([type, config]) => {
+        const grad = defs.append('linearGradient').attr('id', `sankey-grad-${type}`)
+          .attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '0%');
+        grad.append('stop').attr('offset', '0%').attr('stop-color', config.colors[0]).attr('stop-opacity', config.opacity[0]);
+        grad.append('stop').attr('offset', '50%').attr('stop-color', config.colors[1]).attr('stop-opacity', config.opacity[1]);
+        grad.append('stop').attr('offset', '100%').attr('stop-color', config.colors[2]).attr('stop-opacity', config.opacity[2]);
+      });
+
+      // Glow filter
+      const glowFilter = defs.append('filter').attr('id', 'sankey-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      glowFilter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+      const glowMerge = glowFilter.append('feMerge');
+      glowMerge.append('feMergeNode').attr('in', 'blur');
+      glowMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Title
+      svg.append('text').attr('x', 20).attr('y', 28).attr('fill', '#afc4d8')
+        .attr('font-size', '15px').attr('font-weight', 'bold').text('Sankey Diagram — Mass & Energy Balance');
+
+      const flow = inputs.flow || 100;
+      const recovery = solution?.recovery || 0.85;
+      const energy = solution?.energy || 2.5;
+      const pretreatLoss = Math.max(1, flow * 0.02);
+
+      // Subtitle with values
+      svg.append('text').attr('x', 20).attr('y', 46).attr('fill', '#6a7a8a')
+        .attr('font-size', '11px')
+        .text(`Flow: ${flow} m³/h | Recovery: ${(recovery*100).toFixed(0)}% | Energy: ${energy.toFixed(2)} kWh/m³`);
+
+      // Build Sankey data
+      const sankeyData = {
+        nodes: [
+          { id: 'inlet', name: 'Raw Water', value: flow, type: 'water' },
+          { id: 'pretreat', name: 'Pre-treatment', type: 'process' },
+          { id: 'membrane', name: solution?.name || 'Membrane System', type: 'process' },
+          { id: 'post', name: 'Post-treatment', type: 'process' },
+          { id: 'product', name: 'Product Water', value: flow * recovery, type: 'output' },
+          { id: 'reject', name: 'Concentrate', value: flow * (1 - recovery), type: 'waste' },
+          { id: 'losses', name: 'Losses', value: pretreatLoss + 1, type: 'waste' }
+        ],
+        links: [
+          { source: 'inlet', target: 'pretreat', value: flow, type: 'water' },
+          { source: 'pretreat', target: 'membrane', value: flow - pretreatLoss, type: 'water' },
+          { source: 'pretreat', target: 'losses', value: pretreatLoss, type: 'waste' },
+          { source: 'membrane', target: 'post', value: flow * recovery, type: 'output' },
+          { source: 'membrane', target: 'reject', value: flow * (1 - recovery), type: 'waste' },
+          { source: 'post', target: 'product', value: flow * recovery - 1, type: 'output' },
+          { source: 'post', target: 'losses', value: 1, type: 'waste' }
+        ]
+      };
+
+      // Compute layout
+      const sankey = new SankeyLayout({ nodeWidth: 22, nodePadding: 18 });
+      sankey.setExtent([[margin.left, margin.top + 20], [width - margin.right, height - margin.bottom]]);
+      const { nodes, links } = sankey.compute(sankeyData);
+
+      // Smooth cubic bezier path for links
+      const linkPath = (d) => {
+        const x0 = d.source.x1;
+        const x1 = d.target.x0;
+        const y0 = d.y0;
+        const y1 = d.y1;
+        const curvature = 0.5;
+        const xi = d3.interpolateNumber(x0, x1);
+        const x2 = xi(curvature);
+        const x3 = xi(1 - curvature);
+        return `M${x0},${y0} C${x2},${y0} ${x3},${y1} ${x1},${y1}`;
+      };
+
+      // Render links with smooth animation
+      const linkLayer = svg.append('g').attr('class', 'links');
+      links.forEach((link, i) => {
+        const gradientId = `sankey-grad-${link.type}`;
+        const pathEl = linkLayer.append('path')
+          .attr('d', linkPath(link))
+          .attr('fill', 'none')
+          .attr('stroke', `url(#${gradientId})`)
+          .attr('stroke-width', Math.max(3, link.width))
+          .attr('stroke-linecap', 'round')
+          .attr('opacity', 0);
+
+        // Smooth fade-in animation
+        pathEl.transition()
+          .delay(i * 80)
+          .duration(600)
+          .ease(d3.easeCubicOut)
+          .attr('opacity', 1);
+
+        // Flow animation along the path
+        const pathLength = pathEl.node().getTotalLength();
+        pathEl
+          .attr('stroke-dasharray', `${pathLength * 0.1} ${pathLength * 0.9}`)
+          .attr('stroke-dashoffset', pathLength);
+
+        // Animate the dash to create flow effect
+        function animateFlow() {
+          pathEl
+            .attr('stroke-dashoffset', pathLength)
+            .transition()
+            .duration(2000 + i * 200)
+            .ease(d3.easeLinear)
+            .attr('stroke-dashoffset', -pathLength)
+            .on('end', animateFlow);
+        }
+
+        // Start flow animation after initial fade-in
+        setTimeout(() => {
+          pathEl.attr('stroke-dasharray', `${pathLength * 0.15} ${pathLength * 0.05}`);
+          animateFlow();
+        }, 600 + i * 80);
+
+        // Hover effects
+        pathEl
+          .style('cursor', 'pointer')
+          .on('mouseenter', function() {
+            d3.select(this)
+              .transition().duration(150)
+              .attr('stroke-width', Math.max(5, link.width + 3))
+              .attr('filter', 'url(#sankey-glow)');
+          })
+          .on('mouseleave', function() {
+            d3.select(this)
+              .transition().duration(150)
+              .attr('stroke-width', Math.max(3, link.width))
+              .attr('filter', null);
+          });
+      });
+
+      // Render nodes with animation
+      const nodeLayer = svg.append('g').attr('class', 'nodes');
+      nodes.forEach((node, i) => {
+        const g = nodeLayer.append('g')
+          .attr('transform', `translate(${node.x0}, ${node.y0})`)
+          .attr('opacity', 0);
+
+        const nodeHeight = Math.max(8, node.y1 - node.y0);
+        const nodeColor = gradientConfigs[node.type]?.colors[1] || '#7c5cff';
+
+        // Node rectangle with rounded corners
+        g.append('rect')
+          .attr('width', 22)
+          .attr('height', nodeHeight)
+          .attr('rx', 4)
+          .attr('fill', nodeColor)
+          .attr('stroke', 'rgba(255,255,255,.4)')
+          .attr('stroke-width', 1.5)
+          .style('cursor', 'pointer');
+
+        // Fade-in animation
+        g.transition()
+          .delay(200 + i * 60)
+          .duration(500)
+          .ease(d3.easeCubicOut)
+          .attr('opacity', 1);
+
+        // Hover effects
+        g.on('mouseenter', function() {
+          d3.select(this).select('rect')
+            .transition().duration(150)
+            .attr('filter', 'url(#sankey-glow)')
+            .attr('stroke-width', 2.5);
+        }).on('mouseleave', function() {
+          d3.select(this).select('rect')
+            .transition().duration(150)
+            .attr('filter', null)
+            .attr('stroke-width', 1.5);
+        });
+      });
+
+      // Render labels with animation
+      const labelLayer = svg.append('g').attr('class', 'labels');
+      nodes.forEach((node, i) => {
+        const isLeft = node.depth < 2;
+        const labelX = isLeft ? node.x1 + 8 : node.x0 - 8;
+        const labelAnchor = isLeft ? 'start' : 'end';
+
+        // Node name
+        const nameLabel = labelLayer.append('text')
+          .attr('x', labelX)
+          .attr('y', (node.y0 + node.y1) / 2 - 6)
+          .attr('dy', '0.35em')
+          .attr('text-anchor', labelAnchor)
+          .attr('fill', '#afc4d8')
+          .attr('font-size', '11px')
+          .attr('font-weight', '600')
+          .text(node.name)
+          .attr('opacity', 0);
+
+        // Value label
+        const valueText = node.value ? `${node.value.toFixed(0)} m³/h` :
+          (node.id === 'pretreat' ? `${(flow - pretreatLoss).toFixed(0)} m³/h` :
+           node.id === 'membrane' ? `${(flow * recovery).toFixed(0)} m³/h` :
+           node.id === 'post' ? `${(flow * recovery - 1).toFixed(0)} m³/h` : '');
+
+        const valueLabel = labelLayer.append('text')
+          .attr('x', labelX)
+          .attr('y', (node.y0 + node.y1) / 2 + 8)
+          .attr('dy', '0.35em')
+          .attr('text-anchor', labelAnchor)
+          .attr('fill', '#6a7a8a')
+          .attr('font-size', '9px')
+          .text(valueText)
+          .attr('opacity', 0);
+
+        // Animate labels
+        nameLabel.transition().delay(400 + i * 60).duration(400).attr('opacity', 1);
+        valueLabel.transition().delay(450 + i * 60).duration(400).attr('opacity', 1);
+      });
+
+      // Legend
+      const legend = svg.append('g').attr('transform', `translate(${width - 130}, 60)`);
+      legend.append('rect').attr('x', -10).attr('y', -10).attr('width', 125).attr('height', 95).attr('rx', 6)
+        .attr('fill', 'rgba(17,27,61,.85)').attr('stroke', 'rgba(255,255,255,.1)');
+
+      const legendItems = [
+        { color: gradientConfigs.water.colors[1], label: 'Inlet Water' },
+        { color: gradientConfigs.process.colors[1], label: 'Processing' },
+        { color: gradientConfigs.output.colors[1], label: 'Product Water' },
+        { color: gradientConfigs.waste.colors[1], label: 'Waste/Reject' }
+      ];
+      legendItems.forEach((item, i) => {
+        legend.append('rect').attr('x', 0).attr('y', 5 + i * 20).attr('width', 14).attr('height', 14)
+          .attr('rx', 3).attr('fill', item.color);
+        legend.append('text').attr('x', 20).attr('y', 15 + i * 20)
+          .attr('fill', '#afc4d8').attr('font-size', '10px').text(item.label);
+      });
+    }
+
+    // ============================================================
+    // CARBON CLOCK
+    // ============================================================
+    // CARBON CLOCK (Full Implementation with Dual Rings)
+    // ============================================================
+    const CARBON_BENCHMARKS = {
+      excellent: { energy: 1.5, label: 'EXCELLENT', color: '#00d4aa', bgColor: 'rgba(0,212,170,.2)' },
+      good: { energy: 2.5, label: 'GOOD', color: '#4ade80', bgColor: 'rgba(74,222,128,.2)' },
+      average: { energy: 3.5, label: 'AVERAGE', color: '#ffc107', bgColor: 'rgba(255,193,7,.2)' },
+      poor: { energy: 5.0, label: 'POOR', color: '#ff5252', bgColor: 'rgba(255,82,82,.2)' }
+    };
+    const CO2_FACTOR = 0.233; // UK grid average
+
+    function renderCarbonClock(inputs, solution) {
+      const container = document.getElementById('sim-pane-carbon');
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 800, 780);
+      const height = Math.max(rect.height || 500, 500);
+
+      container.innerHTML = '';
+      const svg = d3.select(container).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const clockRadius = 160;
+      const innerRingWidth = 24;
+      const outerRingWidth = 18;
+
+      const energy = solution?.energy || 2.5;
+      const co2 = energy * CO2_FACTOR;
+      const maxEnergy = 5;
+      const energyPct = Math.min(1, energy / maxEnergy);
+      const co2Pct = Math.min(1, co2 / (maxEnergy * CO2_FACTOR));
+
+      // Determine status
+      let status = CARBON_BENCHMARKS.excellent;
+      if (energy > 3.5) status = CARBON_BENCHMARKS.poor;
+      else if (energy > 2.5) status = CARBON_BENCHMARKS.average;
+      else if (energy > 1.5) status = CARBON_BENCHMARKS.good;
+
+      // Create defs for gradients and filters
+      const defs = svg.append('defs');
+
+      // Energy gradient (green -> yellow -> red)
+      const energyGrad = defs.append('linearGradient').attr('id', 'carbon-energy-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '100%');
+      energyGrad.append('stop').attr('offset', '0%').attr('stop-color', '#00d4aa');
+      energyGrad.append('stop').attr('offset', '50%').attr('stop-color', '#ffc107');
+      energyGrad.append('stop').attr('offset', '100%').attr('stop-color', '#ff5252');
+
+      // CO2 gradient (teal -> purple)
+      const co2Grad = defs.append('linearGradient').attr('id', 'carbon-co2-grad')
+        .attr('x1', '0%').attr('y1', '100%').attr('x2', '0%').attr('y2', '0%');
+      co2Grad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(0,212,170,.8)');
+      co2Grad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(124,92,255,.8)');
+
+      // Glow filter
+      const filter = defs.append('filter').attr('id', 'carbon-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      filter.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'blur');
+      const merge = filter.append('feMerge');
+      merge.append('feMergeNode').attr('in', 'blur');
+      merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Shadow filter
+      const shadow = defs.append('filter').attr('id', 'carbon-shadow')
+        .attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
+      shadow.append('feDropShadow').attr('dx', 0).attr('dy', 4).attr('stdDeviation', 6).attr('flood-color', 'rgba(0,0,0,.4)');
+
+      // Title
+      svg.append('text').attr('x', 20).attr('y', 25).attr('fill', '#afc4d8')
+        .attr('font-size', '14px').attr('font-weight', 'bold').text('Carbon Clock — Energy Footprint');
+
+      // Main clock group
+      const clock = svg.append('g').attr('transform', `translate(${centerX}, ${centerY})`);
+
+      // Outer background circle with shadow
+      clock.append('circle').attr('r', clockRadius + 22)
+        .attr('fill', 'rgba(17,27,61,.8)').attr('stroke', '#2a3a4a').attr('stroke-width', 2)
+        .attr('filter', 'url(#carbon-shadow)');
+
+      // Inner circle
+      clock.append('circle').attr('r', clockRadius - 28)
+        .attr('fill', 'rgba(11,16,32,.9)').attr('stroke', '#3a4a5a').attr('stroke-width', 1);
+
+      // Center glow dot
+      clock.append('circle').attr('r', 6).attr('fill', '#00d4aa').attr('filter', 'url(#carbon-glow)');
+
+      // Energy ring (inner) - track
+      const energyTrackArc = d3.arc().innerRadius(clockRadius - innerRingWidth).outerRadius(clockRadius)
+        .startAngle(-Math.PI * 0.75).endAngle(Math.PI * 0.75);
+      clock.append('path').attr('d', energyTrackArc).attr('fill', 'rgba(58,74,90,.5)');
+
+      // Energy ring - value
+      const energyEndAngle = -Math.PI * 0.75 + energyPct * Math.PI * 1.5;
+      const energyValueArc = d3.arc().innerRadius(clockRadius - innerRingWidth).outerRadius(clockRadius)
+        .startAngle(-Math.PI * 0.75).endAngle(energyEndAngle);
+      clock.append('path').attr('d', energyValueArc)
+        .attr('fill', 'url(#carbon-energy-grad)').attr('filter', 'url(#carbon-glow)');
+
+      // CO2 ring (outer) - track
+      const co2TrackArc = d3.arc().innerRadius(clockRadius + 5).outerRadius(clockRadius + 5 + outerRingWidth)
+        .startAngle(-Math.PI * 0.75).endAngle(Math.PI * 0.75);
+      clock.append('path').attr('d', co2TrackArc).attr('fill', 'rgba(58,74,90,.3)');
+
+      // CO2 ring - value
+      const co2EndAngle = -Math.PI * 0.75 + co2Pct * Math.PI * 1.5;
+      const co2ValueArc = d3.arc().innerRadius(clockRadius + 5).outerRadius(clockRadius + 5 + outerRingWidth)
+        .startAngle(-Math.PI * 0.75).endAngle(co2EndAngle);
+      clock.append('path').attr('d', co2ValueArc).attr('fill', 'url(#carbon-co2-grad)');
+
+      // Ring labels
+      clock.append('text').attr('x', -clockRadius - 8).attr('y', 4).attr('text-anchor', 'end')
+        .attr('fill', '#00d4aa').attr('font-size', '9px').attr('font-weight', 'bold').text('ENERGY');
+      clock.append('text').attr('x', clockRadius + 28).attr('y', 4).attr('text-anchor', 'start')
+        .attr('fill', '#7c5cff').attr('font-size', '9px').attr('font-weight', 'bold').text('CO₂');
+
+      // Benchmark scale markers
+      const benchmarkAngles = [
+        { angle: -Math.PI * 0.75, label: '0' }, { angle: -Math.PI * 0.375, label: '1.5' },
+        { angle: 0, label: '2.5' }, { angle: Math.PI * 0.375, label: '3.5' }, { angle: Math.PI * 0.75, label: '5' }
+      ];
+      benchmarkAngles.forEach(({ angle, label }) => {
+        const tickR = clockRadius - 5;
+        const x1 = Math.sin(angle) * (tickR - 8), y1 = -Math.cos(angle) * (tickR - 8);
+        const x2 = Math.sin(angle) * tickR, y2 = -Math.cos(angle) * tickR;
+        clock.append('line').attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
+          .attr('stroke', '#5a6a7a').attr('stroke-width', 2);
+        clock.append('text').attr('x', Math.sin(angle) * (tickR - 18)).attr('y', -Math.cos(angle) * (tickR - 18))
+          .attr('text-anchor', 'middle').attr('dy', '0.35em').attr('fill', '#6a7a8a').attr('font-size', '8px').text(label);
+      });
+
+      // Unit label below scale
+      clock.append('text').attr('y', clockRadius + 45).attr('text-anchor', 'middle')
+        .attr('fill', '#5a6a7a').attr('font-size', '9px').text('kWh/m³');
+
+      // Digital displays
+      // Energy value (center top)
+      clock.append('text').attr('y', -15).attr('text-anchor', 'middle')
+        .attr('fill', '#fff').attr('font-size', '28px').attr('font-weight', 'bold').attr('font-family', 'monospace')
+        .text(energy.toFixed(2));
+      clock.append('text').attr('y', 5).attr('text-anchor', 'middle')
+        .attr('fill', '#8fa4b8').attr('font-size', '10px').text('kWh/m³');
+
+      // CO2 value
+      clock.append('text').attr('y', 35).attr('text-anchor', 'middle')
+        .attr('fill', '#7c5cff').attr('font-size', '15px').attr('font-weight', 'bold').attr('font-family', 'monospace')
+        .text(`${co2.toFixed(2)} kg CO₂/m³`);
+
+      // Status badge
+      const statusG = clock.append('g').attr('transform', 'translate(0, 60)');
+      statusG.append('rect').attr('x', -45).attr('y', -11).attr('width', 90).attr('height', 22).attr('rx', 11)
+        .attr('fill', status.bgColor).attr('stroke', status.color).attr('stroke-width', 1);
+      statusG.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+        .attr('fill', status.color).attr('font-size', '10px').attr('font-weight', 'bold').text(status.label);
+
+      // Legend
+      const legendY = height - 50;
+      const legend = svg.append('g').attr('transform', `translate(${centerX - 95}, ${legendY})`);
+      const legendItems = [
+        { color: '#00d4aa', label: 'Excellent (<1.5)' },
+        { color: '#ffc107', label: 'Average (2.5-3.5)' },
+        { color: '#ff5252', label: 'Poor (>3.5)' }
+      ];
+      legendItems.forEach((item, i) => {
+        const g = legend.append('g').attr('transform', `translate(${i * 65}, 0)`);
+        g.append('rect').attr('width', 10).attr('height', 10).attr('rx', 2).attr('fill', item.color);
+        g.append('text').attr('x', 14).attr('y', 8).attr('fill', '#8fa4b8').attr('font-size', '8px').text(item.label);
+      });
+    }
+
+    // ============================================================
+    // ISOMETRIC 3D PLANT (Full Implementation)
+    // ============================================================
+    const ISO = {
+      angle: Math.PI / 6,
+      scale: 0.8,
+      project(x, y, z) {
+        const isoX = (x - z) * Math.cos(this.angle);
+        const isoY = (x + z) * Math.sin(this.angle) - y;
+        return { x: isoX * this.scale, y: isoY * this.scale };
+      },
+      darken(color, amount) {
+        if (color.startsWith('rgba')) {
+          return color.replace(/,\s*([\d.]+)\s*\)/, (m, a) => `, ${Math.max(0, parseFloat(a) - amount)})`);
+        }
+        return color;
+      },
+      box(g, x, y, z, width, height, depth, color, opacity = 1) {
+        const c = [
+          this.project(x, y + height, z),
+          this.project(x + width, y + height, z),
+          this.project(x + width, y + height, z + depth),
+          this.project(x, y + height, z + depth),
+          this.project(x, y, z),
+          this.project(x + width, y, z),
+          this.project(x + width, y, z + depth),
+          this.project(x, y, z + depth)
+        ];
+        // Right face
+        g.append('polygon')
+          .attr('points', `${c[1].x},${c[1].y} ${c[2].x},${c[2].y} ${c[6].x},${c[6].y} ${c[5].x},${c[5].y}`)
+          .attr('fill', this.darken(color, 0.15)).attr('stroke', 'rgba(255,255,255,.2)').attr('stroke-width', 0.5).attr('opacity', opacity);
+        // Left face
+        g.append('polygon')
+          .attr('points', `${c[0].x},${c[0].y} ${c[3].x},${c[3].y} ${c[7].x},${c[7].y} ${c[4].x},${c[4].y}`)
+          .attr('fill', this.darken(color, 0.3)).attr('stroke', 'rgba(255,255,255,.2)').attr('stroke-width', 0.5).attr('opacity', opacity);
+        // Top face
+        g.append('polygon')
+          .attr('points', `${c[0].x},${c[0].y} ${c[1].x},${c[1].y} ${c[2].x},${c[2].y} ${c[3].x},${c[3].y}`)
+          .attr('fill', color).attr('stroke', 'rgba(255,255,255,.3)').attr('stroke-width', 0.5).attr('opacity', opacity);
+      },
+      cylinder(g, x, y, z, radius, height, color, opacity = 1) {
+        const segments = 8;
+        const topPts = [], botPts = [];
+        for (let i = 0; i < segments; i++) {
+          const angle = (i / segments) * Math.PI * 2;
+          const px = x + Math.cos(angle) * radius;
+          const pz = z + Math.sin(angle) * radius;
+          topPts.push(this.project(px, y + height, pz));
+          botPts.push(this.project(px, y, pz));
+        }
+        // Back faces
+        for (let i = segments / 2; i < segments; i++) {
+          const next = (i + 1) % segments;
+          g.append('polygon')
+            .attr('points', `${topPts[i].x},${topPts[i].y} ${topPts[next].x},${topPts[next].y} ${botPts[next].x},${botPts[next].y} ${botPts[i].x},${botPts[i].y}`)
+            .attr('fill', this.darken(color, 0.25)).attr('stroke', 'rgba(255,255,255,.15)').attr('stroke-width', 0.5).attr('opacity', opacity);
+        }
+        // Front faces
+        for (let i = 0; i < segments / 2; i++) {
+          const next = (i + 1) % segments;
+          g.append('polygon')
+            .attr('points', `${topPts[i].x},${topPts[i].y} ${topPts[next].x},${topPts[next].y} ${botPts[next].x},${botPts[next].y} ${botPts[i].x},${botPts[i].y}`)
+            .attr('fill', this.darken(color, 0.1)).attr('stroke', 'rgba(255,255,255,.15)').attr('stroke-width', 0.5).attr('opacity', opacity);
+        }
+        // Top
+        g.append('polygon')
+          .attr('points', topPts.map(p => `${p.x},${p.y}`).join(' '))
+          .attr('fill', color).attr('stroke', 'rgba(255,255,255,.25)').attr('stroke-width', 0.5).attr('opacity', opacity);
+      }
+    };
+
+    const ISO_EQUIPMENT = {
+      inlet_tank: { type: 'cylinder', x: -200, y: 0, z: 0, radius: 30, height: 60, color: 'rgba(0,180,220,.7)', label: 'Raw Water Tank' },
+      prefilter: { type: 'box', x: -100, y: 0, z: -20, width: 40, height: 50, depth: 40, color: 'rgba(139,90,43,.6)', label: 'Pre-Filter' },
+      uf_membrane: { type: 'cylinder', x: 0, y: 0, z: 0, radius: 25, height: 70, color: 'rgba(124,92,255,.7)', label: 'UF Membrane' },
+      hp_pump: { type: 'box', x: 80, y: 0, z: -15, width: 30, height: 30, depth: 30, color: 'rgba(100,149,237,.7)', label: 'HP Pump' },
+      ro_membrane: { type: 'cylinder', x: 160, y: 0, z: 0, radius: 30, height: 80, color: 'rgba(0,206,209,.7)', label: 'RO Membrane' },
+      uv_reactor: { type: 'box', x: 250, y: 0, z: -20, width: 50, height: 35, depth: 40, color: 'rgba(180,150,255,.6)', label: 'UV Disinfection' },
+      product_tank: { type: 'cylinder', x: 350, y: 0, z: 0, radius: 35, height: 65, color: 'rgba(0,212,170,.7)', label: 'Product Tank' }
+    };
+
+    const ISO_PIPES = [
+      { from: 'inlet_tank', to: 'prefilter' },
+      { from: 'prefilter', to: 'uf_membrane' },
+      { from: 'uf_membrane', to: 'hp_pump' },
+      { from: 'hp_pump', to: 'ro_membrane' },
+      { from: 'ro_membrane', to: 'uv_reactor' },
+      { from: 'uv_reactor', to: 'product_tank' }
+    ];
+
+    let isoParticles = [];
+    let isoAnimFrame = null;
+
+    function renderIsometricPlant(inputs, solution) {
+      const container = document.getElementById('sim-pane-isometric');
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 800, 780);
+      const height = Math.max(rect.height || 500, 500);
+
+      // Clear previous
+      if (container._isoAnimFrame) cancelAnimationFrame(container._isoAnimFrame);
+      if (container._isoSpawnInterval) clearInterval(container._isoSpawnInterval);
+      container.innerHTML = '';
+      isoParticles = [];
+
+      const svg = d3.select(container).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      // Defs for filters
+      const defs = svg.append('defs');
+      const glow = defs.append('filter').attr('id', 'iso-glow').attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      glow.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+      const glowMerge = glow.append('feMerge');
+      glowMerge.append('feMergeNode').attr('in', 'blur');
+      glowMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      const shadow = defs.append('filter').attr('id', 'iso-shadow').attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      shadow.append('feDropShadow').attr('dx', '2').attr('dy', '4').attr('stdDeviation', '3').attr('flood-color', 'rgba(0,0,0,.4)');
+
+      const centerX = width / 2;
+      const centerY = height / 2 + 30;
+
+      const mainGroup = svg.append('g').attr('transform', `translate(${centerX}, ${centerY})`);
+      const groundLayer = mainGroup.append('g');
+      const pipeLayer = mainGroup.append('g');
+      const equipmentLayer = mainGroup.append('g');
+      const particleLayer = mainGroup.append('g');
+      const labelLayer = mainGroup.append('g');
+
+      // Ground plane
+      const groundPts = [ISO.project(-250, 0, -80), ISO.project(420, 0, -80), ISO.project(420, 0, 80), ISO.project(-250, 0, 80)];
+      groundLayer.append('polygon')
+        .attr('points', groundPts.map(p => `${p.x},${p.y}`).join(' '))
+        .attr('fill', 'rgba(30,40,60,.5)').attr('stroke', 'rgba(255,255,255,.1)');
+
+      // Grid
+      for (let i = -200; i <= 400; i += 50) {
+        const s = ISO.project(i, 0, -80), e = ISO.project(i, 0, 80);
+        groundLayer.append('line').attr('x1', s.x).attr('y1', s.y).attr('x2', e.x).attr('y2', e.y).attr('stroke', 'rgba(255,255,255,.05)');
+      }
+      for (let i = -80; i <= 80; i += 40) {
+        const s = ISO.project(-250, 0, i), e = ISO.project(420, 0, i);
+        groundLayer.append('line').attr('x1', s.x).attr('y1', s.y).attr('x2', e.x).attr('y2', e.y).attr('stroke', 'rgba(255,255,255,.05)');
+      }
+
+      // Pipes
+      ISO_PIPES.forEach(pipe => {
+        const from = ISO_EQUIPMENT[pipe.from], to = ISO_EQUIPMENT[pipe.to];
+        if (!from || !to) return;
+        const fromX = from.x + (from.width || from.radius * 2) / 2;
+        const toX = to.x - (to.width || to.radius * 2) / 2;
+        const start = ISO.project(fromX, 25, from.z || 0);
+        const end = ISO.project(toX, 25, to.z || 0);
+        pipeLayer.append('line').attr('x1', start.x).attr('y1', start.y).attr('x2', end.x).attr('y2', end.y)
+          .attr('stroke', 'rgba(255,255,255,.2)').attr('stroke-width', 10).attr('stroke-linecap', 'round');
+        pipeLayer.append('line').attr('x1', start.x).attr('y1', start.y).attr('x2', end.x).attr('y2', end.y)
+          .attr('stroke', 'rgba(100,149,237,.5)').attr('stroke-width', 7).attr('stroke-linecap', 'round');
+      });
+
+      // Equipment (sorted by z for proper depth)
+      const sorted = Object.entries(ISO_EQUIPMENT).sort((a, b) => (b[1].z || 0) - (a[1].z || 0));
+      sorted.forEach(([id, eq]) => {
+        const g = equipmentLayer.append('g').attr('class', `equip-${id}`).attr('filter', 'url(#iso-shadow)').style('cursor', 'pointer');
+        if (eq.type === 'box') ISO.box(g, eq.x, eq.y, eq.z || 0, eq.width, eq.height, eq.depth, eq.color);
+        else if (eq.type === 'cylinder') ISO.cylinder(g, eq.x, eq.y, eq.z || 0, eq.radius, eq.height, eq.color);
+      });
+
+      // Labels
+      Object.entries(ISO_EQUIPMENT).forEach(([id, eq]) => {
+        const pos = ISO.project(eq.x + (eq.width || 0) / 2, eq.height + 12, (eq.z || 0) + (eq.depth || 0) / 2);
+        labelLayer.append('text').attr('x', pos.x).attr('y', pos.y).attr('text-anchor', 'middle')
+          .attr('fill', '#afc4d8').attr('font-size', '9px').attr('font-weight', '600').text(eq.label);
+      });
+
+      // Title & metrics
+      svg.append('text').attr('x', 15).attr('y', 20).attr('fill', '#afc4d8').attr('font-size', '12px').attr('font-weight', 'bold')
+        .text('Isometric Plant View — Treatment Train');
+      svg.append('text').attr('x', 15).attr('y', 34).attr('fill', '#6a7a8a').attr('font-size', '10px')
+        .text(`Flow: ${inputs.flow || 100} m³/h • Recovery: ${((solution?.recovery || 0.85) * 100).toFixed(0)}% • Energy: ${(solution?.energy || 2.5).toFixed(2)} kWh/m³`);
+
+      // Particle animation
+      function spawnParticle() { isoParticles.push({ pipeIdx: 0, progress: 0, speed: 0.012 + Math.random() * 0.006 }); }
+      function updateParticles() {
+        isoParticles = isoParticles.filter(p => {
+          p.progress += p.speed;
+          if (p.progress >= 1) { p.pipeIdx++; p.progress = 0; if (p.pipeIdx >= ISO_PIPES.length) return false; }
+          return true;
+        });
+        const data = isoParticles.map(p => {
+          const pipe = ISO_PIPES[p.pipeIdx]; if (!pipe) return null;
+          const from = ISO_EQUIPMENT[pipe.from], to = ISO_EQUIPMENT[pipe.to]; if (!from || !to) return null;
+          const fromX = from.x + (from.width || from.radius * 2) / 2;
+          const toX = to.x - (to.width || to.radius * 2) / 2;
+          const x = fromX + (toX - fromX) * p.progress;
+          return ISO.project(x, 25, 0);
+        }).filter(Boolean);
+        const circles = particleLayer.selectAll('.flow-p').data(data);
+        circles.enter().append('circle').attr('class', 'flow-p').attr('r', 4).attr('fill', 'rgba(0,212,170,.85)').attr('filter', 'url(#iso-glow)')
+          .merge(circles).attr('cx', d => d.x).attr('cy', d => d.y);
+        circles.exit().remove();
+      }
+      function animate() { updateParticles(); container._isoAnimFrame = requestAnimationFrame(animate); }
+      container._isoSpawnInterval = setInterval(spawnParticle, 500);
+      animate();
+    }
+
+    // ============================================================
+    // TREATMENT TRAIN (P&ID Style)
+    // ============================================================
+    // ============================================================
+    // TREATMENT TRAIN (Full P&ID Implementation)
+    // ============================================================
+    const TRAIN_EQUIPMENT = {
+      tank: {
+        width: 55, height: 70,
+        draw: (g) => {
+          g.append('rect').attr('x', -27).attr('y', -35).attr('width', 55).attr('height', 70)
+            .attr('rx', 4).attr('fill', 'url(#train-tank-grad)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+          g.append('rect').attr('class', 'water-level').attr('x', -25).attr('y', -8)
+            .attr('width', 51).attr('height', 40).attr('fill', 'rgba(0,180,220,.25)');
+        }
+      },
+      membrane: {
+        width: 75, height: 45,
+        draw: (g) => {
+          g.append('rect').attr('x', -37).attr('y', -22).attr('width', 75).attr('height', 45)
+            .attr('rx', 22).attr('fill', 'url(#train-membrane-grad)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+          for (let i = -18; i <= 18; i += 9) {
+            g.append('line').attr('x1', i).attr('y1', -12).attr('x2', i).attr('y2', 12)
+              .attr('stroke', '#6a7a8a').attr('stroke-width', 1).attr('stroke-dasharray', '3,2');
+          }
+        }
+      },
+      uvReactor: {
+        width: 65, height: 36,
+        draw: (g) => {
+          g.append('rect').attr('x', -32).attr('y', -18).attr('width', 65).attr('height', 36)
+            .attr('rx', 4).attr('fill', 'url(#train-uv-grad)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+          for (let i = -18; i <= 18; i += 18) {
+            g.append('circle').attr('cx', i).attr('cy', 0).attr('r', 5)
+              .attr('fill', 'rgba(180,150,255,.6)').attr('stroke', '#b496ff').attr('stroke-width', 1);
+          }
+        }
+      },
+      pump: {
+        width: 36, height: 36,
+        draw: (g) => {
+          g.append('circle').attr('r', 18).attr('fill', 'url(#train-pump-grad)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+          g.append('path').attr('d', 'M-7,-4 L7,0 L-7,4 Z').attr('fill', '#4a5a6a');
+        }
+      },
+      filter: {
+        width: 45, height: 55,
+        draw: (g) => {
+          g.append('polygon').attr('points', '-22,-27 22,-27 18,27 -18,27')
+            .attr('fill', 'url(#train-filter-grad)').attr('stroke', '#4a5a6a').attr('stroke-width', 2);
+          g.append('line').attr('x1', -16).attr('y1', -8).attr('x2', 16).attr('y2', -8)
+            .attr('stroke', '#6a7a8a').attr('stroke-width', 2).attr('stroke-dasharray', '4,3');
+        }
+      }
+    };
+
+    // Particle animation state
+    const TRAIN_STATE = { particles: [], animating: false, intervalId: null };
+
+    function trainGetWaterColor(concentration) {
+      const dirty = { r: 139, g: 90, b: 43 };
+      const clean = { r: 0, g: 212, b: 170 };
+      const t = 1 - (concentration / 100);
+      const r = Math.round(dirty.r + (clean.r - dirty.r) * t);
+      const g = Math.round(dirty.g + (clean.g - dirty.g) * t);
+      const b = Math.round(dirty.b + (clean.b - dirty.b) * t);
+      return `rgba(${r},${g},${b},0.6)`;
+    }
+
+    function renderTreatmentTrain(inputs, solution) {
+      const container = document.getElementById('sim-pane-treatment');
+      const rect = container.getBoundingClientRect();
+      const width = Math.max(rect.width || 800, 780);
+      const height = Math.max(rect.height || 500, 500);
+      const centerY = height * 0.45;
+
+      // Stop any existing animation
+      if (TRAIN_STATE.intervalId) { clearInterval(TRAIN_STATE.intervalId); TRAIN_STATE.intervalId = null; }
+      TRAIN_STATE.particles = [];
+
+      container.innerHTML = '';
+      const svg = d3.select(container).append('svg')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      // Create definitions
+      const defs = svg.append('defs');
+      // Tank gradient
+      const tankGrad = defs.append('linearGradient').attr('id', 'train-tank-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '100%');
+      tankGrad.append('stop').attr('offset', '0%').attr('stop-color', '#2a3a4a');
+      tankGrad.append('stop').attr('offset', '100%').attr('stop-color', '#1a2a3a');
+      // Membrane gradient
+      const memGrad = defs.append('linearGradient').attr('id', 'train-membrane-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '100%').attr('y2', '0%');
+      memGrad.append('stop').attr('offset', '0%').attr('stop-color', '#3a4a5a');
+      memGrad.append('stop').attr('offset', '50%').attr('stop-color', '#4a5a6a');
+      memGrad.append('stop').attr('offset', '100%').attr('stop-color', '#3a4a5a');
+      // UV gradient
+      const uvGrad = defs.append('linearGradient').attr('id', 'train-uv-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+      uvGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(180,150,255,.3)');
+      uvGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(120,100,200,.2)');
+      // Pump gradient
+      const pumpGrad = defs.append('radialGradient').attr('id', 'train-pump-grad');
+      pumpGrad.append('stop').attr('offset', '0%').attr('stop-color', '#4a5a6a');
+      pumpGrad.append('stop').attr('offset', '100%').attr('stop-color', '#2a3a4a');
+      // Filter gradient
+      const filterGrad = defs.append('linearGradient').attr('id', 'train-filter-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+      filterGrad.append('stop').attr('offset', '0%').attr('stop-color', '#3a4a5a');
+      filterGrad.append('stop').attr('offset', '100%').attr('stop-color', '#2a3a4a');
+      // Glow filter
+      const filter = defs.append('filter').attr('id', 'train-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      filter.append('feGaussianBlur').attr('stdDeviation', '2').attr('result', 'blur');
+      const merge = filter.append('feMerge');
+      merge.append('feMergeNode').attr('in', 'blur');
+      merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      const flow = inputs.flow || 100;
+      const recovery = solution?.recovery || 0.85;
+
+      // Define treatment stages
+      const stages = [
+        { id: 'inlet', name: 'Raw Water', type: 'tank', x: 70, concentration: 100 },
+        { id: 'pump1', name: 'Feed Pump', type: 'pump', x: 155, concentration: 100 },
+        { id: 'filter', name: 'Pre-Filter', type: 'filter', x: 250, concentration: 80, tech: true },
+        { id: 'uf', name: 'UF', type: 'membrane', x: 355, concentration: 35, tech: true },
+        { id: 'pump2', name: 'HP Pump', type: 'pump', x: 450, concentration: 35 },
+        { id: 'ro', name: solution?.name || 'RO', type: 'membrane', x: 540, concentration: 8, tech: true },
+        { id: 'uv', name: 'UV', type: 'uvReactor', x: 630, concentration: 2, tech: true },
+        { id: 'product', name: 'Product', type: 'tank', x: 720, concentration: 0 }
+      ];
+
+      // Title and subtitle
+      svg.append('text').attr('x', 30).attr('y', 25).attr('fill', '#afc4d8')
+        .attr('font-size', '14px').attr('font-weight', 'bold').text('Treatment Train — P&ID Schematic');
+      svg.append('text').attr('x', 30).attr('y', 42).attr('fill', '#6a7a8a')
+        .attr('font-size', '10px').text('Water flows left to right through treatment stages');
+
+      // Create layers
+      const pipeLayer = svg.append('g').attr('class', 'pipes');
+      const equipLayer = svg.append('g').attr('class', 'equipment');
+      const particleLayer = svg.append('g').attr('class', 'particles');
+      const labelLayer = svg.append('g').attr('class', 'labels');
+
+      // Draw pipes between stages
+      const pipeWidth = 10;
+      for (let i = 0; i < stages.length - 1; i++) {
+        const from = stages[i], to = stages[i + 1];
+        const fromEquip = TRAIN_EQUIPMENT[from.type] || { width: 40 };
+        const toEquip = TRAIN_EQUIPMENT[to.type] || { width: 40 };
+        const x1 = from.x + fromEquip.width / 2;
+        const x2 = to.x - toEquip.width / 2;
+        const color = trainGetWaterColor(from.concentration);
+
+        pipeLayer.append('rect').attr('x', x1).attr('y', centerY - pipeWidth / 2)
+          .attr('width', x2 - x1).attr('height', pipeWidth).attr('fill', color).attr('rx', 2);
+        pipeLayer.append('rect').attr('x', x1).attr('y', centerY - pipeWidth / 2)
+          .attr('width', x2 - x1).attr('height', pipeWidth).attr('fill', 'none')
+          .attr('stroke', '#4a5a6a').attr('stroke-width', 1).attr('rx', 2);
+      }
+
+      // Add reject stream from RO
+      const roStage = stages.find(s => s.id === 'ro');
+      if (roStage) {
+        pipeLayer.append('path')
+          .attr('d', `M${roStage.x},${centerY + 18} L${roStage.x},${centerY + 50} L${roStage.x + 45},${centerY + 50}`)
+          .attr('fill', 'none').attr('stroke', 'rgba(139,90,43,.6)').attr('stroke-width', 6);
+        pipeLayer.append('text').attr('x', roStage.x + 50).attr('y', centerY + 54)
+          .attr('fill', '#8fa4b8').attr('font-size', '9px').text(`Reject ${((1 - recovery) * flow).toFixed(0)} m³/h`);
+      }
+
+      // Draw equipment
+      stages.forEach(stage => {
+        const equip = TRAIN_EQUIPMENT[stage.type];
+        if (!equip) return;
+        const g = equipLayer.append('g')
+          .attr('transform', `translate(${stage.x}, ${centerY})`)
+          .style('cursor', 'pointer');
+        equip.draw(g);
+        if (stage.tech) g.attr('filter', 'url(#train-glow)');
+      });
+
+      // Draw labels
+      stages.forEach(stage => {
+        const equip = TRAIN_EQUIPMENT[stage.type] || { height: 50 };
+        const offsetY = equip.height / 2 + 18;
+
+        labelLayer.append('text').attr('x', stage.x).attr('y', centerY + offsetY)
+          .attr('text-anchor', 'middle').attr('fill', '#afc4d8')
+          .attr('font-size', '10px').attr('font-weight', '600').text(stage.name);
+
+        if (stage.concentration !== undefined) {
+          const color = trainGetWaterColor(stage.concentration);
+          labelLayer.append('text').attr('x', stage.x).attr('y', centerY + offsetY + 13)
+            .attr('text-anchor', 'middle').attr('fill', color)
+            .attr('font-size', '9px').text(`${stage.concentration}%`);
+        }
+      });
+
+      // Summary stats
+      const statsG = svg.append('g').attr('transform', `translate(${width - 130}, 25)`);
+      statsG.append('rect').attr('width', 115).attr('height', 50).attr('rx', 4)
+        .attr('fill', 'rgba(17,27,61,.8)').attr('stroke', '#2a3a4a');
+      statsG.append('text').attr('x', 10).attr('y', 18).attr('fill', '#8fa4b8').attr('font-size', '9px')
+        .text(`Inlet: ${flow} m³/h`);
+      statsG.append('text').attr('x', 10).attr('y', 32).attr('fill', '#00d4aa').attr('font-size', '9px')
+        .text(`Product: ${(flow * recovery).toFixed(0)} m³/h`);
+      statsG.append('text').attr('x', 10).attr('y', 46).attr('fill', '#8b5a2b').attr('font-size', '9px')
+        .text(`Recovery: ${(recovery * 100).toFixed(0)}%`);
+
+      // Particle animation
+      function spawnParticle() {
+        TRAIN_STATE.particles.push({
+          x: stages[0].x, stageIdx: 0, progress: 0,
+          concentration: stages[0].concentration
+        });
+      }
+
+      function updateParticles() {
+        const dt = 0.025;
+        TRAIN_STATE.particles = TRAIN_STATE.particles.filter(p => {
+          p.progress += dt;
+          if (p.stageIdx < stages.length - 1) {
+            const from = stages[p.stageIdx], to = stages[p.stageIdx + 1];
+            p.x = from.x + (to.x - from.x) * p.progress;
+            if (to.concentration !== undefined) {
+              p.concentration = from.concentration + (to.concentration - from.concentration) * p.progress;
+            }
+            if (p.progress >= 1) { p.stageIdx++; p.progress = 0; }
+            return true;
+          }
+          return false;
+        });
+
+        particleLayer.selectAll('.train-particle').remove();
+        TRAIN_STATE.particles.forEach(p => {
+          particleLayer.append('circle')
+            .attr('class', 'train-particle')
+            .attr('cx', p.x).attr('cy', centerY)
+            .attr('r', 4).attr('fill', trainGetWaterColor(p.concentration))
+            .attr('filter', 'url(#train-glow)');
+        });
+      }
+
+      spawnParticle();
+      TRAIN_STATE.intervalId = setInterval(() => {
+        spawnParticle();
+        updateParticles();
+      }, 400);
+      setInterval(updateParticles, 50);
+    }
+
+    // ============================================================
+    // DECISION TREE (Full Interactive Implementation)
+    // ============================================================
+    const DECISION_TREE_DATA = {
+      id: 'root', name: 'Water Analysis', question: 'Analyze water quality',
+      children: [
+        {
+          id: 'solids-branch', name: 'Solids Treatment', question: 'TSS treatment path',
+          children: [
+            { id: 'tss-high', name: 'High TSS', question: 'TSS > 100 mg/L',
+              threshold: { param: 'tss', value: 100, operator: '>' },
+              children: [
+                { id: 'daf', name: 'DAF', tech: 'DAF', description: 'Dissolved Air Flotation', leaf: true },
+                { id: 'clarifier', name: 'Clarifier', tech: 'CLAR', description: 'Primary Clarification', leaf: true }
+              ]
+            },
+            { id: 'tss-med', name: 'Medium TSS', question: '50 < TSS ≤ 100',
+              threshold: { param: 'tss', value: 50, operator: '>' },
+              children: [
+                { id: 'uf', name: 'UF', tech: 'UF', description: 'Ultrafiltration', leaf: true },
+                { id: 'mf', name: 'MF', tech: 'MF', description: 'Microfiltration', leaf: true }
+              ]
+            },
+            { id: 'tss-low', name: 'Low TSS', question: 'TSS ≤ 50 mg/L',
+              children: [
+                { id: 'direct', name: 'Direct', tech: 'DIRECT', description: 'Direct treatment', leaf: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'dissolved-branch', name: 'Dissolved Solids', question: 'TDS treatment path',
+          children: [
+            { id: 'tds-high', name: 'High TDS', question: 'TDS > 2000 mg/L',
+              threshold: { param: 'tds', value: 2000, operator: '>' },
+              children: [
+                { id: 'ro', name: 'RO', tech: 'RO', description: 'Reverse Osmosis', leaf: true },
+                { id: 'ed', name: 'ED', tech: 'ED', description: 'Electrodialysis', leaf: true }
+              ]
+            },
+            { id: 'tds-med', name: 'Medium TDS', question: '500 < TDS ≤ 2000',
+              threshold: { param: 'tds', value: 500, operator: '>' },
+              children: [
+                { id: 'nf', name: 'NF', tech: 'NF', description: 'Nanofiltration', leaf: true },
+                { id: 'ix', name: 'IX', tech: 'IX', description: 'Ion Exchange', leaf: true }
+              ]
+            },
+            { id: 'tds-low', name: 'Low TDS', question: 'TDS ≤ 500 mg/L',
+              children: [
+                { id: 'polish', name: 'Polish', tech: 'POLISH', description: 'Final polishing', leaf: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'disinfection-branch', name: 'Disinfection', question: 'Final treatment',
+          children: [
+            { id: 'uv', name: 'UV', tech: 'UV', description: 'UV Disinfection', leaf: true },
+            { id: 'aop', name: 'AOP', tech: 'AOP', description: 'Advanced Oxidation', leaf: true },
+            { id: 'chlor', name: 'Cl₂', tech: 'CHLOR', description: 'Chlorination', leaf: true }
+          ]
+        }
+      ]
+    };
+
+    const TECH_INFO = {
+      RO: { name: 'Reverse Osmosis', recovery: 0.75, energy: 3.5, capex: 450, color: '#00d4aa' },
+      NF: { name: 'Nanofiltration', recovery: 0.85, energy: 2.5, capex: 350, color: '#35d0ba' },
+      UF: { name: 'Ultrafiltration', recovery: 0.95, energy: 0.5, capex: 200, color: '#7c5cff' },
+      MF: { name: 'Microfiltration', recovery: 0.97, energy: 0.3, capex: 150, color: '#9370db' },
+      MBR: { name: 'Membrane Bioreactor', recovery: 0.90, energy: 1.2, capex: 500, color: '#4682b4' },
+      DAF: { name: 'Dissolved Air Flotation', recovery: 0.98, energy: 0.3, capex: 150, color: '#ffa500' },
+      UV: { name: 'UV Disinfection', recovery: 1.0, energy: 0.1, capex: 50, color: '#e066ff' },
+      AOP: { name: 'Advanced Oxidation', recovery: 1.0, energy: 0.5, capex: 120, color: '#ff69b4' },
+      CLAR: { name: 'Primary Clarifier', recovery: 0.99, energy: 0.1, capex: 100, color: '#cd853f' },
+      ED: { name: 'Electrodialysis', recovery: 0.80, energy: 2.0, capex: 400, color: '#20b2aa' },
+      IX: { name: 'Ion Exchange', recovery: 0.95, energy: 0.2, capex: 180, color: '#32cd32' },
+      DIRECT: { name: 'Direct Feed', recovery: 1.0, energy: 0.0, capex: 0, color: '#87ceeb' },
+      POLISH: { name: 'Final Polish', recovery: 0.99, energy: 0.1, capex: 30, color: '#98fb98' },
+      CHLOR: { name: 'Chlorination', recovery: 1.0, energy: 0.05, capex: 20, color: '#f0e68c' }
+    };
+
+    function renderDecisionTree(inputs, solution) {
+      const container = document.getElementById('sim-pane-decision');
+      if (!container) { console.warn('Decision container not found'); return; }
+
+      const width = 780, height = 500;
+      const margin = { top: 60, right: 30, bottom: 30, left: 30 };
+      const nodeRadius = 22;
+      const tss = inputs.tss || 150;
+      const tds = inputs.tds || 2500;
+
+      container.innerHTML = '';
+
+      const svg = d3.select(container).append('svg')
+        .attr('width', '100%').attr('height', '100%')
+        .attr('viewBox', `0 0 ${width} ${height}`);
+
+      // Defs
+      const defs = svg.append('defs');
+      const glow = defs.append('filter').attr('id', 'tree-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      glow.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'blur');
+      const feMerge = glow.append('feMerge');
+      feMerge.append('feMergeNode').attr('in', 'blur');
+      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Gradients
+      const nodeGrad = defs.append('linearGradient').attr('id', 'tree-node-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+      nodeGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(124,92,255,.9)');
+      nodeGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(124,92,255,.6)');
+
+      const leafGrad = defs.append('linearGradient').attr('id', 'tree-leaf-grad')
+        .attr('x1', '0%').attr('y1', '0%').attr('x2', '0%').attr('y2', '100%');
+      leafGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(255,165,0,.9)');
+      leafGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(255,165,0,.6)');
+
+      // Title
+      svg.append('text').attr('x', 20).attr('y', 28).attr('fill', '#afc4d8')
+        .attr('font-size', '14px').attr('font-weight', 'bold')
+        .text('AI Decision Tree — Technology Selection');
+      svg.append('text').attr('x', 20).attr('y', 48).attr('fill', '#6a7a8a')
+        .attr('font-size', '11px')
+        .text(`TSS: ${tss} mg/L, TDS: ${tds} mg/L — Recommended path highlighted`);
+
+      const mainGroup = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      // Create hierarchy
+      const root = d3.hierarchy(DECISION_TREE_DATA);
+      const treeLayout = d3.tree()
+        .size([innerWidth, innerHeight - 40])
+        .separation((a, b) => a.parent === b.parent ? 1 : 1.4);
+      treeLayout(root);
+
+      // Determine recommended path
+      function getRecommendedPath() {
+        const path = ['root'];
+        path.push('solids-branch');
+        if (tss > 100) { path.push('tss-high'); path.push('daf'); }
+        else if (tss > 50) { path.push('tss-med'); path.push('uf'); }
+        else { path.push('tss-low'); path.push('direct'); }
+        path.push('dissolved-branch');
+        if (tds > 2000) { path.push('tds-high'); path.push('ro'); }
+        else if (tds > 500) { path.push('tds-med'); path.push('nf'); }
+        else { path.push('tds-low'); path.push('polish'); }
+        path.push('disinfection-branch');
+        path.push('uv');
+        return path;
+      }
+      const recommendedPath = getRecommendedPath();
+
+      // Draw links
+      const linksGroup = mainGroup.append('g');
+      const nodesGroup = mainGroup.append('g');
+      const labelsGroup = mainGroup.append('g');
+      const tooltipGroup = mainGroup.append('g');
+
+      function diagonal(s, d) {
+        const midY = (s.y + d.y) / 2;
+        return `M${s.x},${s.y} C${s.x},${midY} ${d.x},${midY} ${d.x},${d.y}`;
+      }
+
+      root.links().forEach((link, i) => {
+        const isActive = recommendedPath.includes(link.source.data.id) &&
+                        recommendedPath.includes(link.target.data.id);
+        const path = linksGroup.append('path')
+          .attr('d', diagonal(link.source, link.target))
+          .attr('fill', 'none')
+          .attr('stroke', isActive ? '#00d4aa' : 'rgba(159,176,208,.3)')
+          .attr('stroke-width', isActive ? 3 : 1.5)
+          .attr('opacity', 0);
+        path.transition().delay(i * 40).duration(400).attr('opacity', 1);
+
+        if (isActive) {
+          const len = path.node().getTotalLength();
+          path.attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+            .transition().delay(200 + i * 60).duration(500)
+            .ease(d3.easeQuadOut).attr('stroke-dashoffset', 0);
+        }
+      });
+
+      // Draw nodes
+      root.descendants().forEach((node, i) => {
+        const isActive = recommendedPath.includes(node.data.id);
+        const isLeaf = node.data.leaf;
+        const tech = TECH_INFO[node.data.tech];
+
+        const g = nodesGroup.append('g')
+          .attr('transform', `translate(${node.x}, ${node.y})`)
+          .attr('opacity', 0).style('cursor', isLeaf ? 'pointer' : 'default');
+        g.transition().delay(150 + i * 30).duration(400).attr('opacity', 1);
+
+        if (isActive) {
+          g.append('circle').attr('r', nodeRadius + 6)
+            .attr('fill', 'none').attr('stroke', '#00d4aa')
+            .attr('stroke-width', 2).attr('opacity', 0)
+            .attr('filter', 'url(#tree-glow)')
+            .transition().delay(300 + i * 30).duration(500).attr('opacity', 0.6);
+        }
+
+        const nodeColor = isActive
+          ? (tech ? tech.color : '#00d4aa')
+          : (isLeaf ? 'url(#tree-leaf-grad)' : 'url(#tree-node-grad)');
+
+        g.append('circle')
+          .attr('r', isLeaf ? nodeRadius - 2 : nodeRadius)
+          .attr('fill', nodeColor)
+          .attr('stroke', isActive ? '#fff' : 'rgba(255,255,255,.3)')
+          .attr('stroke-width', isActive ? 2 : 1.5)
+          .attr('filter', isActive ? 'url(#tree-glow)' : null);
+
+        const label = isLeaf ? node.data.name : (node.depth === 0 ? '?' : '•');
+        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+          .attr('fill', '#fff').attr('font-size', isLeaf ? '9px' : '14px')
+          .attr('font-weight', 'bold').text(label);
+
+        if (!isLeaf) {
+          labelsGroup.append('text')
+            .attr('x', node.x).attr('y', node.y + nodeRadius + 12)
+            .attr('text-anchor', 'middle')
+            .attr('fill', isActive ? '#00d4aa' : '#8fa4b8')
+            .attr('font-size', '9px')
+            .attr('font-weight', isActive ? 'bold' : 'normal')
+            .text(node.data.name)
+            .attr('opacity', 0)
+            .transition().delay(250 + i * 30).duration(400).attr('opacity', 1);
+        }
+
+        if (isLeaf && tech) {
+          g.on('click', function(event) {
+            event.stopPropagation();
+            tooltipGroup.selectAll('*').remove();
+            const tipX = node.x + nodeRadius + 10;
+            const tipY = node.y - 40;
+            const tip = tooltipGroup.append('g')
+              .attr('transform', `translate(${tipX}, ${tipY})`).attr('opacity', 0);
+            tip.append('rect').attr('width', 160).attr('height', 80).attr('rx', 6)
+              .attr('fill', 'rgba(17,27,61,.95)').attr('stroke', tech.color).attr('stroke-width', 2);
+            tip.append('text').attr('x', 10).attr('y', 18)
+              .attr('fill', tech.color).attr('font-size', '11px').attr('font-weight', 'bold')
+              .text(tech.name);
+            tip.append('text').attr('x', 10).attr('y', 36)
+              .attr('fill', '#afc4d8').attr('font-size', '9px')
+              .text(`Recovery: ${(tech.recovery * 100).toFixed(0)}%`);
+            tip.append('text').attr('x', 10).attr('y', 52)
+              .attr('fill', '#afc4d8').attr('font-size', '9px')
+              .text(`Energy: ${tech.energy} kWh/m³`);
+            tip.append('text').attr('x', 10).attr('y', 68)
+              .attr('fill', '#afc4d8').attr('font-size', '9px')
+              .text(`CAPEX: £${tech.capex}/m³/day`);
+            tip.transition().duration(200).attr('opacity', 1);
+            setTimeout(() => tip.transition().duration(300).attr('opacity', 0).remove(), 4000);
+          });
+          g.on('mouseenter', function() {
+            d3.select(this).select('circle').transition().duration(150).attr('r', nodeRadius);
+          }).on('mouseleave', function() {
+            d3.select(this).select('circle').transition().duration(150).attr('r', nodeRadius - 2);
+          });
+        }
+      });
+
+      // Legend
+      const legend = svg.append('g').attr('transform', `translate(${width - 150}, ${margin.top})`);
+      legend.append('rect').attr('x', -10).attr('y', -10).attr('width', 130).attr('height', 75)
+        .attr('rx', 6).attr('fill', 'rgba(17,27,61,.7)').attr('stroke', 'rgba(255,255,255,.1)');
+      [
+        { label: 'Recommended', color: '#00d4aa' },
+        { label: 'Decision Node', color: 'rgba(124,92,255,.8)' },
+        { label: 'Technology', color: 'rgba(255,165,0,.8)' }
+      ].forEach((item, i) => {
+        legend.append('circle').attr('cx', 8).attr('cy', 8 + i * 20).attr('r', 5).attr('fill', item.color);
+        legend.append('text').attr('x', 20).attr('y', 12 + i * 20)
+          .attr('fill', '#afc4d8').attr('font-size', '9px').text(item.label);
+      });
+
+      console.log('Decision tree rendered');
+    }
+
+    // ============================================================
+    // UPDATE ALL VISUALIZATIONS
+    // ============================================================
+    function updateAllVisualizations(inputs, solution) {
+      lastSimInputs = inputs;
+      lastSimSolution = solution;
+
+      // Render all visualizations
+      try { renderSCADA(inputs, solution); } catch(e) { console.warn('SCADA error:', e); }
+      try { renderSankey(inputs, solution); } catch(e) { console.warn('Sankey error:', e); }
+      try { renderCarbonClock(inputs, solution); } catch(e) { console.warn('Carbon error:', e); }
+      try { renderIsometricPlant(inputs, solution); } catch(e) { console.warn('Isometric error:', e); }
+      try { renderTreatmentTrain(inputs, solution); } catch(e) { console.warn('Treatment error:', e); }
+      try { renderDecisionTree(inputs, solution); } catch(e) { console.warn('Decision error:', e); }
+    }
+
+    // Re-render on window resize
+    window.addEventListener('resize', () => {
+      if (lastSimInputs && lastSimSolution) {
+        updateAllVisualizations(lastSimInputs, lastSimSolution);
+      }
+    });
 
   </script>
 </body>

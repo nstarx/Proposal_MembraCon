@@ -1,0 +1,491 @@
+/* visualizations.css - All visualization styles */
+
+/* Graph Panel */
+#graphPanel {
+  position: relative;
+}
+
+#viz {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Legend */
+.legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.legend .tag {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(12,18,40,.65);
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .2px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+/* SVG Links */
+.link {
+  stroke: rgba(159,176,208,.40);
+  stroke-width: 1.2;
+}
+
+.link.emph {
+  stroke: rgba(124,92,255,.65);
+  stroke-width: 2.0;
+}
+
+.link.feedback {
+  stroke: rgba(53,208,186,.50);
+  stroke-width: 1.4;
+  stroke-dasharray: 6 3;
+}
+
+/* Flow particle animations */
+.flow-particle {
+  pointer-events: none;
+}
+
+.flow-particle.context {
+  fill: rgba(159, 176, 208, 0.9);
+}
+
+.flow-particle.core {
+  fill: rgba(124, 92, 255, 0.95);
+}
+
+.flow-particle.gov {
+  fill: rgba(255, 183, 77, 0.9);
+}
+
+.flow-particle.learning {
+  fill: rgba(53, 208, 186, 0.95);
+}
+
+@keyframes particle-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Node styling */
+.node .shape {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.4));
+  cursor: pointer;
+}
+
+.node text {
+  font-size: 10px;
+  fill: rgba(234,240,255,.95);
+  pointer-events: none;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+.node .sub {
+  fill: rgba(159,176,208,.85);
+  font-size: 9px;
+  font-weight: 400;
+}
+
+/* Visualization container */
+.viz-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Viz tabs for switching between visualizations */
+.viz-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(17,27,61,.6);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.viz-tabs::-webkit-scrollbar {
+  height: 4px;
+}
+
+.viz-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.viz-tabs::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.2);
+  border-radius: 2px;
+}
+
+.viz-tab {
+  padding: 6px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viz-tab:hover {
+  background: rgba(255,255,255,.08);
+  color: var(--text);
+}
+
+.viz-tab.active {
+  background: linear-gradient(135deg, rgba(124,92,255,.25), rgba(53,208,186,.20));
+  border-color: rgba(124,92,255,.5);
+  color: var(--text);
+}
+
+.viz-tab:disabled,
+.viz-tab[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.viz-tab .material-icons-outlined {
+  font-size: 14px;
+}
+
+/* Visualization panes */
+.viz-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.viz-pane.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* SCADA Dashboard styles */
+.scada-dashboard {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(11,16,32,1), rgba(17,27,61,1));
+  overflow: hidden;
+}
+
+.scada-dashboard .scada-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.scada-gauge {
+  background: rgba(17,27,61,.7);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scada-gauge .label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scada-gauge .value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.scada-gauge .unit {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.scada-gauge svg {
+  width: 120px;
+  height: 120px;
+}
+
+/* Treatment Train styles */
+.treatment-train {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.treatment-train svg {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+}
+
+.treatment-stage {
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.treatment-stage:hover {
+  filter: brightness(1.2);
+}
+
+.treatment-stage text {
+  font-size: 10px;
+  fill: var(--text);
+  text-anchor: middle;
+}
+
+/* Sankey styles */
+.sankey-diagram {
+  width: 100%;
+  height: 100%;
+}
+
+.sankey-diagram svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sankey-node rect {
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+  stroke: rgba(255,255,255,.3);
+  stroke-width: 1;
+}
+
+.sankey-node text {
+  font-size: 11px;
+  fill: var(--text);
+}
+
+.sankey-link {
+  fill: none;
+  stroke-opacity: .3;
+}
+
+.sankey-link:hover {
+  stroke-opacity: .5;
+}
+
+/* Carbon Clock styles */
+.carbon-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+}
+
+.carbon-clock svg {
+  width: 300px;
+  height: 300px;
+}
+
+.carbon-clock .counter {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-top: 24px;
+}
+
+.carbon-clock .counter-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* Decision Tree styles */
+.decision-tree {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.decision-tree svg {
+  width: 100%;
+  height: 100%;
+  min-height: 600px;
+}
+
+.decision-node {
+  cursor: pointer;
+}
+
+.decision-node circle {
+  fill: var(--accent);
+  stroke: rgba(255,255,255,.4);
+  stroke-width: 2;
+  transition: all .2s ease;
+}
+
+.decision-node:hover circle {
+  fill: var(--accent2);
+}
+
+.decision-node text {
+  font-size: 10px;
+  fill: var(--text);
+}
+
+.decision-link {
+  fill: none;
+  stroke: rgba(159,176,208,.4);
+  stroke-width: 1.5;
+}
+
+.decision-link.highlighted {
+  stroke: var(--accent2);
+  stroke-width: 2.5;
+}
+
+/* Isometric Plant (3D) styles */
+.isometric-plant {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(11,16,32,1), rgba(15,23,51,1));
+}
+
+.isometric-plant canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Optimization 3D styles */
+.optimization-3d {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(11,16,32,1), rgba(15,23,51,1));
+}
+
+.optimization-3d canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Molecule Journey styles */
+.molecule-journey {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.molecule-journey canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.molecule-journey .controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.molecule-journey .control-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+  background: rgba(17,27,61,.8);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s ease;
+}
+
+.molecule-journey .control-btn:hover {
+  background: rgba(255,255,255,.1);
+}
+
+/* Sparkline */
+.sparkline {
+  stroke: var(--accent2);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.sparkline-area {
+  fill: rgba(53,208,186,.1);
+  stroke: none;
+}
+
+/* Alert indicator */
+.alert-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.alert-indicator.normal {
+  background: rgba(74,222,128,.15);
+  color: var(--ok);
+}
+
+.alert-indicator.warning {
+  background: rgba(255,176,32,.15);
+  color: var(--warn);
+}
+
+.alert-indicator.critical {
+  background: rgba(251,113,133,.15);
+  color: var(--bad);
+}
+
+/* Threshold markers */
+.threshold-line {
+  stroke-dasharray: 4 2;
+  stroke-width: 1;
+}
+
+.threshold-line.low {
+  stroke: var(--warn);
+}
+
+.threshold-line.high {
+  stroke: var(--bad);
+}
