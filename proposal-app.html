@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
 
   <style>
+    /* Dark Theme (Default) */
     :root {
       --bg: #0a0f1a;
       --panel: #0d1424;
@@ -29,6 +30,142 @@
       --esg-green: #10b981;
       --esg-blue: #3b82f6;
       --esg-purple: #8b5cf6;
+      --input-bg: rgba(0,0,0,0.2);
+      --shadow: rgba(0,0,0,0.3);
+    }
+
+    /* Light Theme */
+    [data-theme="light"] {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --muted: #64748b;
+      --text: #1e293b;
+      --line: #e2e8f0;
+      --accent: #4f46e5;
+      --accent2: #0891b2;
+      --accent3: #9333ea;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --esg-green: #059669;
+      --esg-blue: #2563eb;
+      --esg-purple: #7c3aed;
+      --input-bg: #f1f5f9;
+      --shadow: rgba(0,0,0,0.08);
+    }
+
+    /* Light theme specific overrides */
+    [data-theme="light"] .app-header {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+      border-bottom-color: var(--line);
+    }
+
+    [data-theme="light"] .sidebar {
+      background: var(--panel);
+      box-shadow: 2px 0 8px var(--shadow);
+    }
+
+    [data-theme="light"] .content-panel {
+      box-shadow: 0 1px 3px var(--shadow);
+    }
+
+    [data-theme="light"] .form-input {
+      background: var(--input-bg);
+      border-color: var(--line);
+    }
+
+    [data-theme="light"] .chip {
+      background: var(--input-bg);
+      border-color: var(--line);
+    }
+
+    [data-theme="light"] .tech-card {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .workflow-step {
+      background: var(--card);
+      box-shadow: 0 1px 3px var(--shadow);
+    }
+
+    [data-theme="light"] .metric-card {
+      box-shadow: 0 1px 3px var(--shadow);
+    }
+
+    [data-theme="light"] .solution-table th {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .btn-secondary {
+      background: var(--input-bg);
+      border-color: var(--line);
+    }
+
+    [data-theme="light"] .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    [data-theme="light"] .proposal-preview {
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    [data-theme="light"] .override-panel {
+      background: linear-gradient(135deg, rgba(245,158,11,0.05), rgba(239,68,68,0.03));
+    }
+
+    [data-theme="light"] .ai-processing {
+      background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(147,51,234,0.05));
+    }
+
+    [data-theme="light"] .esg-gauge {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .decision-item {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .project-item {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .nav-tab.active {
+      background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(8,145,178,0.08));
+    }
+
+    [data-theme="light"] input[type="range"] {
+      background: #cbd5e1;
+    }
+
+    [data-theme="light"] .gauge-bg {
+      stroke: #e2e8f0;
+    }
+
+    [data-theme="light"] .sidebar-section {
+      box-shadow: 0 1px 3px var(--shadow);
+    }
+
+    [data-theme="light"] .progress-bar-bg {
+      background: #e2e8f0 !important;
+    }
+
+    [data-theme="light"] .logo-icon {
+      box-shadow: 0 2px 8px rgba(79,70,229,0.25);
+    }
+
+    [data-theme="light"] .cost-segment {
+      color: #fff;
+    }
+
+    [data-theme="light"] .confidence-bar {
+      background: #e2e8f0;
+    }
+
+    /* Smooth theme transition */
+    * {
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -140,6 +277,174 @@
       font-weight: 600;
     }
 
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .theme-toggle .material-icons-outlined {
+      font-size: 20px;
+    }
+
+    [data-theme="light"] .theme-toggle {
+      background: var(--input-bg);
+    }
+
+    /* Keyboard Mode */
+    [data-keyboard-mode="true"] .keyboard-toggle {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .shortcut-badge {
+      display: none;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      z-index: 10;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    [data-keyboard-mode="true"] .shortcut-badge {
+      display: flex;
+    }
+
+    .has-shortcut {
+      position: relative;
+    }
+
+    /* Keyboard mode indicator */
+    .keyboard-mode-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 9999;
+    }
+
+    [data-keyboard-mode="true"] .keyboard-mode-bar {
+      display: flex;
+    }
+
+    .keyboard-mode-bar kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 22px;
+      padding: 0 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .keyboard-mode-bar .separator {
+      width: 1px;
+      height: 20px;
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Highlight focused element in keyboard mode */
+    [data-keyboard-mode="true"] .form-input:focus,
+    [data-keyboard-mode="true"] select:focus {
+      box-shadow: 0 0 0 3px var(--accent), 0 0 20px rgba(99,102,241,0.4);
+    }
+
+    [data-keyboard-mode="true"] .chip:focus,
+    [data-keyboard-mode="true"] .workflow-step:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Input label shortcut indicator */
+    .input-label .shortcut-key {
+      display: none;
+      margin-left: 4px;
+      padding: 1px 4px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      border-radius: 3px;
+    }
+
+    [data-keyboard-mode="true"] .input-label .shortcut-key {
+      display: inline;
+    }
+
+    /* Workflow step shortcuts */
+    [data-keyboard-mode="true"] .workflow-step::before {
+      content: attr(data-shortcut);
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .workflow-step {
+      position: relative;
+    }
+
+    /* Hide step shortcut when not in keyboard mode */
+    .workflow-step::before {
+      display: none;
+    }
+
+    [data-keyboard-mode="true"] .workflow-step::before {
+      display: flex;
+    }
+
     /* Main Layout */
     .app-container {
       margin-top: 60px;
@@ -245,6 +550,21 @@
 
     .view.active {
       display: block;
+    }
+
+    /* Step Content */
+    .step-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .step-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Workflow Steps */
@@ -434,6 +754,26 @@
 
     select.form-input {
       cursor: pointer;
+    }
+
+    /* Input Field with Label */
+    .input-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    [data-theme="light"] .input-label {
+      color: #475569;
     }
 
     .form-row {
@@ -1050,34 +1390,30 @@
 
     <nav class="nav-tabs">
       <div class="nav-tab active" data-view="proposal">
-        <span class="material-icons-outlined">description</span>
-        Proposal Builder
+        <span class="material-icons-outlined">add_circle</span>
+        New Proposal
       </div>
-      <div class="nav-tab" data-view="solutions">
-        <span class="material-icons-outlined">build</span>
-        Solution Design
-      </div>
-      <div class="nav-tab" data-view="pricing">
-        <span class="material-icons-outlined">paid</span>
-        Pricing Intelligence
-      </div>
-      <div class="nav-tab" data-view="esg">
-        <span class="material-icons-outlined">eco</span>
-        ESG Optimization
-      </div>
-      <div class="nav-tab" data-view="generate">
-        <span class="material-icons-outlined">picture_as_pdf</span>
-        Generate Proposal
+      <div class="nav-tab" data-view="projects">
+        <span class="material-icons-outlined">folder_open</span>
+        All Projects
       </div>
       <div class="nav-tab" data-view="docs">
         <span class="material-icons-outlined">hub</span>
-        System Architecture
+        Documentation
       </div>
     </nav>
 
     <div class="header-spacer"></div>
 
     <div class="user-menu">
+      <!-- Keyboard Mode Toggle -->
+      <button class="theme-toggle" id="keyboardToggle" onclick="toggleKeyboardMode()" title="Toggle keyboard mode (Ctrl+K)">
+        <span class="material-icons-outlined" id="keyboardIcon">keyboard</span>
+      </button>
+      <!-- Theme Toggle -->
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+        <span class="material-icons-outlined" id="themeIcon">light_mode</span>
+      </button>
       <span style="font-size:12px;color:var(--muted)">Internal System v1.0</span>
       <div class="user-avatar">TE</div>
     </div>
@@ -1176,27 +1512,38 @@
           <p class="workflow-subtitle">End-to-end intelligent proposal generation workflow</p>
         </div>
 
+        <!-- Progress Bar -->
+        <div class="progress-bar-container" style="margin-bottom:24px">
+          <div class="progress-bar-bg" style="height:4px;background:var(--line);border-radius:2px;overflow:hidden">
+            <div class="progress-bar-fill" id="progressFill" style="width:20%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.3s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted)">
+            <span>Step <span id="currentStepNum">1</span> of 5</span>
+            <span id="progressPercent">20%</span>
+          </div>
+        </div>
+
         <!-- Workflow Steps -->
         <div class="workflow-steps">
-          <div class="workflow-step completed" data-step="intake">
+          <div class="workflow-step active" data-step="1" data-content="step-intake" data-shortcut="1" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
-                <span class="material-icons-outlined">check</span>
+                <span class="material-icons-outlined">input</span>
               </div>
               <span class="step-name">1. Intake</span>
             </div>
-            <div class="step-desc">Customer requirements captured</div>
+            <div class="step-desc">Customer requirements</div>
           </div>
-          <div class="workflow-step active" data-step="design">
+          <div class="workflow-step" data-step="2" data-content="step-design" data-shortcut="2" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">architecture</span>
               </div>
               <span class="step-name">2. Solution Design</span>
             </div>
-            <div class="step-desc">AI-optimized technical solution</div>
+            <div class="step-desc">AI-optimized solution</div>
           </div>
-          <div class="workflow-step" data-step="pricing">
+          <div class="workflow-step" data-step="3" data-content="step-pricing" data-shortcut="3" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">calculate</span>
@@ -1205,26 +1552,28 @@
             </div>
             <div class="step-desc">CapEx & OpEx modeling</div>
           </div>
-          <div class="workflow-step" data-step="esg">
+          <div class="workflow-step" data-step="4" data-content="step-esg" data-shortcut="4" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">eco</span>
               </div>
               <span class="step-name">4. ESG Analysis</span>
             </div>
-            <div class="step-desc">Sustainability optimization</div>
+            <div class="step-desc">Sustainability metrics</div>
           </div>
-          <div class="workflow-step" data-step="generate">
+          <div class="workflow-step" data-step="5" data-content="step-generate" data-shortcut="5" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">auto_awesome</span>
               </div>
               <span class="step-name">5. Generate</span>
             </div>
-            <div class="step-desc">Final proposal output</div>
+            <div class="step-desc">Export proposal</div>
           </div>
         </div>
 
+        <!-- Step 1: Intake -->
+        <div class="step-content active" id="step-intake">
         <div class="content-grid">
           <!-- Input Specifications Panel -->
           <div class="content-panel">
@@ -1250,30 +1599,130 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Flow Rate (m³/h)</label>
-                <input type="number" class="form-input" id="flowRate" value="200" placeholder="Enter flow rate">
+                <div class="input-field">
+                  <label class="input-label" for="flowRate">Flow Rate (m³/h) <span class="shortcut-key">F</span></label>
+                  <input type="number" class="form-input" id="flowRate" value="200" data-shortcut="f">
+                </div>
               </div>
               <div class="form-group">
-                <label class="form-label">Operating Hours</label>
-                <input type="number" class="form-input" id="opHours" value="8000" placeholder="Hours/year">
+                <div class="input-field">
+                  <label class="input-label" for="opHours">Operating Hours (hrs/year) <span class="shortcut-key">H</span></label>
+                  <input type="number" class="form-input" id="opHours" value="8000" data-shortcut="h">
+                </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Feed Water Quality</label>
+              <label class="form-label">Feed Water Quality - Primary</label>
               <div class="form-row three-cols">
-                <input type="number" class="form-input" placeholder="TDS (mg/L)" value="1500">
-                <input type="number" class="form-input" placeholder="TSS (mg/L)" value="50">
-                <input type="number" class="form-input" placeholder="BOD (mg/L)" value="120">
+                <div class="input-field">
+                  <label class="input-label" for="feedTDS">TDS (ppm) <span class="shortcut-key">T</span></label>
+                  <input type="number" class="form-input" id="feedTDS" value="45" data-shortcut="t">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedTSS">TSS (ppm) <span class="shortcut-key">S</span></label>
+                  <input type="number" class="form-input" id="feedTSS" value="1" data-shortcut="s">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedBOD">BOD (mg/L) <span class="shortcut-key">B</span></label>
+                  <input type="number" class="form-input" id="feedBOD" value="120" data-shortcut="b">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Feed Water Quality - Extended</label>
+              <div class="form-row three-cols">
+                <div class="input-field">
+                  <label class="input-label" for="feedConductivity">Conductivity (µS/cm) <span class="shortcut-key">C</span></label>
+                  <input type="number" class="form-input" id="feedConductivity" value="11" data-shortcut="c">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedPH">pH <span class="shortcut-key">P</span></label>
+                  <input type="number" class="form-input" id="feedPH" value="6" step="0.1" min="0" max="14" data-shortcut="p">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedChlorine">Chlorine (ppm) <span class="shortcut-key">L</span></label>
+                  <input type="number" class="form-input" id="feedChlorine" value="0.01" step="0.01" data-shortcut="l">
+                </div>
+              </div>
+              <div class="form-row three-cols" style="margin-top:12px">
+                <div class="input-field">
+                  <label class="input-label" for="feedTurbidity">Turbidity (NTU) <span class="shortcut-key">U</span></label>
+                  <input type="number" class="form-input" id="feedTurbidity" value="1" step="0.1" data-shortcut="u">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedSDI">SDI <span class="shortcut-key">D</span></label>
+                  <input type="number" class="form-input" id="feedSDI" value="3" step="0.1" data-shortcut="d">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedIron">Iron (mg/L) <span class="shortcut-key">I</span></label>
+                  <input type="number" class="form-input" id="feedIron" value="0.01" step="0.01" data-shortcut="i">
+                </div>
+              </div>
+              <div class="form-row three-cols" style="margin-top:12px">
+                <div class="input-field">
+                  <label class="input-label" for="feedHardness">Hardness (mg/L CaCO₃) <span class="shortcut-key">A</span></label>
+                  <input type="number" class="form-input" id="feedHardness" value="100" data-shortcut="a">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedTemp">Temperature (°C) <span class="shortcut-key">E</span></label>
+                  <input type="number" class="form-input" id="feedTemp" value="15" data-shortcut="e">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="feedPressure">Feed Pressure (BAR) <span class="shortcut-key">R</span></label>
+                  <input type="number" class="form-input" id="feedPressure" value="4" step="0.1" data-shortcut="r">
+                </div>
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">Required Output Quality</label>
               <div class="form-row three-cols">
-                <input type="number" class="form-input" placeholder="TDS (mg/L)" value="10">
-                <input type="number" class="form-input" placeholder="TSS (mg/L)" value="0.1">
-                <input type="number" class="form-input" placeholder="BOD (mg/L)" value="1">
+                <div class="input-field">
+                  <label class="input-label" for="outTDS">TDS (ppm) <span class="shortcut-key">O</span></label>
+                  <input type="number" class="form-input" id="outTDS" value="10" data-shortcut="o">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="outTSS">TSS (ppm) <span class="shortcut-key">W</span></label>
+                  <input type="number" class="form-input" id="outTSS" value="0.1" step="0.01" data-shortcut="w">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="outConductivity">Permeate Quality (µS/cm) <span class="shortcut-key">Q</span></label>
+                  <input type="number" class="form-input" id="outConductivity" value="15" data-shortcut="q">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">System Design Parameters</label>
+              <div class="form-row three-cols">
+                <div class="input-field">
+                  <label class="input-label" for="recovery">Recovery (%) <span class="shortcut-key">Y</span></label>
+                  <input type="number" class="form-input" id="recovery" value="75" min="50" max="95" data-shortcut="y">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="componentMarkup">Component Markup (%) <span class="shortcut-key">M</span></label>
+                  <input type="number" class="form-input" id="componentMarkup" value="30" min="0" max="100" data-shortcut="m">
+                </div>
+                <div class="input-field">
+                  <label class="input-label" for="permeateFlow">Permeate Flow (m³/hr) <span class="shortcut-key">X</span></label>
+                  <input type="number" class="form-input" id="permeateFlow" value="9" data-shortcut="x">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">System Configuration</label>
+              <div class="chip-group">
+                <div class="chip" id="chipContainer">
+                  <span class="material-icons-outlined">view_in_ar</span>
+                  Container Required
+                </div>
+                <div class="chip active" id="chipUV">
+                  <span class="material-icons-outlined">light_mode</span>
+                  UV Required
+                </div>
               </div>
             </div>
 
@@ -1294,9 +1743,16 @@
             <div class="form-group">
               <label class="form-label">Optional Modules</label>
               <div class="chip-group">
-                <div class="chip active">UV Disinfection</div>
                 <div class="chip">Pre-filtration</div>
                 <div class="chip active">Chemical Dosing</div>
+                <div class="chip">pH Adjustment - Dosing</div>
+                <div class="chip">Hardness - Anti Scale Dosing</div>
+                <div class="chip">Carbon (Chlorine Removal)</div>
+                <div class="chip">Iron Removal</div>
+                <div class="chip">Second Stage RO</div>
+                <div class="chip">Polish DI</div>
+                <div class="chip">Buffer Tank</div>
+                <div class="chip">CIP System</div>
                 <div class="chip">Remote Monitoring</div>
               </div>
             </div>
@@ -1348,6 +1804,33 @@
               </div>
             </div>
 
+            <!-- Calculated Values Panel -->
+            <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid var(--line)">
+              <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">
+                RO System Calculations
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+                <div style="color:var(--muted)">Feed Flow (m³/hr):</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcFeedFlow">11.25</div>
+                <div style="color:var(--muted)">Reject Flow (m³/hr):</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcRejectFlow">2.25</div>
+                <div style="color:var(--muted)">Permeate Flow (m³/hr):</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPermeateFlow">9.00</div>
+                <div style="color:var(--muted)">Membrane Area (m²) 8080:</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcMembraneArea">37</div>
+                <div style="color:var(--muted)">Number of Membranes:</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcNumMembranes">9</div>
+                <div style="color:var(--muted)">Total Membrane Area (m²):</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcTotalArea">333</div>
+                <div style="color:var(--muted)">Pressure Vessels:</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPressureVessels">3</div>
+                <div style="color:var(--muted)">Estimated µS/cm 1st Stage:</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcConductivity">1.08</div>
+                <div style="color:var(--muted)">Pump Power (kW):</div>
+                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPumpPower">7.5</div>
+              </div>
+            </div>
+
             <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                 <span class="material-icons-outlined" style="color:var(--success);font-size:18px">check_circle</span>
@@ -1355,7 +1838,18 @@
               </div>
               <p style="font-size:12px;color:var(--muted);margin:0">
                 UF + RO + UV train meets all output quality requirements with 89% confidence.
-                Expected water recovery: 82%. Total energy: 2.9 kWh/m³.
+                Expected water recovery: 75%. Total energy: 2.9 kWh/m³.
+              </p>
+            </div>
+
+            <!-- Warning Panel (from spreadsheet) -->
+            <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.3)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="material-icons-outlined" style="color:var(--warning);font-size:18px">warning</span>
+                <span style="font-size:12px;font-weight:600;color:var(--warning)">Temperature Warning</span>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin:0">
+                Temperature is low - check this could affect flow. Perhaps increase size of system.
               </p>
             </div>
 
@@ -1416,22 +1910,22 @@
         </div>
 
         <div class="action-bar">
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary" onclick="prevStep()" style="visibility:hidden">
             <span class="material-icons-outlined">arrow_back</span>
-            Previous Step
+            Previous
           </button>
           <div style="display:flex;gap:12px">
-            <button class="btn btn-secondary">Save Draft</button>
-            <button class="btn btn-primary" onclick="nextStep()">
-              Continue to Pricing
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(2)">
+              Continue to Solution Design
               <span class="material-icons-outlined">arrow_forward</span>
             </button>
           </div>
         </div>
-      </div>
+        </div><!-- End Step 1: Intake -->
 
-      <!-- Solutions View -->
-      <div class="view" id="view-solutions">
+        <!-- Step 2: Solution Design -->
+        <div class="step-content" id="step-design">
         <div class="workflow-header">
           <h1 class="workflow-title">Solution Design & Comparison</h1>
           <p class="workflow-subtitle">Compare and rank optimized treatment solutions</p>
@@ -1588,10 +2082,24 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Pricing View -->
-      <div class="view" id="view-pricing">
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="goToStep(1)">
+            <span class="material-icons-outlined">arrow_back</span>
+            Back to Intake
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">
+              Continue to Pricing
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        </div><!-- End Step 2: Solution Design -->
+
+        <!-- Step 3: Pricing -->
+        <div class="step-content" id="step-pricing">
         <div class="workflow-header">
           <h1 class="workflow-title">Pricing Intelligence</h1>
           <p class="workflow-subtitle">Dynamic CapEx & OpEx modeling with market intelligence</p>
@@ -1733,49 +2241,102 @@
               <thead>
                 <tr>
                   <th>Component</th>
-                  <th>Vendor</th>
-                  <th>Unit Cost</th>
-                  <th>Qty</th>
-                  <th>Total</th>
+                  <th>Base Cost (£)</th>
+                  <th>Marked Up (£)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>UF Modules</td>
-                  <td>Pentair</td>
-                  <td>£12,500</td>
-                  <td>16</td>
-                  <td>£200,000</td>
+                  <td>RO System with Pretreatment 5µm Filter</td>
+                  <td>£15,954</td>
+                  <td>£20,740</td>
+                </tr>
+                <tr>
+                  <td>Universal Unit for Flushing with Permeate</td>
+                  <td>£700</td>
+                  <td>£910</td>
                 </tr>
                 <tr>
                   <td>RO Membranes</td>
-                  <td>Dow FilmTec</td>
-                  <td>£850</td>
-                  <td>120</td>
-                  <td>£102,000</td>
+                  <td>£4,140</td>
+                  <td>£5,382</td>
                 </tr>
                 <tr>
-                  <td>HP Pumps</td>
-                  <td>Grundfos</td>
-                  <td>£28,000</td>
-                  <td>4</td>
-                  <td>£112,000</td>
+                  <td>Hardness - Anti Scale Dosing</td>
+                  <td>£1,400</td>
+                  <td>£1,820</td>
                 </tr>
                 <tr>
-                  <td>UV System</td>
-                  <td>Trojan</td>
-                  <td>£45,000</td>
-                  <td>2</td>
-                  <td>£90,000</td>
+                  <td>CIP System</td>
+                  <td>£4,716</td>
+                  <td>£6,131</td>
+                </tr>
+                <tr>
+                  <td>Container</td>
+                  <td>£5,500</td>
+                  <td>£7,150</td>
+                </tr>
+                <tr>
+                  <td>Pipework</td>
+                  <td>£9,000</td>
+                  <td>£11,700</td>
+                </tr>
+                <tr>
+                  <td>Labour</td>
+                  <td>£10,000</td>
+                  <td>£13,000</td>
+                </tr>
+                <tr>
+                  <td>Shipping</td>
+                  <td>£1,500</td>
+                  <td>£1,950</td>
+                </tr>
+                <tr>
+                  <td>pH Adjustment - Dosing</td>
+                  <td>£1,400</td>
+                  <td>£1,820</td>
+                </tr>
+                <tr style="background:rgba(99,102,241,0.08)">
+                  <td><strong>Base Total</strong></td>
+                  <td><strong>£54,310</strong></td>
+                  <td><strong>£70,603</strong></td>
                 </tr>
               </tbody>
             </table>
+
+            <div style="margin-top:16px;padding:12px;background:rgba(34,211,238,0.1);border-radius:10px;border:1px solid rgba(34,211,238,0.3)">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Pricing Summary</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+                <div>Base Manufacturing Cost:</div><div style="text-align:right;font-weight:600">£70,603.00</div>
+                <div>Workshop (5%):</div><div style="text-align:right">£3,530.15</div>
+                <div>Contingency (5%):</div><div style="text-align:right">£3,530.15</div>
+                <div>Social Impact (2%):</div><div style="text-align:right">£1,412.06</div>
+                <div style="border-top:1px solid var(--line);padding-top:8px"><strong>Subtotal:</strong></div>
+                <div style="border-top:1px solid var(--line);padding-top:8px;text-align:right"><strong>£79,075.36</strong></div>
+                <div style="color:var(--success)">Estimated GM:</div><div style="text-align:right;color:var(--success);font-weight:600">31%</div>
+                <div style="color:var(--accent)">Estimated GP:</div><div style="text-align:right;color:var(--accent);font-weight:600">£24,765.36</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- ESG View -->
-      <div class="view" id="view-esg">
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="goToStep(2)">
+            <span class="material-icons-outlined">arrow_back</span>
+            Back to Solution Design
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(4)">
+              Continue to ESG Analysis
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        </div><!-- End Step 3: Pricing -->
+
+        <!-- Step 4: ESG -->
+        <div class="step-content" id="step-esg">
         <div class="workflow-header">
           <h1 class="workflow-title">ESG Optimization</h1>
           <p class="workflow-subtitle">Environmental, Social, and Governance analysis</p>
@@ -1957,10 +2518,24 @@
             </table>
           </div>
         </div>
-      </div>
 
-      <!-- Generate Proposal View -->
-      <div class="view" id="view-generate">
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="goToStep(3)">
+            <span class="material-icons-outlined">arrow_back</span>
+            Back to Pricing
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(5)">
+              Continue to Generate
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        </div><!-- End Step 4: ESG -->
+
+        <!-- Step 5: Generate -->
+        <div class="step-content" id="step-generate">
         <div class="workflow-header">
           <h1 class="workflow-title">Generate Proposal</h1>
           <p class="workflow-subtitle">Review and export your complete technical and commercial proposal</p>
@@ -2214,12 +2789,12 @@
         </div>
 
         <div class="action-bar">
-          <button class="btn btn-secondary">
+          <button class="btn btn-secondary" onclick="goToStep(4)">
             <span class="material-icons-outlined">arrow_back</span>
             Back to ESG
           </button>
           <div style="display:flex;gap:12px">
-            <button class="btn btn-secondary">
+            <button class="btn btn-secondary" onclick="saveDraft()">
               <span class="material-icons-outlined">save</span>
               Save to Projects
             </button>
@@ -2227,6 +2802,70 @@
               <span class="material-icons-outlined">send</span>
               Finalize & Send
             </button>
+          </div>
+        </div>
+        </div><!-- End Step 5: Generate -->
+
+      </div><!-- End view-proposal -->
+
+      <!-- Projects View -->
+      <div class="view" id="view-projects">
+        <div class="workflow-header">
+          <h1 class="workflow-title">All Projects</h1>
+          <p class="workflow-subtitle">Manage and track your proposal projects</p>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel full-width">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">folder_open</span>
+                Project List
+              </div>
+              <button class="btn btn-primary" onclick="document.querySelector('[data-view=proposal]').click()">
+                <span class="material-icons-outlined">add</span>
+                New Proposal
+              </button>
+            </div>
+
+            <table class="solution-table">
+              <thead>
+                <tr>
+                  <th>Project Name</th>
+                  <th>Client</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Value</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Riverside Pharma - Purified Water</strong></td>
+                  <td>Riverside Pharmaceuticals</td>
+                  <td><span class="project-stage stage-design">In Design</span></td>
+                  <td>18 Jan 2026</td>
+                  <td>£1.49M</td>
+                  <td><button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">Open</button></td>
+                </tr>
+                <tr>
+                  <td><strong>Nordic Foods - Wastewater</strong></td>
+                  <td>Nordic Foods Ltd</td>
+                  <td><span class="project-stage stage-pricing">Pricing</span></td>
+                  <td>15 Jan 2026</td>
+                  <td>£2.1M</td>
+                  <td><button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">Open</button></td>
+                </tr>
+                <tr>
+                  <td><strong>GreenEnergy - Cooling Tower</strong></td>
+                  <td>GreenEnergy plc</td>
+                  <td><span class="project-stage stage-proposal">Proposal Ready</span></td>
+                  <td>10 Jan 2026</td>
+                  <td>£3.2M</td>
+                  <td><button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">Open</button></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -2366,7 +3005,156 @@
     </main>
   </div>
 
+  <!-- Keyboard Mode Help Bar -->
+  <div class="keyboard-mode-bar" id="keyboardModeBar">
+    <span><kbd>Ctrl</kbd>+<kbd>K</kbd> Toggle Mode</span>
+    <span class="separator"></span>
+    <span><kbd>1</kbd>-<kbd>5</kbd> Steps</span>
+    <span class="separator"></span>
+    <span><kbd>←</kbd><kbd>→</kbd> Navigate</span>
+    <span class="separator"></span>
+    <span><kbd>Tab</kbd> Next Field</span>
+    <span class="separator"></span>
+    <span><kbd>Esc</kbd> Exit Mode</span>
+    <span class="separator"></span>
+    <span><kbd>N</kbd> Continue</span>
+    <span class="separator"></span>
+    <span><kbd>G</kbd> Save</span>
+  </div>
+
   <script>
+    // Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const currentTheme = html.getAttribute('data-theme');
+
+      if (currentTheme === 'light') {
+        html.removeAttribute('data-theme');
+        themeIcon.textContent = 'light_mode';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeIcon.textContent = 'dark_mode';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Load saved theme on page load
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const themeIcon = document.getElementById('themeIcon');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (themeIcon) themeIcon.textContent = 'dark_mode';
+      }
+    })();
+
+    // Keyboard Mode
+    let keyboardModeActive = false;
+
+    function toggleKeyboardMode() {
+      keyboardModeActive = !keyboardModeActive;
+      const html = document.documentElement;
+      const keyboardIcon = document.getElementById('keyboardIcon');
+      const keyboardToggle = document.getElementById('keyboardToggle');
+
+      if (keyboardModeActive) {
+        html.setAttribute('data-keyboard-mode', 'true');
+        keyboardIcon.textContent = 'keyboard_hide';
+        keyboardToggle.classList.add('keyboard-toggle');
+        localStorage.setItem('keyboardMode', 'true');
+        showNotification('keyboard', 'Keyboard mode ON - Press letter keys to focus fields', 'info');
+      } else {
+        html.removeAttribute('data-keyboard-mode');
+        keyboardIcon.textContent = 'keyboard';
+        keyboardToggle.classList.remove('keyboard-toggle');
+        localStorage.setItem('keyboardMode', 'false');
+      }
+    }
+
+    // Global keyboard event listener
+    document.addEventListener('keydown', (e) => {
+      // Don't trigger shortcuts when typing in inputs (unless Escape or Ctrl+K)
+      const isTyping = document.activeElement.tagName === 'INPUT' ||
+                       document.activeElement.tagName === 'TEXTAREA' ||
+                       document.activeElement.tagName === 'SELECT';
+
+      // Ctrl+K toggles keyboard mode
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        toggleKeyboardMode();
+        return;
+      }
+
+      // Escape exits keyboard mode or blurs current input
+      if (e.key === 'Escape') {
+        if (isTyping) {
+          document.activeElement.blur();
+        } else if (keyboardModeActive) {
+          toggleKeyboardMode();
+        }
+        return;
+      }
+
+      // If typing, only handle Tab normally
+      if (isTyping) return;
+
+      // Only process shortcuts in keyboard mode
+      if (!keyboardModeActive) return;
+
+      // Step navigation with number keys 1-5
+      if (['1', '2', '3', '4', '5'].includes(e.key)) {
+        e.preventDefault();
+        goToStep(parseInt(e.key));
+        return;
+      }
+
+      // Arrow keys for step navigation
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentStep < totalSteps) goToStep(currentStep + 1);
+        return;
+      }
+
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentStep > 1) goToStep(currentStep - 1);
+        return;
+      }
+
+      // N = Next step (Continue)
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        if (currentStep < totalSteps) goToStep(currentStep + 1);
+        return;
+      }
+
+      // G = Save draft
+      if (e.key === 'g' || e.key === 'G') {
+        e.preventDefault();
+        saveDraft();
+        return;
+      }
+
+      // Focus input fields by shortcut key
+      const shortcutInput = document.querySelector(`input[data-shortcut="${e.key.toLowerCase()}"]`);
+      if (shortcutInput) {
+        e.preventDefault();
+        shortcutInput.focus();
+        shortcutInput.select();
+        return;
+      }
+    });
+
+    // Load saved keyboard mode preference
+    (function() {
+      const savedKeyboardMode = localStorage.getItem('keyboardMode');
+      if (savedKeyboardMode === 'true') {
+        toggleKeyboardMode();
+      }
+    })();
+
     // Navigation
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -2381,13 +3169,114 @@
       });
     });
 
-    // Workflow steps
+    // Current step state
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    // Workflow steps - click to navigate
     document.querySelectorAll('.workflow-step').forEach(step => {
       step.addEventListener('click', () => {
-        document.querySelectorAll('.workflow-step').forEach(s => s.classList.remove('active'));
-        step.classList.add('active');
+        const stepNum = parseInt(step.dataset.step);
+        goToStep(stepNum);
       });
     });
+
+    // Go to specific step
+    function goToStep(stepNum) {
+      if (stepNum < 1 || stepNum > totalSteps) return;
+
+      // Update current step
+      currentStep = stepNum;
+
+      // Update workflow step indicators
+      document.querySelectorAll('.workflow-step').forEach(s => {
+        const sNum = parseInt(s.dataset.step);
+        s.classList.remove('active');
+        if (sNum < stepNum) {
+          s.classList.add('completed');
+          s.querySelector('.step-icon').innerHTML = '<span class="material-icons-outlined">check</span>';
+        } else if (sNum === stepNum) {
+          s.classList.add('active');
+          s.classList.remove('completed');
+          // Restore original icon for active step
+          const icons = {1:'input', 2:'architecture', 3:'calculate', 4:'eco', 5:'auto_awesome'};
+          s.querySelector('.step-icon').innerHTML = `<span class="material-icons-outlined">${icons[sNum]}</span>`;
+        } else {
+          s.classList.remove('completed');
+          // Restore original icon for future steps
+          const icons = {1:'input', 2:'architecture', 3:'calculate', 4:'eco', 5:'auto_awesome'};
+          s.querySelector('.step-icon').innerHTML = `<span class="material-icons-outlined">${icons[sNum]}</span>`;
+        }
+      });
+
+      // Update step content visibility
+      document.querySelectorAll('.step-content').forEach(content => {
+        content.classList.remove('active');
+      });
+
+      const stepIds = ['step-intake', 'step-design', 'step-pricing', 'step-esg', 'step-generate'];
+      const targetContent = document.getElementById(stepIds[stepNum - 1]);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+
+      // Update progress bar
+      updateProgress(stepNum);
+
+      // Scroll to top of content
+      document.querySelector('.main-content').scrollTop = 0;
+    }
+
+    // Update progress indicators
+    function updateProgress(stepNum) {
+      const percent = (stepNum / totalSteps) * 100;
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const currentStepNum = document.getElementById('currentStepNum');
+
+      if (progressFill) progressFill.style.width = percent + '%';
+      if (progressPercent) progressPercent.textContent = Math.round(percent) + '%';
+      if (currentStepNum) currentStepNum.textContent = stepNum;
+    }
+
+    // Previous step
+    function prevStep() {
+      if (currentStep > 1) {
+        goToStep(currentStep - 1);
+      }
+    }
+
+    // Save draft notification
+    function saveDraft() {
+      showNotification('save', 'Draft saved successfully!', 'success');
+    }
+
+    // Show notification
+    function showNotification(icon, message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? 'var(--success)' : 'linear-gradient(135deg, var(--accent), var(--accent2))'};
+        border-radius: 12px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      `;
+      notification.innerHTML = `
+        <span class="material-icons-outlined">${icon}</span>
+        ${message}
+      `;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 2500);
+    }
 
     // Technology cards
     document.querySelectorAll('.tech-card').forEach(card => {
@@ -2418,22 +3307,6 @@
     function updateSolutionValidation() {
       const selected = document.querySelectorAll('.tech-card.selected').length;
       // Update validation message based on selection
-    }
-
-    function nextStep() {
-      const steps = document.querySelectorAll('.workflow-step');
-      let activeIndex = -1;
-      steps.forEach((step, i) => {
-        if (step.classList.contains('active')) activeIndex = i;
-      });
-
-      if (activeIndex >= 0 && activeIndex < steps.length - 1) {
-        steps[activeIndex].classList.remove('active');
-        steps[activeIndex].classList.add('completed');
-        steps[activeIndex].querySelector('.step-icon').innerHTML =
-          '<span class="material-icons-outlined">check</span>';
-        steps[activeIndex + 1].classList.add('active');
-      }
     }
 
     // Initialize OpEx chart
@@ -2586,11 +3459,32 @@
       });
     }
 
+    // Step icons mapping
+    const stepIcons = {
+      1: 'input',
+      2: 'architecture',
+      3: 'calculate',
+      4: 'eco',
+      5: 'auto_awesome'
+    };
+
+    // Restore step icon
+    function restoreStepIcon(stepNum) {
+      const step = document.querySelector(`.workflow-step[data-step="${stepNum}"]`);
+      if (step) {
+        step.querySelector('.step-icon').innerHTML =
+          `<span class="material-icons-outlined">${stepIcons[stepNum]}</span>`;
+      }
+    }
+
     // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       initOpexChart();
 
-      // Simulate AI processing
+      // Initialize step 1 as active
+      goToStep(1);
+
+      // Simulate AI processing on step 2
       setTimeout(() => {
         const processing = document.querySelector('.ai-processing');
         if (processing) {
