@@ -221,6 +221,141 @@
       line-height: 1.5;
     }
 
+    /* Apps Section */
+    .apps-section {
+      padding: 60px 40px;
+      background: rgba(0,0,0,.25);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .apps-section h3 {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .apps-section .section-title {
+      text-align: center;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .apps-section .section-desc {
+      text-align: center;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .apps-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .app-group h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+    .app-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .app-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .app-card:hover {
+      transform: translateX(4px);
+      border-color: rgba(124,92,255,.4);
+      background: rgba(124,92,255,.08);
+    }
+    .app-card.featured {
+      border-color: rgba(124,92,255,.3);
+      background: linear-gradient(135deg, rgba(124,92,255,.12), rgba(53,208,186,.08));
+    }
+    .app-card.featured:hover {
+      border-color: rgba(124,92,255,.5);
+    }
+    .app-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .app-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--accent);
+    }
+    .app-card.featured .app-icon {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+    .app-card.featured .app-icon svg {
+      stroke: white;
+    }
+    .app-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .app-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      background: var(--accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .app-info h5 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .app-info p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    @media (max-width: 768px) {
+      .apps-section {
+        padding: 40px 20px;
+      }
+      .apps-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+
     /* Infographics Section */
     .infographics-section {
       padding: 60px 40px;
@@ -346,7 +481,8 @@
       </div>
     </div>
     <nav>
-      <a href="ai-proposal-d3.html">Interactive Map</a>
+      <a href="membracon-quotation-system.html">Quotation System</a>
+      <a href="ai-proposal-d3.html">Architecture</a>
       <a href="https://www.nstarxinc.com" target="_blank" rel="noopener">NStarX</a>
     </nav>
   </header>
@@ -360,7 +496,7 @@
       explainable, and auditable solutions.
     </p>
     <div class="cta-group">
-      <a href="proposal-app.html" class="btn btn-primary">
+      <a href="membracon-quotation-system.html" class="btn btn-primary">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
@@ -368,7 +504,7 @@
           <line x1="16" y1="17" x2="8" y2="17"/>
           <polyline points="10 9 9 9 8 9"/>
         </svg>
-        Launch Proposal System
+        Launch Quotation System
       </a>
       <a href="ai-proposal-d3.html" class="btn btn-secondary">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -460,6 +596,101 @@
     </div>
   </section>
 
+  <section class="apps-section">
+    <h3>Applications & Tools</h3>
+    <div class="section-title">Explore Our Suite</div>
+    <p class="section-desc">
+      Access our quotation systems, visualization tools, and architectural documentation.
+    </p>
+    <div class="apps-grid">
+      <div class="app-group">
+        <h4>Quotation Systems</h4>
+        <div class="app-cards">
+          <a href="membracon-quotation-system.html" class="app-card featured">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <span class="app-badge">New</span>
+              <h5>Quotation System</h5>
+              <p>Full 3-stage workflow: Quick Estimate, Detailed Quote, Proposal</p>
+            </div>
+          </a>
+          <a href="waterlogic-app.html" class="app-card">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <h5>WaterLogic App</h5>
+              <p>Intelligent proposal system mockup</p>
+            </div>
+          </a>
+          <a href="proposal-app.html" class="app-card">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M3 9h18M9 21V9"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <h5>Proposal App</h5>
+              <p>Original AI-native proposal builder</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="app-group">
+        <h4>Architecture & Docs</h4>
+        <div class="app-cards">
+          <a href="ai-proposal-d3.html" class="app-card">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <h5>System Architecture</h5>
+              <p>Interactive D3 decision tree visualization</p>
+            </div>
+          </a>
+          <a href="ai-proposal.html" class="app-card">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <h5>AI Proposal</h5>
+              <p>Core AI proposal engine</p>
+            </div>
+          </a>
+          <a href="infographics.html" class="app-card">
+            <div class="app-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <div class="app-info">
+              <h5>Infographics</h5>
+              <p>Visual system overview</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="infographics-section">
     <h3>Interactive Proposal System</h3>
     <div class="section-title">AI-Native Solution Design & Pricing</div>
@@ -483,7 +714,8 @@
       </div>
     </div>
     <nav>
-      <a href="ai-proposal-d3.html">Interactive Map</a>
+      <a href="membracon-quotation-system.html">Quotation System</a>
+      <a href="ai-proposal-d3.html">Architecture</a>
     </nav>
   </footer>
 </body>

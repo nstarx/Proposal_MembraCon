@@ -1,0 +1,3358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MembraCon - Water Treatment Quotation System</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined|Material+Icons+Round" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --text: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #a0aec0;
+      --border: #e8ecf1;
+      --border-light: #f0f3f7;
+      --accent: #4f6ef7;
+      --accent-soft: #eef2ff;
+      --accent-hover: #4361ee;
+      --success: #22c55e;
+      --success-soft: #f0fdf4;
+      --warning: #eab308;
+      --warning-soft: #fefce8;
+      --danger: #ef4444;
+      --danger-soft: #fef2f2;
+      --info: #3b82f6;
+      --info-soft: #eff6ff;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --text: #e6edf3;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --border: #30363d;
+      --border-light: #21262d;
+      --accent-soft: rgba(79,110,247,0.15);
+      --success-soft: rgba(34,197,94,0.12);
+      --warning-soft: rgba(234,179,8,0.12);
+      --danger-soft: rgba(239,68,68,0.12);
+      --info-soft: rgba(59,130,246,0.12);
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.2);
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(79,110,247,0.25);
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.2px;
+    }
+
+    .logo-text span {
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 3px;
+      gap: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .mode-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mode-btn:hover { color: var(--text-secondary); }
+
+    .mode-btn.active {
+      background: var(--panel);
+      color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mode-btn .material-icons-outlined { font-size: 16px; }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .icon-btn:hover {
+      background: var(--bg);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ==================== STAGE BAR ==================== */
+    .stage-bar {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stage-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition);
+      border: 2px solid transparent;
+      background: var(--bg);
+    }
+
+    .stage-item:hover {
+      border-color: var(--border);
+    }
+
+    .stage-item.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .stage-item.completed {
+      background: var(--success-soft);
+      border-color: var(--success);
+    }
+
+    .stage-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all var(--transition);
+    }
+
+    .stage-item.active .stage-number {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(79,110,247,0.35);
+    }
+
+    .stage-item.completed .stage-number {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .stage-info h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1px;
+    }
+
+    .stage-info p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .stage-arrow {
+      color: var(--border);
+      font-size: 20px;
+    }
+
+    /* ==================== MAIN CONTENT ==================== */
+    .main-container {
+      display: flex;
+      min-height: calc(100vh - 52px);
+    }
+
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ==================== SECTIONS ==================== */
+    .section {
+      background: var(--panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .section-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, var(--panel), var(--bg));
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .section-title .material-icons-outlined {
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .section-badge {
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .section-badge.success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .section-badge.warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .section-body {
+      padding: 16px 18px;
+    }
+
+    /* ==================== FORMS ==================== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .form-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group.span-2 { grid-column: span 2; }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .form-label .unit {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 10px;
+    }
+
+    .form-input {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--panel);
+      transition: all var(--transition);
+      width: 100%;
+    }
+
+    .form-input:hover {
+      border-color: var(--text-muted);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .form-input:disabled {
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      border-color: var(--border-light);
+    }
+
+    .form-input.computed {
+      background: var(--accent-soft);
+      border-color: transparent;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    select.form-input {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 36px;
+    }
+
+    .view-mode .form-input:not(.computed) {
+      border-color: transparent;
+      background: var(--bg);
+    }
+
+    /* ==================== CHIPS ==================== */
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 10px 18px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1.5px solid var(--border);
+      background: var(--panel);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79,110,247,0.3);
+    }
+
+    .chip .material-icons-outlined { font-size: 18px; }
+
+    /* ==================== ALERTS ==================== */
+    .alerts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .alert-item.critical {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .alert-item.warning {
+      background: var(--warning-soft);
+      color: #a16207;
+    }
+
+    .alert-item.info {
+      background: var(--info-soft);
+      color: var(--info);
+    }
+
+    .alert-item.success {
+      background: var(--success-soft);
+      color: #16a34a;
+    }
+
+    [data-theme="dark"] .alert-item.warning { color: var(--warning); }
+    [data-theme="dark"] .alert-item.success { color: var(--success); }
+
+    .alert-item .material-icons-outlined {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .alert-text { flex: 1; }
+
+    /* ==================== METRICS ==================== */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      text-align: center;
+      transition: all var(--transition);
+    }
+
+    .metric-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .metric-card.highlight {
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      border: none;
+      color: #fff;
+    }
+
+    .metric-card.highlight .metric-label,
+    .metric-card.highlight .metric-unit { color: rgba(255,255,255,0.8); }
+    .metric-card.highlight .metric-value { color: #fff; }
+
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+    }
+
+    .metric-value.accent { color: var(--accent); }
+    .metric-value.success { color: var(--success); }
+    .metric-value.warning { color: var(--warning); }
+
+    .metric-unit {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ==================== TABLES ==================== */
+    .component-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .component-table th,
+    .component-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 12px;
+    }
+
+    .component-table th {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-muted);
+      background: var(--bg);
+    }
+
+    .component-table tbody tr {
+      transition: background var(--transition);
+    }
+
+    .component-table tbody tr:hover {
+      background: var(--bg);
+    }
+
+    .component-table tbody tr:nth-child(even) {
+      background: rgba(0,0,0,0.01);
+    }
+
+    [data-theme="dark"] .component-table tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .tag.auto { background: var(--warning-soft); color: #a16207; }
+    .tag.base { background: var(--accent-soft); color: var(--accent); }
+    .tag.manual { background: #f3e8ff; color: #7c3aed; }
+
+    [data-theme="dark"] .tag.auto { color: var(--warning); }
+    [data-theme="dark"] .tag.manual { background: rgba(124,58,237,0.15); }
+
+    .component-table .price {
+      font-weight: 600;
+      font-feature-settings: 'tnum';
+    }
+
+    .component-table .price.cost { color: var(--text-secondary); }
+    .component-table .price.sell { color: var(--success); }
+
+    .component-table tfoot tr {
+      background: var(--accent-soft) !important;
+    }
+
+    .component-table tfoot td {
+      border-bottom: none;
+      padding: 16px 18px;
+      font-weight: 700;
+    }
+
+    .labour-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .labour-table th,
+    .labour-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px;
+    }
+
+    .labour-table th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--bg);
+    }
+
+    .labour-table input {
+      width: 72px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: right;
+      font-weight: 500;
+      transition: all var(--transition);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .labour-table input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .labour-table tfoot tr {
+      background: var(--accent-soft);
+    }
+
+    .labour-table tfoot td {
+      border-bottom: none;
+      font-weight: 700;
+    }
+
+    /* ==================== ROI CARDS ==================== */
+    .roi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .roi-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all var(--transition);
+    }
+
+    .roi-card:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    .roi-card.highlight {
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(79,110,247,0.25);
+    }
+
+    .roi-card.highlight .roi-label { color: rgba(255,255,255,0.85); }
+    .roi-card.highlight .roi-value { color: #fff; }
+
+    .roi-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+      letter-spacing: -0.3px;
+    }
+
+    .roi-value.success { color: var(--success); }
+    .roi-value.warning { color: var(--warning); }
+
+    .roi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* ==================== MILESTONES ==================== */
+    .milestone-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .milestone-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: all var(--transition);
+    }
+
+    .milestone-card:hover {
+      border-color: var(--border);
+    }
+
+    .milestone-card.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .milestone-percent {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .milestone-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .milestone-amount {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ==================== BUTTONS ==================== */
+    .btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+    }
+
+    .btn .material-icons-outlined { font-size: 20px; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79,110,247,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79,110,247,0.4);
+    }
+
+    .btn-secondary {
+      background: var(--panel);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 14px;
+    }
+
+    /* ==================== FOOTER ==================== */
+    .action-footer {
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ==================== LAYOUT HELPERS ==================== */
+    .stage-view { display: none; }
+    .stage-view.active { display: block; animation: fadeIn 0.3s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .project-header {
+      margin-bottom: 28px;
+    }
+
+    .project-info h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .project-info p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .project-meta {
+      display: flex;
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .meta-item .material-icons-outlined { font-size: 18px; color: var(--text-muted); }
+
+    .meta-item .form-input {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .summary-row .value { font-size: 14px; }
+    .summary-row .value.success { color: var(--success); }
+    .summary-row .value.danger { color: var(--danger); }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 1400px) {
+      .form-grid { grid-template-columns: repeat(3, 1fr); }
+      .metrics-row { grid-template-columns: repeat(3, 1fr); }
+      .roi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 1024px) {
+      .form-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col-grid { grid-template-columns: 1fr; }
+      .milestone-grid { grid-template-columns: repeat(2, 1fr); }
+      .stage-bar { flex-wrap: wrap; }
+    }
+
+    @media print {
+      .header, .stage-bar, .action-footer { display: none; }
+      .section { break-inside: avoid; box-shadow: none; }
+    }
+
+    /* ==================== AI SIDEBAR ==================== */
+    .ai-sidebar {
+      position: fixed;
+      top: 52px;
+      right: -380px;
+      width: 380px;
+      height: calc(100vh - 52px);
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+      z-index: 200;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-sidebar.open { right: 0; }
+
+    .ai-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent-soft), rgba(6,182,212,0.08));
+    }
+
+    .ai-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .ai-header-text h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .ai-header-text p {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .ai-header-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .ai-header-close:hover { background: var(--bg); color: var(--text); }
+
+    .ai-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ai-tab {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all var(--transition);
+    }
+
+    .ai-tab:hover { color: var(--text-secondary); }
+    .ai-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .ai-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .ai-tab-panel { display: none; }
+    .ai-tab-panel.active { display: block; }
+
+    /* Quick Actions Bar */
+    .quick-actions-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .quick-actions-bar input {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .quick-actions-bar input:focus { outline: none; }
+    .quick-actions-bar input::placeholder { color: var(--text-muted); }
+
+    .quick-actions-bar button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .quick-actions-bar button:hover { background: var(--accent-hover); }
+
+    .quick-actions-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .quick-chip {
+      padding: 4px 10px;
+      font-size: 10px;
+      border-radius: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .quick-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* Smart Suggestions */
+    .suggestion-card {
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(79,110,247,0.1);
+    }
+
+    .suggestion-card.highlight {
+      background: linear-gradient(135deg, var(--accent-soft), rgba(6,182,212,0.05));
+      border-color: rgba(79,110,247,0.3);
+    }
+
+    .suggestion-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .suggestion-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .suggestion-icon.optimize { background: var(--success-soft); color: var(--success); }
+    .suggestion-icon.warning { background: var(--warning-soft); color: #a16207; }
+    .suggestion-icon.opportunity { background: var(--info-soft); color: var(--info); }
+    .suggestion-icon.save { background: var(--accent-soft); color: var(--accent); }
+
+    .suggestion-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .suggestion-impact {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .suggestion-impact.negative { background: var(--danger-soft); color: var(--danger); }
+
+    .suggestion-body {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .suggestion-action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .suggestion-action:hover { text-decoration: underline; }
+    .suggestion-action .material-icons-outlined { font-size: 14px; }
+
+    /* Scenario Builder */
+    .scenario-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scenario-card {
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+    }
+
+    .scenario-card:hover { border-color: var(--accent); }
+
+    .scenario-card.recommended {
+      border-color: var(--success);
+      background: linear-gradient(135deg, var(--success-soft), transparent);
+    }
+
+    .scenario-card.recommended::before {
+      content: 'RECOMMENDED';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      padding: 2px 8px;
+      font-size: 8px;
+      font-weight: 700;
+      background: var(--success);
+      color: #fff;
+      border-radius: 4px;
+    }
+
+    .scenario-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .scenario-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .scenario-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .scenario-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .scenario-spec {
+      font-size: 9px;
+      padding: 2px 6px;
+      background: var(--panel);
+      border-radius: 4px;
+      color: var(--text-secondary);
+    }
+
+    .scenario-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .scenario-apply {
+      margin-top: 8px;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .scenario-apply:hover { background: var(--accent-hover); }
+    .scenario-card.recommended .scenario-apply { background: var(--success); }
+    .scenario-card.recommended .scenario-apply:hover { background: #059669; }
+
+    /* Guided Wizard */
+    .wizard-progress {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .wizard-step {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .wizard-step.complete { background: var(--success); }
+    .wizard-step.current { background: var(--accent); }
+
+    .wizard-question {
+      padding: 16px;
+      background: linear-gradient(135deg, var(--accent-soft), rgba(6,182,212,0.05));
+      border-radius: 10px;
+      border: 1px solid rgba(79,110,247,0.2);
+      margin-bottom: 12px;
+    }
+
+    .wizard-q-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .wizard-q-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wizard-q-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .wizard-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .wizard-option {
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .wizard-option:hover {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .wizard-option.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .wizard-option-main {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .wizard-option-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .wizard-nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .wizard-nav button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .wizard-nav .wizard-back {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .wizard-nav .wizard-back:hover { border-color: var(--text-muted); }
+
+    .wizard-nav .wizard-next {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+    }
+
+    .wizard-nav .wizard-next:hover { background: var(--accent-hover); }
+
+    .wizard-complete {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .wizard-complete-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--success-soft);
+      color: var(--success);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .wizard-complete h4 {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .wizard-complete p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Inline Risk/Opportunity Flags */
+    .field-flag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 600;
+      border-radius: 4px;
+      margin-left: 6px;
+      cursor: help;
+    }
+
+    .field-flag.risk {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .field-flag.warning {
+      background: var(--warning-soft);
+      color: #a16207;
+    }
+
+    .field-flag.opportunity {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .field-flag.info {
+      background: var(--info-soft);
+      color: var(--info);
+    }
+
+    .field-flag .material-icons-outlined { font-size: 11px; }
+
+    .field-flag-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 10px;
+      background: var(--text);
+      color: var(--panel);
+      font-size: 10px;
+      font-weight: 400;
+      border-radius: 6px;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    .field-flag:hover .field-flag-tooltip { display: block; }
+
+    .form-group { position: relative; }
+
+    /* Decision Trail */
+    .decision-item {
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .decision-item.warning { border-left-color: var(--warning); }
+    .decision-item.success { border-left-color: var(--success); }
+    .decision-item.info { border-left-color: var(--info); }
+
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .decision-time {
+      font-size: 9px;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    .decision-type {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .decision-type.auto { background: var(--accent-soft); color: var(--accent); }
+    .decision-type.rule { background: var(--warning-soft); color: #a16207; }
+    .decision-type.user { background: var(--success-soft); color: var(--success); }
+
+    .decision-action {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .decision-reason {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Confidence Indicator */
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .confidence-badge.high { background: var(--success-soft); color: var(--success); }
+    .confidence-badge.medium { background: var(--warning-soft); color: #a16207; }
+    .confidence-badge.low { background: var(--danger-soft); color: var(--danger); }
+
+    .confidence-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .confidence-fill.high { background: var(--success); }
+    .confidence-fill.medium { background: var(--warning); }
+    .confidence-fill.low { background: var(--danger); }
+
+    /* AI Recommendation Card */
+    .ai-recommendation {
+      background: linear-gradient(135deg, var(--accent-soft), rgba(6,182,212,0.08));
+      border: 1px solid rgba(79,110,247,0.2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .ai-rec-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .ai-rec-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .ai-rec-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .ai-rec-content {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* AI Button in Header */
+    .ai-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(79,110,247,0.3);
+      background: linear-gradient(135deg, var(--accent-soft), rgba(6,182,212,0.08));
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .ai-btn:hover {
+      background: linear-gradient(135deg, rgba(79,110,247,0.15), rgba(6,182,212,0.12));
+      border-color: var(--accent);
+    }
+
+    .ai-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .ai-btn .material-icons-outlined { font-size: 16px; }
+
+    .ai-pulse {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* AI Status in Metric Card */
+    .metric-ai-status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 9px;
+      color: var(--accent);
+    }
+
+    .metric-ai-status .material-icons-outlined { font-size: 12px; }
+
+    /* Similar Projects */
+    .similar-project {
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    .similar-project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .similar-project-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .similar-project-match {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .similar-project-details {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <span class="material-icons-round">water_drop</span>
+      </div>
+      <div class="logo-text">MembraCon<span>Quote</span></div>
+    </div>
+
+    <div class="header-spacer"></div>
+
+    <div class="header-actions">
+      <button class="ai-btn" id="aiToggleBtn" onclick="toggleAI()">
+        <span class="material-icons-outlined">auto_awesome</span>
+        AI Assistant
+        <span class="ai-pulse"></span>
+      </button>
+
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="editModeBtn" onclick="setMode('edit')">
+          <span class="material-icons-outlined">edit</span>
+          Edit
+        </button>
+        <button class="mode-btn" id="viewModeBtn" onclick="setMode('view')">
+          <span class="material-icons-outlined">visibility</span>
+          View
+        </button>
+      </div>
+
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+        <span class="material-icons-outlined" id="themeIcon">dark_mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Stage Bar -->
+  <div class="stage-bar">
+    <div class="stage-item active" data-stage="1" onclick="setStage(1)">
+      <div class="stage-number">1</div>
+      <div class="stage-info">
+        <h3>Quick Estimate</h3>
+        <p>System sizing & pricing</p>
+      </div>
+    </div>
+    <span class="material-icons-outlined stage-arrow">chevron_right</span>
+    <div class="stage-item" data-stage="2" onclick="setStage(2)">
+      <div class="stage-number">2</div>
+      <div class="stage-info">
+        <h3>Detailed Quote</h3>
+        <p>Full BOM & labour</p>
+      </div>
+    </div>
+    <span class="material-icons-outlined stage-arrow">chevron_right</span>
+    <div class="stage-item" data-stage="3" onclick="setStage(3)">
+      <div class="stage-number">3</div>
+      <div class="stage-info">
+        <h3>Proposal</h3>
+        <p>ROI & export</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div class="content-wrapper">
+      <div class="content-area">
+
+        <!-- ==================== STAGE 1 ==================== -->
+        <div class="stage-view active" id="stage-1">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>RO System Estimate</h1>
+              <p>Configure system requirements and get instant pricing</p>
+            </div>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">Feed Flow</div>
+              <div class="metric-value accent" id="m_feedFlow">12.00</div>
+              <div class="metric-unit">m³/hr</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Reject Flow</div>
+              <div class="metric-value warning" id="m_rejectFlow">3.00</div>
+              <div class="metric-unit">m³/hr</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Membranes</div>
+              <div class="metric-value" id="m_membranes">9</div>
+              <div class="metric-unit">8040 elements</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Est. Permeate</div>
+              <div class="metric-value success" id="m_permeateQuality">10.00</div>
+              <div class="metric-unit">µS/cm</div>
+            </div>
+            <div class="metric-card highlight">
+              <div class="metric-label">System Price</div>
+              <div class="metric-value" id="m_totalPrice">£79,075</div>
+              <div class="metric-unit">excl. VAT</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div>
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">tune</span>
+                    System Requirements
+                  </div>
+                </div>
+                <div class="section-body">
+                  <div class="form-grid cols-2">
+                    <div class="form-group">
+                      <label class="form-label">Permeate Flow <span class="unit">(m³/hr)</span></label>
+                      <select class="form-input" id="permeateFlow" onchange="calculate()">
+                        <option value="0.25">0.25</option>
+                        <option value="0.5">0.5</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="4">4</option>
+                        <option value="6">6</option>
+                        <option value="9" selected>9</option>
+                        <option value="12">12</option>
+                        <option value="16">16</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Permeate Quality <span class="unit">(µS/cm)</span></label>
+                      <input type="number" class="form-input" id="permeateQuality" value="12" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Recovery <span class="unit">(%)</span></label>
+                      <input type="number" class="form-input" id="recovery" value="75" min="50" max="95" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Markup <span class="unit">(%)</span></label>
+                      <input type="number" class="form-input" id="markup" value="30" min="0" max="100" onchange="calculate()">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">science</span>
+                    Feed Water Analysis
+                  </div>
+                </div>
+                <div class="section-body">
+                  <div class="form-grid cols-3">
+                    <div class="form-group">
+                      <label class="form-label">Conductivity <span class="unit">(µS/cm)</span></label>
+                      <input type="number" class="form-input" id="feedConductivity" value="500" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">TDS <span class="unit">(ppm)</span></label>
+                      <input type="number" class="form-input" id="feedTDS" value="350" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">TSS <span class="unit">(ppm)</span></label>
+                      <input type="number" class="form-input" id="feedTSS" value="1" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Pressure <span class="unit">(BAR)</span></label>
+                      <input type="number" class="form-input" id="feedPressure" value="4" step="0.5" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Temperature <span class="unit">(°C)</span></label>
+                      <input type="number" class="form-input" id="feedTemp" value="15" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">pH</label>
+                      <input type="number" class="form-input" id="feedPH" value="7" step="0.1" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Chlorine <span class="unit">(ppm)</span></label>
+                      <input type="number" class="form-input" id="feedChlorine" value="0.01" step="0.01" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Iron <span class="unit">(mg/L)</span></label>
+                      <input type="number" class="form-input" id="feedIron" value="0.01" step="0.01" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Hardness <span class="unit">(CaCO₃)</span></label>
+                      <input type="number" class="form-input" id="feedHardness" value="100" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Turbidity <span class="unit">(NTU)</span></label>
+                      <input type="number" class="form-input" id="feedTurbidity" value="1" step="0.1" onchange="calculate()">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">SDI</label>
+                      <input type="number" class="form-input" id="feedSDI" value="3" step="0.5" onchange="calculate()">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">settings</span>
+                    Options
+                  </div>
+                </div>
+                <div class="section-body">
+                  <div class="chip-grid">
+                    <div class="chip" id="opt_container" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">view_in_ar</span>Container
+                    </div>
+                    <div class="chip" id="opt_uv" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">light_mode</span>UV System
+                    </div>
+                    <div class="chip active" id="opt_cip" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">cleaning_services</span>CIP
+                    </div>
+                    <div class="chip" id="opt_flush" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">water</span>Permeate Flush
+                    </div>
+                    <div class="chip" id="opt_monitoring" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">wifi</span>Monitoring
+                    </div>
+                    <div class="chip" id="opt_secondRO" onclick="toggleOption(this)">
+                      <span class="material-icons-outlined">filter_2</span>2nd Stage
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">notification_important</span>
+                    System Alerts
+                  </div>
+                  <span class="section-badge success" id="alertBadge">All Clear</span>
+                </div>
+                <div class="section-body">
+                  <div class="alerts-list" id="alertsList"></div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">calculate</span>
+                    Calculations
+                  </div>
+                  <span class="section-badge" id="modelBadge">MEMR09</span>
+                </div>
+                <div class="section-body">
+                  <div class="form-grid cols-2">
+                    <div class="form-group">
+                      <label class="form-label">Feed Flow <span class="unit">(m³/hr)</span></label>
+                      <input type="text" class="form-input computed" id="calc_feedFlow" value="12.00" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Reject Flow <span class="unit">(m³/hr)</span></label>
+                      <input type="text" class="form-input computed" id="calc_rejectFlow" value="3.00" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Membrane Area <span class="unit">(m²)</span></label>
+                      <input type="text" class="form-input computed" id="calc_membraneArea" value="333" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Pressure Vessels</label>
+                      <input type="text" class="form-input computed" id="calc_pressureVessels" value="3" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Pump Power <span class="unit">(kW)</span></label>
+                      <input type="text" class="form-input computed" id="calc_pumpPower" value="7.5" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Temp Factor</label>
+                      <input type="text" class="form-input computed" id="calc_tempFactor" value="0.75" readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section">
+                <div class="section-header">
+                  <div class="section-title">
+                    <span class="material-icons-outlined">payments</span>
+                    Pricing
+                  </div>
+                  <span class="section-badge success" id="marginBadge">GM: 31%</span>
+                </div>
+                <div class="section-body" style="padding:0">
+                  <table class="component-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th style="text-align:right">Cost</th>
+                        <th style="text-align:right">Sell</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pricingSummary"></tbody>
+                    <tfoot>
+                      <tr>
+                        <td>Total</td>
+                        <td class="price cost" style="text-align:right" id="totalCost">£54,310</td>
+                        <td class="price sell" style="text-align:right" id="totalSell">£79,075</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STAGE 2 ==================== -->
+        <div class="stage-view" id="stage-2">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>Detailed Quote</h1>
+              <p>Bill of materials and labour breakdown</p>
+              <div class="project-meta">
+                <div class="meta-item">
+                  <span class="material-icons-outlined">business</span>
+                  <input type="text" class="form-input" id="customerName" placeholder="Customer Name" style="width:200px">
+                </div>
+                <div class="meta-item">
+                  <span class="material-icons-outlined">tag</span>
+                  <input type="text" class="form-input" id="quoteNumber" value="E4924A" style="width:110px">
+                </div>
+                <div class="meta-item">
+                  <span class="material-icons-outlined">calendar_today</span>
+                  <span id="quoteDate">23 Jan 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">inventory_2</span>
+                Equipment BOM
+              </div>
+              <span class="section-badge" id="componentCount">12 Items</span>
+            </div>
+            <div class="section-body" style="padding:0">
+              <table class="component-table">
+                <thead>
+                  <tr>
+                    <th style="width:50px">Qty</th>
+                    <th>Description</th>
+                    <th>Supplier</th>
+                    <th>Part No.</th>
+                    <th style="text-align:right">Unit</th>
+                    <th style="text-align:right">Cost</th>
+                    <th style="text-align:center">Markup</th>
+                    <th style="text-align:right">Sell</th>
+                    <th style="width:70px">Type</th>
+                  </tr>
+                </thead>
+                <tbody id="bomTable"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5">Equipment Total</td>
+                    <td class="price cost" style="text-align:right" id="bomTotalCost">£45,247</td>
+                    <td></td>
+                    <td class="price sell" style="text-align:right" id="bomTotalSell">£71,943</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">engineering</span>
+                Labour & Installation
+              </div>
+            </div>
+            <div class="section-body" style="padding:0">
+              <table class="labour-table">
+                <thead>
+                  <tr>
+                    <th>Activity</th>
+                    <th>Unit</th>
+                    <th style="text-align:center">Qty</th>
+                    <th style="text-align:right">Rate</th>
+                    <th style="text-align:right">Cost</th>
+                    <th style="text-align:center">Markup</th>
+                    <th style="text-align:right">Sell</th>
+                  </tr>
+                </thead>
+                <tbody id="labourTable"></tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4"><strong>Labour Total</strong></td>
+                    <td class="price cost" style="text-align:right" id="labourTotalCost">£7,065</td>
+                    <td></td>
+                    <td class="price sell" style="text-align:right" id="labourTotalSell">£11,589</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">event</span>
+                Payment Milestones
+              </div>
+            </div>
+            <div class="section-body">
+              <div class="milestone-grid">
+                <div class="milestone-card active">
+                  <div class="milestone-percent">60%</div>
+                  <div class="milestone-label">On PO</div>
+                  <div class="milestone-amount" id="mile_po">£50,119</div>
+                </div>
+                <div class="milestone-card">
+                  <div class="milestone-percent">20%</div>
+                  <div class="milestone-label">Drawing Approval</div>
+                  <div class="milestone-amount" id="mile_drawing">£16,706</div>
+                </div>
+                <div class="milestone-card">
+                  <div class="milestone-percent">15%</div>
+                  <div class="milestone-label">Ready to Ship</div>
+                  <div class="milestone-amount" id="mile_ship">£12,530</div>
+                </div>
+                <div class="milestone-card">
+                  <div class="milestone-percent">5%</div>
+                  <div class="milestone-label">Commissioning</div>
+                  <div class="milestone-amount" id="mile_commission">£4,177</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">summarize</span>
+                Quote Summary
+              </div>
+              <span class="section-badge success" id="finalMarginBadge">GM: 37%</span>
+            </div>
+            <div class="section-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;text-align:center">
+                <div>
+                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:500">Total Cost</div>
+                  <div style="font-size:32px;font-weight:700;color:var(--text)" id="grandTotalCost">£52,312</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:500">Total Sell</div>
+                  <div style="font-size:32px;font-weight:700;color:var(--success)" id="grandTotalSell">£83,532</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:500">Gross Profit</div>
+                  <div style="font-size:32px;font-weight:700;color:var(--accent)" id="grandProfit">£31,220</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STAGE 3 ==================== -->
+        <div class="stage-view" id="stage-3">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>ROI & Proposal</h1>
+              <p>Customer value proposition and document generation</p>
+            </div>
+          </div>
+
+          <div class="roi-grid" style="margin-bottom:28px">
+            <div class="roi-card">
+              <div class="roi-value success">£63,000</div>
+              <div class="roi-label">Annual Net Benefit</div>
+            </div>
+            <div class="roi-card highlight">
+              <div class="roi-value">1.5</div>
+              <div class="roi-label">Payback (Years)</div>
+            </div>
+            <div class="roi-card">
+              <div class="roi-value">60%</div>
+              <div class="roi-label">3-Year ROI</div>
+            </div>
+            <div class="roi-card">
+              <div class="roi-value warning">31%</div>
+              <div class="roi-label">Gross Margin</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">trending_up</span>
+                  Annual Benefits
+                </div>
+              </div>
+              <div class="section-body">
+                <div class="form-grid cols-2">
+                  <div class="form-group span-2">
+                    <label class="form-label">Water Purchase Savings</label>
+                    <input type="number" class="form-input" id="roi_waterSavings" value="60000" onchange="calculateROI()">
+                  </div>
+                  <div class="form-group span-2">
+                    <label class="form-label">Wastewater Discharge Savings</label>
+                    <input type="number" class="form-input" id="roi_wastewaterSavings" value="20000" onchange="calculateROI()">
+                  </div>
+                  <div class="form-group span-2">
+                    <label class="form-label">Production Efficiency Gains</label>
+                    <input type="number" class="form-input" id="roi_efficiencyGains" value="3000" onchange="calculateROI()">
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="summary-row">
+                  <span>Total Annual Benefits</span>
+                  <span class="value success" id="roi_totalBenefits">£83,000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">trending_down</span>
+                  Annual O&M Costs
+                </div>
+              </div>
+              <div class="section-body">
+                <div class="form-grid cols-2">
+                  <div class="form-group span-2">
+                    <label class="form-label">Electricity</label>
+                    <input type="number" class="form-input" id="roi_electricity" value="10000" onchange="calculateROI()">
+                  </div>
+                  <div class="form-group span-2">
+                    <label class="form-label">Membranes & Chemicals</label>
+                    <input type="number" class="form-input" id="roi_membranes" value="5000" onchange="calculateROI()">
+                  </div>
+                  <div class="form-group span-2">
+                    <label class="form-label">Maintenance Labour</label>
+                    <input type="number" class="form-input" id="roi_maintenance" value="5000" onchange="calculateROI()">
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div class="summary-row">
+                  <span>Total Annual Costs</span>
+                  <span class="value danger" id="roi_totalCosts">£20,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">file_download</span>
+                Export Proposal
+              </div>
+            </div>
+            <div class="section-body">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                <button class="btn btn-secondary" style="padding:14px">
+                  <span class="material-icons-outlined">picture_as_pdf</span>
+                  Export PDF
+                </button>
+                <button class="btn btn-secondary" style="padding:14px">
+                  <span class="material-icons-outlined">table_chart</span>
+                  Export Excel
+                </button>
+                <button class="btn btn-secondary" style="padding:14px">
+                  <span class="material-icons-outlined">description</span>
+                  Export Word
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="action-footer">
+        <button class="btn btn-secondary" onclick="prevStage()">
+          <span class="material-icons-outlined">arrow_back</span>
+          Previous
+        </button>
+        <div class="btn-group">
+          <button class="btn btn-secondary">
+            <span class="material-icons-outlined">save</span>
+            Save Draft
+          </button>
+          <button class="btn btn-primary" onclick="nextStage()">
+            Continue
+            <span class="material-icons-outlined">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Sidebar -->
+  <aside class="ai-sidebar" id="aiSidebar">
+    <div class="ai-header">
+      <div class="ai-header-icon">
+        <span class="material-icons-outlined">auto_awesome</span>
+      </div>
+      <div class="ai-header-text">
+        <h3>AI Assistant</h3>
+        <p>Intelligent quotation support</p>
+      </div>
+      <button class="ai-header-close" onclick="toggleAI()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="ai-tabs">
+      <div class="ai-tab active" data-tab="suggest" onclick="setAITab('suggest')">Suggest</div>
+      <div class="ai-tab" data-tab="scenarios" onclick="setAITab('scenarios')">Scenarios</div>
+      <div class="ai-tab" data-tab="wizard" onclick="setAITab('wizard')">Wizard</div>
+      <div class="ai-tab" data-tab="decisions" onclick="setAITab('decisions')">Trail</div>
+      <div class="ai-tab" data-tab="similar" onclick="setAITab('similar')">Similar</div>
+    </div>
+
+    <div class="ai-content">
+      <!-- Smart Suggestions Panel -->
+      <div class="ai-tab-panel active" id="ai-panel-suggest">
+        <!-- Quick Actions Bar -->
+        <div class="quick-actions-bar">
+          <input type="text" id="quickActionInput" placeholder="Try: 'size for 8 m³/hr' or 'add softener'" onkeypress="if(event.key==='Enter')executeQuickAction()">
+          <button onclick="executeQuickAction()">Go</button>
+        </div>
+
+        <div class="quick-actions-chips">
+          <span class="quick-chip" onclick="quickAction('optimize')">Optimize cost</span>
+          <span class="quick-chip" onclick="quickAction('premium')">Go premium</span>
+          <span class="quick-chip" onclick="quickAction('minimal')">Minimize risk</span>
+          <span class="quick-chip" onclick="quickAction('compare')">Compare options</span>
+        </div>
+
+        <!-- AI Confidence -->
+        <div class="ai-recommendation">
+          <div class="ai-rec-header">
+            <div class="ai-rec-icon">
+              <span class="material-icons-outlined">lightbulb</span>
+            </div>
+            <span class="ai-rec-title">AI Confidence</span>
+            <span class="confidence-badge high" id="aiConfidenceBadge">92%</span>
+          </div>
+          <div class="confidence-bar">
+            <div class="confidence-fill high" id="aiConfidenceBar" style="width: 92%"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Suggestions -->
+        <div id="aiSuggestions">
+          <!-- Suggestions will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Scenario Builder Panel -->
+      <div class="ai-tab-panel" id="ai-panel-scenarios">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Configuration Scenarios</span>
+          <p style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">AI-generated options based on your requirements</p>
+        </div>
+        <div class="scenario-grid" id="scenarioGrid">
+          <!-- Scenarios will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Guided Wizard Panel -->
+      <div class="ai-tab-panel" id="ai-panel-wizard">
+        <div class="wizard-progress" id="wizardProgress">
+          <div class="wizard-step current"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+        </div>
+        <div id="wizardContent">
+          <!-- Wizard questions will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Decisions Panel -->
+      <div class="ai-tab-panel" id="ai-panel-decisions">
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Decision Trail</span>
+            <span style="font-size: 10px; color: var(--text-muted);" id="decisionCount">0 decisions</span>
+          </div>
+        </div>
+        <div id="decisionTrail">
+          <!-- Decisions will be populated here -->
+        </div>
+      </div>
+
+      <!-- Similar Projects Panel -->
+      <div class="ai-tab-panel" id="ai-panel-similar">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">Similar Past Projects</span>
+        </div>
+        <div id="similarProjects">
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">Pharma Co - Lab Water</span>
+              <span class="similar-project-match">94% match</span>
+            </div>
+            <div class="similar-project-details">
+              MEMR09 • 9 m³/hr • £82,400 • Won
+            </div>
+          </div>
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">BioTech Ltd - Process</span>
+              <span class="similar-project-match">87% match</span>
+            </div>
+            <div class="similar-project-details">
+              MEMR09 • 9 m³/hr • £76,200 • Won
+            </div>
+          </div>
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">MediCare - Dialysis</span>
+              <span class="similar-project-match">82% match</span>
+            </div>
+            <div class="similar-project-details">
+              MEMR06 • 6 m³/hr • £58,900 • Lost (price)
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding: 10px; background: var(--info-soft); border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+          <div style="font-size: 11px; font-weight: 600; color: var(--info); margin-bottom: 4px;">
+            <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle;">insights</span>
+            Pricing Insight
+          </div>
+          <div style="font-size: 10px; color: var(--text-secondary);">
+            Similar projects closed at £76,200 - £82,400. Your current quote is within the competitive range.
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    const MODELS = {
+      '0.25': { code: 'MEMR0025', roCost: 1700, membranes: 1, power: 0.5, cip: 3500, pipework: 3000, labour: 2000, shipping: 1000 },
+      '0.5': { code: 'MEMR005', roCost: 2200, membranes: 2, power: 0.75, cip: 3500, pipework: 4000, labour: 3000, shipping: 1000 },
+      '1': { code: 'MEMR01', roCost: 3500, membranes: 4, power: 1.5, cip: 3500, pipework: 5000, labour: 4000, shipping: 1000 },
+      '2': { code: 'MEMR02', roCost: 4500, membranes: 2, power: 3, cip: 3500, pipework: 6000, labour: 5000, shipping: 1000 },
+      '4': { code: 'MEMR04', roCost: 5500, membranes: 4, power: 4, cip: 3500, pipework: 7000, labour: 6000, shipping: 1500 },
+      '6': { code: 'MEMR06', roCost: 12100, membranes: 6, power: 7.5, cip: 3500, pipework: 8000, labour: 8000, shipping: 1500 },
+      '9': { code: 'MEMR09', roCost: 15954, membranes: 9, power: 7.5, cip: 4716, pipework: 9000, labour: 10000, shipping: 1500 },
+      '12': { code: 'MEMR012', roCost: 23250, membranes: 12, power: 11, cip: 4716, pipework: 10000, labour: 12000, shipping: 2500 },
+      '16': { code: 'MEMR016', roCost: 27500, membranes: 16, power: 11, cip: 4716, pipework: 11000, labour: 15000, shipping: 2750 }
+    };
+
+    const ADDONS = {
+      container: { name: 'Container (20ft)', cost: 5500, supplier: 'Container Co' },
+      uv: { name: 'UV Disinfection', cost: 2500, supplier: 'Trojan UV' },
+      flush: { name: 'Permeate Flushing', cost: 700, supplier: 'Ecosoft' },
+      monitoring: { name: 'Remote Monitoring', cost: 1500, supplier: 'Membracon' },
+      secondRO: { name: 'Second Stage RO', cost: 8000, supplier: 'Ecosoft' },
+      carbonFilter: { name: 'Carbon Filter', cost: 1062, supplier: 'Ecosoft' },
+      ironRemoval: { name: 'Iron Removal', cost: 3500, supplier: 'Ecosoft' },
+      phDosing: { name: 'pH Dosing', cost: 1400, supplier: 'Grundfos' },
+      antiscalant: { name: 'Antiscalant Dosing', cost: 1400, supplier: 'Grundfos' },
+      softener: { name: 'Water Softener', cost: 3000, supplier: 'Ecosoft' },
+      boostPump: { name: 'Boost Pump', cost: 2000, supplier: 'Grundfos' }
+    };
+
+    const LABOUR = [
+      { id: 'mechanical', name: 'Mechanical Install', unit: 'man-days', qty: 12, rate: 325 },
+      { id: 'electrical', name: 'Electrical Install', unit: 'man-days', qty: 5, rate: 325 },
+      { id: 'mileage', name: 'Mileage', unit: 'miles', qty: 1200, rate: 0.45 },
+      { id: 'accommodation', name: 'Accommodation', unit: 'nights', qty: 12, rate: 125 },
+      { id: 'commissioning', name: 'Commissioning', unit: 'man-days', qty: 2, rate: 350 },
+      { id: 'survey', name: 'Site Survey', unit: 'man-days', qty: 1, rate: 350 }
+    ];
+
+    const TEMP_FACTORS = { 5: 0.45, 10: 0.58, 15: 0.75, 20: 0.88, 25: 1.00, 30: 1.15, 35: 1.30 };
+
+    const ALARMS = [
+      { check: d => d.temp < 15, type: 'warning', msg: 'Low temperature may reduce flow. Consider oversizing.' },
+      { check: d => d.permeateQuality < 10, type: 'info', msg: 'Target <10 µS/cm may need second stage RO.' },
+      { check: d => d.sdi > 6, type: 'critical', msg: 'SDI too high - pre-treatment required.' },
+      { check: d => d.tds > 1000, type: 'warning', msg: 'High TDS - consider high-rejection membranes.' },
+      { check: d => d.tss > 5, type: 'critical', msg: 'High TSS - multimedia filtration required.' },
+      { check: d => d.turbidity > 5, type: 'critical', msg: 'High turbidity - sand filter required.' },
+      { check: d => d.pressure < 3, type: 'warning', msg: 'Low pressure - boost pump required.' },
+      { check: d => d.iron > 0.1, type: 'warning', msg: 'Elevated iron - removal recommended.' },
+      { check: d => d.iron > 0.3, type: 'critical', msg: 'High iron - dedicated removal required.' },
+      { check: d => d.ph < 5 || d.ph > 9, type: 'critical', msg: 'pH out of range - membrane damage risk.' },
+      { check: d => d.chlorine > 0.05, type: 'warning', msg: 'Chlorine detected - carbon filter needed.' },
+      { check: d => d.hardness > 300, type: 'warning', msg: 'Very hard water - softener recommended.' },
+      { check: d => d.hardness >= 100 && d.hardness <= 300, type: 'info', msg: 'Hard water - antiscalant recommended.' }
+    ];
+
+    let currentStage = 1, currentMode = 'edit';
+    let selectedOptions = { cip: true };
+    let bomItems = [], labourData = [...LABOUR];
+
+    function getInputs() {
+      return {
+        permeateFlow: parseFloat(document.getElementById('permeateFlow').value),
+        permeateQuality: parseFloat(document.getElementById('permeateQuality').value),
+        recovery: parseFloat(document.getElementById('recovery').value),
+        markup: parseFloat(document.getElementById('markup').value),
+        conductivity: parseFloat(document.getElementById('feedConductivity').value),
+        tds: parseFloat(document.getElementById('feedTDS').value),
+        tss: parseFloat(document.getElementById('feedTSS').value),
+        pressure: parseFloat(document.getElementById('feedPressure').value),
+        temp: parseFloat(document.getElementById('feedTemp').value),
+        ph: parseFloat(document.getElementById('feedPH').value),
+        chlorine: parseFloat(document.getElementById('feedChlorine').value),
+        iron: parseFloat(document.getElementById('feedIron').value),
+        hardness: parseFloat(document.getElementById('feedHardness').value),
+        turbidity: parseFloat(document.getElementById('feedTurbidity').value),
+        sdi: parseFloat(document.getElementById('feedSDI').value)
+      };
+    }
+
+    function getTempFactor(temp) {
+      for (let t of Object.keys(TEMP_FACTORS).map(Number).sort((a,b)=>a-b)) if (temp <= t) return TEMP_FACTORS[t];
+      return 1.30;
+    }
+
+    function calculate() {
+      const d = getInputs();
+      const model = MODELS[d.permeateFlow] || MODELS['9'];
+      const mf = 1 + d.markup / 100;
+
+      const feedFlow = d.permeateFlow / (d.recovery / 100);
+      const rejectFlow = feedFlow - d.permeateFlow;
+      const membraneArea = model.membranes * 37;
+      const pressureVessels = Math.ceil(model.membranes / 3);
+      const tempFactor = getTempFactor(d.temp);
+      const estPermeate = d.conductivity * 0.02;
+
+      document.getElementById('m_feedFlow').textContent = feedFlow.toFixed(2);
+      document.getElementById('m_rejectFlow').textContent = rejectFlow.toFixed(2);
+      document.getElementById('m_membranes').textContent = model.membranes;
+      document.getElementById('m_permeateQuality').textContent = estPermeate.toFixed(2);
+      document.getElementById('calc_feedFlow').value = feedFlow.toFixed(2);
+      document.getElementById('calc_rejectFlow').value = rejectFlow.toFixed(2);
+      document.getElementById('calc_membraneArea').value = membraneArea;
+      document.getElementById('calc_pressureVessels').value = pressureVessels;
+      document.getElementById('calc_pumpPower').value = model.power || '-';
+      document.getElementById('calc_tempFactor').value = tempFactor.toFixed(2);
+      document.getElementById('modelBadge').textContent = model.code;
+
+      bomItems = [
+        { qty: 1, name: `RO System ${model.code}`, supplier: 'Ecosoft', partNo: model.code, cost: model.roCost, type: 'base' },
+        { qty: model.membranes, name: 'RO Membrane 8040', supplier: 'Ecosoft', partNo: '8040', cost: 460, type: 'base' },
+        { qty: 1, name: 'Pipework & Materials', supplier: 'Various', partNo: '-', cost: model.pipework, type: 'base' },
+        { qty: 1, name: 'Shipping', supplier: 'Logistics', partNo: '-', cost: model.shipping, type: 'base' }
+      ];
+
+      if (d.chlorine > 0.05) bomItems.push({ qty: 1, ...ADDONS.carbonFilter, type: 'auto' });
+      if (d.iron > 0.1) bomItems.push({ qty: 1, ...ADDONS.ironRemoval, type: 'auto' });
+      if (d.hardness >= 100 && d.hardness < 300) bomItems.push({ qty: 1, ...ADDONS.antiscalant, type: 'auto' });
+      if (d.hardness >= 300) bomItems.push({ qty: 1, ...ADDONS.softener, type: 'auto' });
+      if (d.ph < 6 || d.ph > 8.5) bomItems.push({ qty: 1, ...ADDONS.phDosing, type: 'auto' });
+      if (d.pressure < 3) bomItems.push({ qty: 1, ...ADDONS.boostPump, type: 'auto' });
+
+      if (selectedOptions.container) bomItems.push({ qty: 1, ...ADDONS.container, type: 'manual' });
+      if (selectedOptions.uv) bomItems.push({ qty: 1, ...ADDONS.uv, type: 'manual' });
+      if (selectedOptions.cip) bomItems.push({ qty: 1, name: 'CIP System', supplier: 'Membracon', partNo: 'CIP', cost: model.cip, type: 'manual' });
+      if (selectedOptions.flush) bomItems.push({ qty: 1, ...ADDONS.flush, type: 'manual' });
+      if (selectedOptions.monitoring) bomItems.push({ qty: 1, ...ADDONS.monitoring, type: 'manual' });
+      if (selectedOptions.secondRO) bomItems.push({ qty: 1, ...ADDONS.secondRO, type: 'manual' });
+
+      let eqCost = 0, eqSell = 0;
+      bomItems.forEach(i => { i.totalCost = i.qty * i.cost; i.totalSell = i.totalCost * mf; i.markup = d.markup; eqCost += i.totalCost; eqSell += i.totalSell; });
+
+      let labCost = 0, labSell = 0;
+      labourData.forEach(i => { i.totalCost = i.qty * i.rate; i.totalSell = i.totalCost * mf; i.markup = d.markup; labCost += i.totalCost; labSell += i.totalSell; });
+
+      const grandCost = eqCost + labCost, grandSell = eqSell + labSell, grossProfit = grandSell - grandCost;
+      const gm = (grossProfit / grandSell * 100).toFixed(1);
+
+      document.getElementById('m_totalPrice').textContent = '£' + Math.round(grandSell).toLocaleString();
+      document.getElementById('marginBadge').textContent = 'GM: ' + gm + '%';
+      document.getElementById('totalCost').textContent = '£' + Math.round(eqCost).toLocaleString();
+      document.getElementById('totalSell').textContent = '£' + Math.round(eqSell).toLocaleString();
+
+      document.getElementById('pricingSummary').innerHTML = `
+        <tr><td>RO System</td><td class="price cost" style="text-align:right">£${model.roCost.toLocaleString()}</td><td class="price sell" style="text-align:right">£${Math.round(model.roCost*mf).toLocaleString()}</td></tr>
+        <tr><td>Membranes (${model.membranes}×)</td><td class="price cost" style="text-align:right">£${(model.membranes*460).toLocaleString()}</td><td class="price sell" style="text-align:right">£${Math.round(model.membranes*460*mf).toLocaleString()}</td></tr>
+        <tr><td>Pipework</td><td class="price cost" style="text-align:right">£${model.pipework.toLocaleString()}</td><td class="price sell" style="text-align:right">£${Math.round(model.pipework*mf).toLocaleString()}</td></tr>
+        <tr><td>Add-ons</td><td class="price cost" style="text-align:right">£${Math.round(eqCost-model.roCost-model.membranes*460-model.pipework-model.shipping).toLocaleString()}</td><td class="price sell" style="text-align:right">£${Math.round((eqCost-model.roCost-model.membranes*460-model.pipework-model.shipping)*mf).toLocaleString()}</td></tr>`;
+
+      renderBOM(); renderLabour();
+
+      document.getElementById('bomTotalCost').textContent = '£' + Math.round(eqCost).toLocaleString();
+      document.getElementById('bomTotalSell').textContent = '£' + Math.round(eqSell).toLocaleString();
+      document.getElementById('labourTotalCost').textContent = '£' + Math.round(labCost).toLocaleString();
+      document.getElementById('labourTotalSell').textContent = '£' + Math.round(labSell).toLocaleString();
+      document.getElementById('grandTotalCost').textContent = '£' + Math.round(grandCost).toLocaleString();
+      document.getElementById('grandTotalSell').textContent = '£' + Math.round(grandSell).toLocaleString();
+      document.getElementById('grandProfit').textContent = '£' + Math.round(grossProfit).toLocaleString();
+      document.getElementById('finalMarginBadge').textContent = 'GM: ' + gm + '%';
+      document.getElementById('componentCount').textContent = bomItems.length + ' Items';
+      document.getElementById('mile_po').textContent = '£' + Math.round(grandSell * 0.60).toLocaleString();
+      document.getElementById('mile_drawing').textContent = '£' + Math.round(grandSell * 0.20).toLocaleString();
+      document.getElementById('mile_ship').textContent = '£' + Math.round(grandSell * 0.15).toLocaleString();
+      document.getElementById('mile_commission').textContent = '£' + Math.round(grandSell * 0.05).toLocaleString();
+
+      renderAlerts(d); calculateROI();
+
+      // Update AI features in real-time
+      if (aiOpen) {
+        updateAISuggestions();
+        updateScenarios();
+      }
+      updateFieldFlags(d);
+    }
+
+    function renderBOM() {
+      document.getElementById('bomTable').innerHTML = bomItems.map(i => `<tr><td>${i.qty}</td><td>${i.name}</td><td>${i.supplier||'-'}</td><td>${i.partNo||'-'}</td><td class="price cost" style="text-align:right">£${i.cost.toLocaleString()}</td><td class="price cost" style="text-align:right">£${Math.round(i.totalCost).toLocaleString()}</td><td style="text-align:center">${i.markup}%</td><td class="price sell" style="text-align:right">£${Math.round(i.totalSell).toLocaleString()}</td><td><span class="tag ${i.type}">${i.type}</span></td></tr>`).join('');
+    }
+
+    function renderLabour() {
+      document.getElementById('labourTable').innerHTML = labourData.map(i => `<tr><td>${i.name}</td><td>${i.unit}</td><td style="text-align:center"><input type="number" value="${i.qty}" onchange="updateLabour('${i.id}',this.value)"></td><td class="price" style="text-align:right">£${i.rate}</td><td class="price cost" style="text-align:right">£${Math.round(i.totalCost).toLocaleString()}</td><td style="text-align:center">${i.markup}%</td><td class="price sell" style="text-align:right">£${Math.round(i.totalSell).toLocaleString()}</td></tr>`).join('');
+    }
+
+    function updateLabour(id, val) { const i = labourData.find(l => l.id === id); if (i) { i.qty = parseFloat(val); calculate(); } }
+
+    function renderAlerts(d) {
+      const active = ALARMS.filter(a => a.check(d)), list = document.getElementById('alertsList');
+      if (!active.length) {
+        list.innerHTML = `<div class="alert-item success"><span class="material-icons-outlined">check_circle</span><span class="alert-text">All parameters within acceptable range.</span></div>`;
+        document.getElementById('alertBadge').textContent = 'All Clear';
+        document.getElementById('alertBadge').className = 'section-badge success';
+        return;
+      }
+      list.innerHTML = active.map(a => `<div class="alert-item ${a.type}"><span class="material-icons-outlined">${a.type==='critical'?'error':a.type==='warning'?'warning':'info'}</span><span class="alert-text">${a.msg}</span></div>`).join('');
+      const crit = active.filter(a => a.type === 'critical').length;
+      document.getElementById('alertBadge').textContent = crit ? crit + ' Critical' : active.length + ' Warning';
+      document.getElementById('alertBadge').className = 'section-badge' + (crit ? ' warning' : '');
+    }
+
+    function calculateROI() {
+      const b = (parseFloat(document.getElementById('roi_waterSavings').value)||0) + (parseFloat(document.getElementById('roi_wastewaterSavings').value)||0) + (parseFloat(document.getElementById('roi_efficiencyGains').value)||0);
+      const c = (parseFloat(document.getElementById('roi_electricity').value)||0) + (parseFloat(document.getElementById('roi_membranes').value)||0) + (parseFloat(document.getElementById('roi_maintenance').value)||0);
+      document.getElementById('roi_totalBenefits').textContent = '£' + b.toLocaleString();
+      document.getElementById('roi_totalCosts').textContent = '£' + c.toLocaleString();
+    }
+
+    function toggleOption(el) { const id = el.id.replace('opt_', ''); el.classList.toggle('active'); selectedOptions[id] = el.classList.contains('active'); calculate(); }
+
+    function setStage(s) {
+      currentStage = s;
+      document.querySelectorAll('.stage-item').forEach((el, i) => { el.classList.toggle('active', i+1 === s); el.classList.toggle('completed', i+1 < s); });
+      document.querySelectorAll('.stage-view').forEach((el, i) => el.classList.toggle('active', i+1 === s));
+    }
+
+    function nextStage() { if (currentStage < 3) setStage(currentStage + 1); }
+    function prevStage() { if (currentStage > 1) setStage(currentStage - 1); }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('editModeBtn').classList.toggle('active', mode === 'edit');
+      document.getElementById('viewModeBtn').classList.toggle('active', mode === 'view');
+      document.body.classList.toggle('view-mode', mode === 'view');
+      document.querySelectorAll('.form-input:not(.computed)').forEach(i => i.disabled = mode === 'view');
+      document.querySelectorAll('.chip').forEach(c => c.style.pointerEvents = mode === 'view' ? 'none' : 'auto');
+    }
+
+    function toggleTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+      document.getElementById('themeIcon').textContent = isDark ? 'dark_mode' : 'light_mode';
+    }
+
+    // ==================== AI FEATURES ====================
+    let aiOpen = false;
+    let decisions = [];
+    let wizardStep = 0;
+    let wizardAnswers = {};
+
+    const WIZARD_QUESTIONS = [
+      {
+        q: "What's the primary application?",
+        options: [
+          { value: 'industrial', label: 'Industrial Process', sub: 'Manufacturing, cooling, boiler feed' },
+          { value: 'pharma', label: 'Pharmaceutical/Lab', sub: 'Ultra-pure water required' },
+          { value: 'food', label: 'Food & Beverage', sub: 'Potable water quality' },
+          { value: 'commercial', label: 'Commercial Building', sub: 'HVAC, general use' }
+        ]
+      },
+      {
+        q: "What daily volume do you need?",
+        options: [
+          { value: 'low', label: 'Up to 50 m³/day', sub: '~2-4 m³/hr systems' },
+          { value: 'medium', label: '50-150 m³/day', sub: '~6-9 m³/hr systems' },
+          { value: 'high', label: '150-300 m³/day', sub: '~12-16 m³/hr systems' },
+          { value: 'custom', label: 'Custom requirement', sub: 'Specify exact flow rate' }
+        ]
+      },
+      {
+        q: "What's your feed water source?",
+        options: [
+          { value: 'mains', label: 'Mains/Municipal', sub: 'Usually good quality, may have chlorine' },
+          { value: 'borehole', label: 'Borehole/Well', sub: 'May have iron, hardness issues' },
+          { value: 'surface', label: 'Surface Water', sub: 'Rivers, lakes - variable quality' },
+          { value: 'recycled', label: 'Recycled/Effluent', sub: 'Requires extensive pre-treatment' }
+        ]
+      },
+      {
+        q: "What's your budget priority?",
+        options: [
+          { value: 'capex', label: 'Minimize Upfront Cost', sub: 'Lower initial investment' },
+          { value: 'opex', label: 'Minimize Running Costs', sub: 'Higher efficiency, lower consumables' },
+          { value: 'balanced', label: 'Balanced Approach', sub: 'Optimal total cost of ownership' },
+          { value: 'premium', label: 'Maximum Reliability', sub: 'Best components, full redundancy' }
+        ]
+      },
+      {
+        q: "Installation requirements?",
+        options: [
+          { value: 'indoor', label: 'Indoor Installation', sub: 'Existing plant room space' },
+          { value: 'container', label: 'Containerized', sub: 'Self-contained outdoor unit' },
+          { value: 'skid', label: 'Skid-Mounted', sub: 'Compact, relocatable' },
+          { value: 'custom', label: 'Custom Build', sub: 'Site-specific requirements' }
+        ]
+      }
+    ];
+
+    function toggleAI() {
+      aiOpen = !aiOpen;
+      document.getElementById('aiSidebar').classList.toggle('open', aiOpen);
+      document.getElementById('aiToggleBtn').classList.toggle('active', aiOpen);
+      if (aiOpen) {
+        updateAISuggestions();
+        updateScenarios();
+        renderWizard();
+      }
+    }
+
+    function setAITab(tab) {
+      document.querySelectorAll('.ai-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      document.querySelectorAll('.ai-tab-panel').forEach(p => p.classList.toggle('active', p.id === 'ai-panel-' + tab));
+      if (tab === 'scenarios') updateScenarios();
+      if (tab === 'wizard') renderWizard();
+      if (tab === 'suggest') updateAISuggestions();
+    }
+
+    // ==================== QUICK ACTIONS ====================
+    function executeQuickAction() {
+      const input = document.getElementById('quickActionInput');
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      // Parse natural language commands
+      if (cmd.includes('size') || cmd.includes('m³') || cmd.includes('flow')) {
+        const match = cmd.match(/(\d+\.?\d*)/);
+        if (match) {
+          const flow = parseFloat(match[1]);
+          const sizes = Object.keys(MODELS).map(Number).sort((a,b) => a-b);
+          const closest = sizes.reduce((prev, curr) => Math.abs(curr - flow) < Math.abs(prev - flow) ? curr : prev);
+          document.getElementById('permeateFlow').value = closest;
+          calculate();
+          logDecision(`Set flow to ${closest} m³/hr`, `User requested sizing for ${flow} m³/hr`, 'user');
+        }
+      } else if (cmd.includes('softener') || cmd.includes('soft')) {
+        selectedOptions.softener = true;
+        document.getElementById('opt_softener')?.classList.add('active');
+        calculate();
+        logDecision('Added water softener', 'User requested softener', 'user');
+      } else if (cmd.includes('container')) {
+        selectedOptions.container = true;
+        document.getElementById('opt_container')?.classList.add('active');
+        calculate();
+        logDecision('Added container housing', 'User requested containerized system', 'user');
+      } else if (cmd.includes('markup') || cmd.includes('%')) {
+        const match = cmd.match(/(\d+)/);
+        if (match) {
+          document.getElementById('markup').value = match[1];
+          calculate();
+          logDecision(`Set markup to ${match[1]}%`, 'User adjusted markup', 'user');
+        }
+      } else if (cmd.includes('uv')) {
+        selectedOptions.uv = true;
+        calculate();
+        logDecision('Added UV disinfection', 'User requested UV', 'user');
+      }
+
+      input.value = '';
+      updateAISuggestions();
+    }
+
+    function quickAction(action) {
+      const d = getInputs();
+      switch(action) {
+        case 'optimize':
+          document.getElementById('markup').value = 25;
+          selectedOptions.cip = true;
+          selectedOptions.container = false;
+          calculate();
+          logDecision('Applied cost optimization', 'Reduced markup to 25%, removed non-essential options', 'user');
+          break;
+        case 'premium':
+          document.getElementById('markup').value = 45;
+          selectedOptions.cip = true;
+          selectedOptions.uv = true;
+          selectedOptions.monitoring = true;
+          selectedOptions.flush = true;
+          calculate();
+          logDecision('Applied premium configuration', 'Added UV, monitoring, flushing; set markup to 45%', 'user');
+          break;
+        case 'minimal':
+          if (d.chlorine > 0.05) selectedOptions.carbonFilter = true;
+          if (d.iron > 0.1) selectedOptions.ironRemoval = true;
+          if (d.hardness > 300) selectedOptions.softener = true;
+          if (d.pressure < 3) selectedOptions.boostPump = true;
+          calculate();
+          logDecision('Applied risk mitigation', 'Ensured all required pre-treatment is selected', 'user');
+          break;
+        case 'compare':
+          setAITab('scenarios');
+          break;
+      }
+      updateAISuggestions();
+    }
+
+    // ==================== SMART SUGGESTIONS ====================
+    function updateAISuggestions() {
+      const d = getInputs();
+      const model = MODELS[d.permeateFlow] || MODELS['9'];
+      const suggestions = [];
+
+      // Calculate confidence
+      let confidence = 85;
+      if (d.temp < 15) confidence -= 5;
+      if (d.sdi > 5) confidence -= 10;
+      if (d.chlorine > 0.05) confidence -= 3;
+      if (d.iron > 0.1) confidence -= 5;
+      if (d.hardness > 200) confidence -= 3;
+      if (d.permeateQuality < 10) confidence -= 5;
+      confidence = Math.max(60, Math.min(98, confidence));
+      const confLevel = confidence >= 85 ? 'high' : confidence >= 70 ? 'medium' : 'low';
+
+      document.getElementById('aiConfidenceBadge').textContent = confidence + '%';
+      document.getElementById('aiConfidenceBadge').className = 'confidence-badge ' + confLevel;
+      document.getElementById('aiConfidenceBar').style.width = confidence + '%';
+      document.getElementById('aiConfidenceBar').className = 'confidence-fill ' + confLevel;
+
+      // Generate contextual suggestions
+      if (d.chlorine > 0.05 && !selectedOptions.carbonFilter) {
+        suggestions.push({
+          icon: 'warning', type: 'warning',
+          title: 'Carbon filter required',
+          body: `Chlorine at ${d.chlorine} ppm will damage membranes. Add carbon filtration.`,
+          impact: '+£1,062', impactType: 'negative',
+          action: 'Add carbon filter', actionFn: () => { selectedOptions.carbonFilter = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.iron > 0.1 && !selectedOptions.ironRemoval) {
+        suggestions.push({
+          icon: 'warning', type: 'warning',
+          title: 'Iron removal recommended',
+          body: `Iron at ${d.iron} mg/L exceeds safe limit. Will cause fouling.`,
+          impact: '+£3,500', impactType: 'negative',
+          action: 'Add iron removal', actionFn: () => { selectedOptions.ironRemoval = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.hardness >= 100 && d.hardness < 300 && !selectedOptions.antiscalant) {
+        suggestions.push({
+          icon: 'opportunity', type: 'info',
+          title: 'Antiscalant dosing advised',
+          body: `Hardness at ${d.hardness} mg/L CaCO₃. Prevents scaling and extends membrane life.`,
+          impact: '+£1,400', impactType: 'negative',
+          action: 'Add antiscalant', actionFn: () => { selectedOptions.antiscalant = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.hardness >= 300 && !selectedOptions.softener) {
+        suggestions.push({
+          icon: 'warning', type: 'warning',
+          title: 'Softener strongly recommended',
+          body: `Very hard water at ${d.hardness} mg/L. Softener more cost-effective than frequent membrane replacement.`,
+          impact: '+£3,000', impactType: 'negative',
+          action: 'Add softener', actionFn: () => { selectedOptions.softener = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.pressure < 3 && !selectedOptions.boostPump) {
+        suggestions.push({
+          icon: 'warning', type: 'warning',
+          title: 'Boost pump needed',
+          body: `Feed pressure ${d.pressure} bar is below minimum 3 bar for RO operation.`,
+          impact: '+£2,000', impactType: 'negative',
+          action: 'Add boost pump', actionFn: () => { selectedOptions.boostPump = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.permeateQuality < 10 && !selectedOptions.secondRO) {
+        suggestions.push({
+          icon: 'opportunity', type: 'info',
+          title: 'Second stage RO may be needed',
+          body: `Target ${d.permeateQuality} µS/cm requires ultra-pure water. Single stage typically achieves 10-50 µS/cm.`,
+          impact: '+£8,000', impactType: 'negative',
+          action: 'Add 2nd stage', actionFn: () => { selectedOptions.secondRO = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.markup > 40) {
+        suggestions.push({
+          icon: 'save', type: 'optimize',
+          title: 'Markup above market average',
+          body: `Current markup ${d.markup}% is high. Similar projects won at 30-35% markup.`,
+          impact: '-£' + Math.round((d.markup - 35) / 100 * 50000).toLocaleString(), impactType: '',
+          action: 'Reduce to 35%', actionFn: () => { document.getElementById('markup').value = 35; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      if (d.temp < 15) {
+        const factor = getTempFactor(d.temp);
+        suggestions.push({
+          icon: 'opportunity', type: 'info',
+          title: 'Temperature affects sizing',
+          body: `At ${d.temp}°C, membranes produce ${Math.round(factor*100)}% of rated flow. Consider oversizing.`,
+          impact: 'Flow reduced', impactType: 'negative',
+          action: 'View temp chart', actionFn: () => { alert(`Temperature correction factors:\n5°C: 45%\n10°C: 58%\n15°C: 75%\n20°C: 88%\n25°C: 100%`); }
+        });
+      }
+
+      // Opportunity suggestions
+      if (!selectedOptions.monitoring) {
+        suggestions.push({
+          icon: 'opportunity', type: 'opportunity',
+          title: 'Add remote monitoring?',
+          body: 'Enables proactive maintenance, reduces callouts by 60%. Popular with industrial clients.',
+          impact: '+£1,500', impactType: 'negative',
+          action: 'Add monitoring', actionFn: () => { selectedOptions.monitoring = true; calculate(); updateAISuggestions(); }
+        });
+      }
+
+      // Render suggestions
+      const container = document.getElementById('aiSuggestions');
+      if (suggestions.length === 0) {
+        container.innerHTML = `
+          <div class="suggestion-card highlight">
+            <div class="suggestion-header">
+              <div class="suggestion-icon optimize"><span class="material-icons-outlined">check_circle</span></div>
+              <span class="suggestion-title">Configuration looks good!</span>
+            </div>
+            <div class="suggestion-body">All required pre-treatment is in place. No critical issues detected.</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = suggestions.map((s, i) => `
+          <div class="suggestion-card ${i === 0 ? 'highlight' : ''}" onclick="window.suggestionActions[${i}]()">
+            <div class="suggestion-header">
+              <div class="suggestion-icon ${s.type}"><span class="material-icons-outlined">${s.icon === 'warning' ? 'warning' : s.icon === 'opportunity' ? 'lightbulb' : 'savings'}</span></div>
+              <span class="suggestion-title">${s.title}</span>
+              <span class="suggestion-impact ${s.impactType}">${s.impact}</span>
+            </div>
+            <div class="suggestion-body">${s.body}</div>
+            <div class="suggestion-action">
+              <span class="material-icons-outlined">add_circle</span>
+              ${s.action}
+            </div>
+          </div>
+        `).join('');
+        window.suggestionActions = suggestions.map(s => s.actionFn);
+      }
+
+      // Update field flags
+      updateFieldFlags(d);
+    }
+
+    // ==================== INLINE FIELD FLAGS ====================
+    function updateFieldFlags(d) {
+      // Remove existing flags
+      document.querySelectorAll('.field-flag').forEach(f => f.remove());
+
+      const flags = [
+        { field: 'feedChlorine', check: d.chlorine > 0.05, type: 'warning', text: 'Needs carbon filter' },
+        { field: 'feedChlorine', check: d.chlorine > 0.1, type: 'risk', text: 'Critical - membrane damage risk' },
+        { field: 'feedIron', check: d.iron > 0.1 && d.iron <= 0.3, type: 'warning', text: 'Iron removal advised' },
+        { field: 'feedIron', check: d.iron > 0.3, type: 'risk', text: 'Dedicated removal required' },
+        { field: 'feedHardness', check: d.hardness >= 100 && d.hardness < 300, type: 'info', text: 'Antiscalant recommended' },
+        { field: 'feedHardness', check: d.hardness >= 300, type: 'warning', text: 'Softener required' },
+        { field: 'feedPressure', check: d.pressure < 3, type: 'warning', text: 'Boost pump needed' },
+        { field: 'feedTemp', check: d.temp < 15, type: 'info', text: `${Math.round(getTempFactor(d.temp)*100)}% flux` },
+        { field: 'feedPH', check: d.ph < 5 || d.ph > 9, type: 'risk', text: 'pH out of safe range' },
+        { field: 'feedSDI', check: d.sdi > 5, type: 'warning', text: 'Pre-treatment required' },
+        { field: 'feedSDI', check: d.sdi > 6, type: 'risk', text: 'Critical - will foul membranes' },
+        { field: 'feedTSS', check: d.tss > 5, type: 'risk', text: 'Multimedia filter required' },
+        { field: 'feedTurbidity', check: d.turbidity > 5, type: 'risk', text: 'Sand filter required' },
+        { field: 'permeateQuality', check: d.permeateQuality < 10, type: 'info', text: 'May need 2nd stage RO' },
+        { field: 'markup', check: d.markup > 40, type: 'opportunity', text: 'Above market average' },
+        { field: 'markup', check: d.markup < 25, type: 'warning', text: 'Below typical margin' }
+      ];
+
+      flags.forEach(f => {
+        if (f.check) {
+          const input = document.getElementById(f.field);
+          if (input) {
+            const label = input.closest('.form-group')?.querySelector('label');
+            if (label && !label.querySelector(`.field-flag.${f.type}`)) {
+              const flag = document.createElement('span');
+              flag.className = `field-flag ${f.type}`;
+              flag.innerHTML = `<span class="material-icons-outlined">${f.type === 'risk' ? 'error' : f.type === 'warning' ? 'warning' : f.type === 'opportunity' ? 'trending_up' : 'info'}</span>${f.text}`;
+              label.appendChild(flag);
+            }
+          }
+        }
+      });
+    }
+
+    // ==================== SCENARIO BUILDER ====================
+    function updateScenarios() {
+      const d = getInputs();
+      const baseModel = MODELS[d.permeateFlow] || MODELS['9'];
+      const mf = 1 + d.markup / 100;
+
+      // Budget scenario - minimal options, lower markup
+      const budgetMarkup = Math.min(d.markup, 28);
+      const budgetMf = 1 + budgetMarkup / 100;
+      let budgetCost = baseModel.roCost + baseModel.membranes * 460 + baseModel.pipework + baseModel.cip + baseModel.shipping;
+      if (d.chlorine > 0.05) budgetCost += ADDONS.carbonFilter.cost;
+      if (d.pressure < 3) budgetCost += ADDONS.boostPump.cost;
+      const budgetPrice = Math.round(budgetCost * budgetMf);
+
+      // Recommended scenario - balanced
+      const recMarkup = 35;
+      const recMf = 1 + recMarkup / 100;
+      let recCost = baseModel.roCost + baseModel.membranes * 460 + baseModel.pipework + baseModel.cip + baseModel.shipping;
+      if (d.chlorine > 0.05) recCost += ADDONS.carbonFilter.cost;
+      if (d.iron > 0.1) recCost += ADDONS.ironRemoval.cost;
+      if (d.hardness >= 100) recCost += d.hardness >= 300 ? ADDONS.softener.cost : ADDONS.antiscalant.cost;
+      if (d.pressure < 3) recCost += ADDONS.boostPump.cost;
+      recCost += ADDONS.monitoring.cost;
+      const recPrice = Math.round(recCost * recMf);
+
+      // Premium scenario - all options, higher markup
+      const premMarkup = 45;
+      const premMf = 1 + premMarkup / 100;
+      let premCost = baseModel.roCost + baseModel.membranes * 460 + baseModel.pipework + baseModel.cip + baseModel.shipping;
+      premCost += ADDONS.carbonFilter.cost + ADDONS.uv.cost + ADDONS.monitoring.cost + ADDONS.flush.cost;
+      if (d.hardness >= 100) premCost += ADDONS.softener.cost;
+      if (d.iron > 0.05) premCost += ADDONS.ironRemoval.cost;
+      premCost += ADDONS.container.cost;
+      const premPrice = Math.round(premCost * premMf);
+
+      document.getElementById('scenarioGrid').innerHTML = `
+        <div class="scenario-card" onclick="applyScenario('budget')">
+          <div class="scenario-header">
+            <span class="scenario-name">💰 Budget</span>
+            <span class="scenario-price">£${budgetPrice.toLocaleString()}</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">${baseModel.code}</span>
+            <span class="scenario-spec">${budgetMarkup}% markup</span>
+            <span class="scenario-spec">Essential only</span>
+          </div>
+          <div class="scenario-desc">Minimum viable configuration. Includes only required pre-treatment. Best for price-sensitive clients.</div>
+          <button class="scenario-apply">Apply This Scenario</button>
+        </div>
+
+        <div class="scenario-card recommended" onclick="applyScenario('recommended')">
+          <div class="scenario-header">
+            <span class="scenario-name">⭐ Recommended</span>
+            <span class="scenario-price">£${recPrice.toLocaleString()}</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">${baseModel.code}</span>
+            <span class="scenario-spec">${recMarkup}% markup</span>
+            <span class="scenario-spec">+ Monitoring</span>
+          </div>
+          <div class="scenario-desc">Optimal balance of cost and reliability. Includes remote monitoring for proactive maintenance.</div>
+          <button class="scenario-apply">Apply This Scenario</button>
+        </div>
+
+        <div class="scenario-card" onclick="applyScenario('premium')">
+          <div class="scenario-header">
+            <span class="scenario-name">🏆 Premium</span>
+            <span class="scenario-price">£${premPrice.toLocaleString()}</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">${baseModel.code}</span>
+            <span class="scenario-spec">${premMarkup}% markup</span>
+            <span class="scenario-spec">Containerized</span>
+          </div>
+          <div class="scenario-desc">Full-featured system with UV, monitoring, flushing. Containerized for outdoor installation.</div>
+          <button class="scenario-apply">Apply This Scenario</button>
+        </div>
+      `;
+    }
+
+    function applyScenario(type) {
+      const d = getInputs();
+
+      // Reset options
+      Object.keys(selectedOptions).forEach(k => selectedOptions[k] = false);
+      document.querySelectorAll('.chip.active').forEach(c => c.classList.remove('active'));
+
+      switch(type) {
+        case 'budget':
+          document.getElementById('markup').value = 28;
+          selectedOptions.cip = true;
+          if (d.chlorine > 0.05) selectedOptions.carbonFilter = true;
+          if (d.pressure < 3) selectedOptions.boostPump = true;
+          logDecision('Applied Budget scenario', 'Minimum configuration with 28% markup', 'user');
+          break;
+        case 'recommended':
+          document.getElementById('markup').value = 35;
+          selectedOptions.cip = true;
+          selectedOptions.monitoring = true;
+          if (d.chlorine > 0.05) selectedOptions.carbonFilter = true;
+          if (d.iron > 0.1) selectedOptions.ironRemoval = true;
+          if (d.hardness >= 300) selectedOptions.softener = true;
+          else if (d.hardness >= 100) selectedOptions.antiscalant = true;
+          if (d.pressure < 3) selectedOptions.boostPump = true;
+          logDecision('Applied Recommended scenario', 'Balanced configuration with monitoring, 35% markup', 'user');
+          break;
+        case 'premium':
+          document.getElementById('markup').value = 45;
+          selectedOptions.cip = true;
+          selectedOptions.uv = true;
+          selectedOptions.monitoring = true;
+          selectedOptions.flush = true;
+          selectedOptions.container = true;
+          selectedOptions.carbonFilter = true;
+          if (d.hardness >= 100) selectedOptions.softener = true;
+          if (d.iron > 0.05) selectedOptions.ironRemoval = true;
+          logDecision('Applied Premium scenario', 'Full-featured containerized system, 45% markup', 'user');
+          break;
+      }
+
+      // Update chip states
+      Object.keys(selectedOptions).forEach(k => {
+        const chip = document.getElementById('opt_' + k);
+        if (chip) chip.classList.toggle('active', selectedOptions[k]);
+      });
+
+      calculate();
+      updateAISuggestions();
+      updateScenarios();
+    }
+
+    // ==================== GUIDED WIZARD ====================
+    function renderWizard() {
+      const progress = document.getElementById('wizardProgress');
+      progress.innerHTML = WIZARD_QUESTIONS.map((_, i) =>
+        `<div class="wizard-step ${i < wizardStep ? 'complete' : i === wizardStep ? 'current' : ''}"></div>`
+      ).join('');
+
+      const content = document.getElementById('wizardContent');
+
+      if (wizardStep >= WIZARD_QUESTIONS.length) {
+        // Wizard complete - show summary and apply
+        content.innerHTML = `
+          <div class="wizard-complete">
+            <div class="wizard-complete-icon">
+              <span class="material-icons-outlined">check</span>
+            </div>
+            <h4>Configuration Ready!</h4>
+            <p>Based on your answers, we've configured the optimal system.</p>
+            <button class="scenario-apply" style="margin-top: 16px" onclick="applyWizardConfig()">Apply Configuration</button>
+            <button class="wizard-back" style="margin-top: 8px; width: 100%" onclick="wizardStep=0; renderWizard();">Start Over</button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = WIZARD_QUESTIONS[wizardStep];
+      content.innerHTML = `
+        <div class="wizard-question">
+          <div class="wizard-q-header">
+            <div class="wizard-q-num">${wizardStep + 1}</div>
+            <div class="wizard-q-text">${q.q}</div>
+          </div>
+          <div class="wizard-options">
+            ${q.options.map(o => `
+              <div class="wizard-option ${wizardAnswers[wizardStep] === o.value ? 'selected' : ''}" onclick="selectWizardOption('${o.value}')">
+                <div class="wizard-option-main">${o.label}</div>
+                <div class="wizard-option-sub">${o.sub}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="wizard-nav">
+          ${wizardStep > 0 ? '<button class="wizard-back" onclick="wizardStep--; renderWizard();">Back</button>' : ''}
+          <button class="wizard-next" onclick="nextWizardStep()" ${!wizardAnswers[wizardStep] ? 'disabled style="opacity:0.5"' : ''}>
+            ${wizardStep === WIZARD_QUESTIONS.length - 1 ? 'Complete' : 'Next'}
+          </button>
+        </div>
+      `;
+    }
+
+    function selectWizardOption(value) {
+      wizardAnswers[wizardStep] = value;
+      renderWizard();
+    }
+
+    function nextWizardStep() {
+      if (wizardAnswers[wizardStep]) {
+        wizardStep++;
+        renderWizard();
+      }
+    }
+
+    function applyWizardConfig() {
+      // Map wizard answers to configuration
+      const app = wizardAnswers[0]; // application
+      const vol = wizardAnswers[1]; // volume
+      const source = wizardAnswers[2]; // water source
+      const budget = wizardAnswers[3]; // budget priority
+      const install = wizardAnswers[4]; // installation
+
+      // Set flow based on volume
+      const flowMap = { low: '4', medium: '9', high: '16', custom: '9' };
+      document.getElementById('permeateFlow').value = flowMap[vol] || '9';
+
+      // Set markup based on budget priority
+      const markupMap = { capex: 25, opex: 35, balanced: 32, premium: 45 };
+      document.getElementById('markup').value = markupMap[budget] || 32;
+
+      // Reset and set options
+      Object.keys(selectedOptions).forEach(k => selectedOptions[k] = false);
+      selectedOptions.cip = true;
+
+      // Application-specific
+      if (app === 'pharma') {
+        selectedOptions.secondRO = true;
+        selectedOptions.uv = true;
+        document.getElementById('permeateQuality').value = 5;
+      }
+
+      // Water source assumptions
+      if (source === 'mains') {
+        selectedOptions.carbonFilter = true;
+        document.getElementById('feedChlorine').value = 0.5;
+      } else if (source === 'borehole') {
+        selectedOptions.ironRemoval = true;
+        selectedOptions.softener = true;
+        document.getElementById('feedIron').value = 0.2;
+        document.getElementById('feedHardness').value = 350;
+      } else if (source === 'surface' || source === 'recycled') {
+        selectedOptions.carbonFilter = true;
+        selectedOptions.ironRemoval = true;
+        document.getElementById('feedTurbidity').value = 8;
+        document.getElementById('feedSDI').value = 5;
+      }
+
+      // Installation type
+      if (install === 'container') {
+        selectedOptions.container = true;
+      }
+
+      // Budget priority
+      if (budget === 'opex' || budget === 'premium') {
+        selectedOptions.monitoring = true;
+        selectedOptions.flush = true;
+      }
+      if (budget === 'premium') {
+        selectedOptions.uv = true;
+      }
+
+      // Update chips
+      Object.keys(selectedOptions).forEach(k => {
+        const chip = document.getElementById('opt_' + k);
+        if (chip) chip.classList.toggle('active', selectedOptions[k]);
+      });
+
+      calculate();
+      logDecision('Applied wizard configuration', `${app} application, ${vol} volume, ${source} source, ${budget} budget, ${install} install`, 'user');
+
+      // Switch to suggestions tab
+      setAITab('suggest');
+    }
+
+    // ==================== DECISION TRAIL ====================
+    function logDecision(action, reason, type = 'auto') {
+      const now = new Date();
+      const time = now.toTimeString().slice(0, 8);
+      decisions.unshift({ time, action, reason, type });
+      renderDecisions();
+    }
+
+    function renderDecisions() {
+      const trail = document.getElementById('decisionTrail');
+      document.getElementById('decisionCount').textContent = decisions.length + ' decisions';
+      trail.innerHTML = decisions.map(d => `
+        <div class="decision-item ${d.type === 'rule' ? 'warning' : d.type === 'user' ? 'success' : ''}">
+          <div class="decision-header">
+            <span class="decision-time">${d.time}</span>
+            <span class="decision-type ${d.type}">${d.type}</span>
+          </div>
+          <div class="decision-action">${d.action}</div>
+          <div class="decision-reason">${d.reason}</div>
+        </div>
+      `).join('');
+    }
+
+    function logAutoDecisions(d) {
+      // Clear previous auto decisions
+      decisions = decisions.filter(dec => dec.type !== 'auto' && dec.type !== 'rule');
+
+      const model = MODELS[d.permeateFlow] || MODELS['9'];
+
+      // Log model selection
+      logDecision(
+        `Selected ${model.code}`,
+        `Permeate flow ${d.permeateFlow} m³/hr requires ${model.membranes} membranes with ${model.power} kW pump.`,
+        'auto'
+      );
+
+      // Log water quality decisions
+      if (d.chlorine > 0.05) {
+        logDecision(
+          'Carbon filtration required',
+          `Chlorine ${d.chlorine} ppm exceeds 0.05 ppm threshold. Carbon filter prevents membrane damage.`,
+          'rule'
+        );
+      }
+
+      if (d.iron > 0.1) {
+        logDecision(
+          'Iron removal required',
+          `Iron ${d.iron} mg/L exceeds 0.1 mg/L limit. Prevents fouling and extends membrane life.`,
+          'rule'
+        );
+      }
+
+      if (d.hardness >= 100 && d.hardness < 300) {
+        logDecision(
+          'Antiscalant dosing recommended',
+          `Hardness ${d.hardness} mg/L CaCO₃ requires scale prevention. Antiscalant is cost-effective for this range.`,
+          'rule'
+        );
+      }
+
+      if (d.hardness >= 300) {
+        logDecision(
+          'Water softener required',
+          `Hardness ${d.hardness} mg/L CaCO₃ is very high. Softener required to prevent scaling.`,
+          'rule'
+        );
+      }
+
+      if (d.pressure < 3) {
+        logDecision(
+          'Boost pump required',
+          `Feed pressure ${d.pressure} bar is below 3 bar minimum. Boost pump ensures adequate RO pressure.`,
+          'rule'
+        );
+      }
+
+      if (d.temp < 15) {
+        const factor = getTempFactor(d.temp);
+        logDecision(
+          'Temperature correction applied',
+          `Temperature ${d.temp}°C reduces flux to ${Math.round(factor*100)}%. Consider oversizing system.`,
+          'auto'
+        );
+      }
+
+      if (d.permeateQuality < 10) {
+        logDecision(
+          'Ultra-pure water target',
+          `Target ${d.permeateQuality} µS/cm may require second stage RO. First stage typically achieves 98% rejection.`,
+          'auto'
+        );
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      calculate();
+      const d = getInputs();
+      logAutoDecisions(d);
+      updateAISuggestions();
+      updateScenarios();
+      renderWizard();
+      updateFieldFlags(d);
+    });
+  </script>
+</body>
+</html>
