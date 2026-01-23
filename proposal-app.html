@@ -1376,6 +1376,702 @@
       font-size: 11px;
       color: var(--muted);
     }
+
+    /* ==================== AI SIDEBAR ==================== */
+    .ai-sidebar {
+      position: fixed;
+      top: 60px;
+      right: -380px;
+      width: 380px;
+      height: calc(100vh - 60px);
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      z-index: 200;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-sidebar.open { right: 0; }
+
+    .ai-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.08));
+    }
+
+    .ai-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    .ai-header-text h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .ai-header-text p {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .ai-header-close {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .ai-header-close:hover { background: var(--card); color: var(--text); }
+
+    .ai-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .ai-tab {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .ai-tab:hover { color: var(--text); }
+    .ai-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .ai-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+    }
+
+    .ai-tab-panel { display: none; }
+    .ai-tab-panel.active { display: block; }
+
+    /* Quick Actions Bar */
+    .quick-actions-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .quick-actions-bar input {
+      flex: 1;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .quick-actions-bar input:focus { outline: none; }
+    .quick-actions-bar input::placeholder { color: var(--muted); }
+
+    .quick-actions-bar button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .quick-actions-bar button:hover { filter: brightness(1.1); }
+
+    .quick-actions-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .quick-chip {
+      padding: 4px 10px;
+      font-size: 10px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99,102,241,0.1);
+    }
+
+    /* Smart Suggestions */
+    .suggestion-card {
+      padding: 10px 12px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(99,102,241,0.1);
+    }
+
+    .suggestion-card.highlight {
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.05));
+      border-color: rgba(99,102,241,0.3);
+    }
+
+    .suggestion-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .suggestion-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .suggestion-icon.optimize { background: rgba(34,197,94,0.15); color: var(--success); }
+    .suggestion-icon.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .suggestion-icon.opportunity { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .suggestion-icon.save { background: rgba(99,102,241,0.15); color: var(--accent); }
+
+    .suggestion-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .suggestion-impact {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(34,197,94,0.15);
+      color: var(--success);
+    }
+
+    .suggestion-impact.negative { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+    .suggestion-body {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .suggestion-action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .suggestion-action:hover { text-decoration: underline; }
+    .suggestion-action .material-icons-outlined { font-size: 14px; }
+
+    /* Scenario Builder */
+    .scenario-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scenario-card {
+      padding: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 2px solid var(--line);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .scenario-card:hover { border-color: var(--accent); }
+
+    .scenario-card.recommended {
+      border-color: var(--success);
+      background: linear-gradient(135deg, rgba(34,197,94,0.1), transparent);
+    }
+
+    .scenario-card.recommended::before {
+      content: 'RECOMMENDED';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      padding: 2px 8px;
+      font-size: 8px;
+      font-weight: 700;
+      background: var(--success);
+      color: #fff;
+      border-radius: 4px;
+    }
+
+    .scenario-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .scenario-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .scenario-price {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .scenario-specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .scenario-spec {
+      font-size: 9px;
+      padding: 2px 6px;
+      background: var(--bg);
+      border-radius: 4px;
+      color: var(--muted);
+    }
+
+    .scenario-desc {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .scenario-apply {
+      margin-top: 8px;
+      padding: 6px 12px;
+      font-size: 10px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .scenario-apply:hover { filter: brightness(1.1); }
+    .scenario-card.recommended .scenario-apply { background: var(--success); }
+
+    /* Guided Wizard */
+    .wizard-progress {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+    }
+
+    .wizard-step {
+      flex: 1;
+      height: 4px;
+      background: var(--line);
+      border-radius: 2px;
+    }
+
+    .wizard-step.complete { background: var(--success); }
+    .wizard-step.current { background: var(--accent); }
+
+    .wizard-question {
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.05));
+      border-radius: 10px;
+      border: 1px solid rgba(99,102,241,0.2);
+      margin-bottom: 12px;
+    }
+
+    .wizard-q-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .wizard-q-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wizard-q-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .wizard-options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .wizard-option {
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .wizard-option:hover {
+      border-color: var(--accent);
+      background: var(--card);
+    }
+
+    .wizard-option.selected {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.1);
+    }
+
+    .wizard-option-main {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .wizard-option-sub {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .wizard-nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .wizard-nav button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .wizard-nav .wizard-back {
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .wizard-nav .wizard-back:hover { border-color: var(--text); }
+
+    .wizard-nav .wizard-next {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+    }
+
+    .wizard-nav .wizard-next:hover { filter: brightness(1.1); }
+
+    .wizard-complete {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .wizard-complete-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(34,197,94,0.15);
+      color: var(--success);
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .wizard-complete h4 {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .wizard-complete p {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Decision Trail */
+    .decision-item {
+      padding: 10px 12px;
+      background: var(--card);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .decision-item.warning { border-left-color: var(--warning); }
+    .decision-item.success { border-left-color: var(--success); }
+    .decision-item.info { border-left-color: #3b82f6; }
+
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .decision-time {
+      font-size: 9px;
+      color: var(--muted);
+      font-family: monospace;
+    }
+
+    .decision-type {
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .decision-type.auto { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .decision-type.rule { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .decision-type.user { background: rgba(34,197,94,0.15); color: var(--success); }
+
+    .decision-action {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .ai-decision-reason {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Confidence Indicator */
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .confidence-badge.high { background: rgba(34,197,94,0.15); color: var(--success); }
+    .confidence-badge.medium { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .confidence-badge.low { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+    .confidence-bar {
+      height: 4px;
+      background: var(--line);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    .confidence-fill.high { background: var(--success); }
+    .confidence-fill.medium { background: var(--warning); }
+    .confidence-fill.low { background: var(--danger); }
+
+    /* AI Recommendation Card */
+    .ai-recommendation {
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.08));
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .ai-rec-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .ai-rec-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .ai-rec-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* AI Button in Header */
+    .ai-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(99,102,241,0.3);
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.08));
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .ai-btn:hover {
+      background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.12));
+      border-color: var(--accent);
+    }
+
+    .ai-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .ai-btn .material-icons-outlined { font-size: 16px; }
+
+    .ai-pulse {
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Similar Projects */
+    .similar-project {
+      padding: 10px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .similar-project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .similar-project-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .similar-project-match {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--success);
+    }
+
+    .similar-project-details {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* Light theme AI overrides */
+    [data-theme="light"] .ai-sidebar {
+      box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="light"] .ai-header {
+      background: linear-gradient(135deg, rgba(79,70,229,0.08), rgba(8,145,178,0.05));
+    }
+
+    [data-theme="light"] .suggestion-card {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .scenario-card {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .wizard-option {
+      background: var(--card);
+    }
+
+    [data-theme="light"] .decision-item {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .similar-project {
+      background: var(--input-bg);
+    }
   </style>
 </head>
 <body>
@@ -1406,6 +2102,12 @@
     <div class="header-spacer"></div>
 
     <div class="user-menu">
+      <!-- AI Assistant Toggle -->
+      <button class="ai-btn" id="aiToggleBtn" onclick="toggleAI()">
+        <span class="material-icons-outlined">auto_awesome</span>
+        AI Assistant
+        <span class="ai-pulse"></span>
+      </button>
       <!-- Keyboard Mode Toggle -->
       <button class="theme-toggle" id="keyboardToggle" onclick="toggleKeyboardMode()" title="Toggle keyboard mode (Ctrl+K)">
         <span class="material-icons-outlined" id="keyboardIcon">keyboard</span>
@@ -3231,6 +3933,150 @@
     <span><kbd>G</kbd> Save</span>
   </div>
 
+  <!-- AI Sidebar -->
+  <aside class="ai-sidebar" id="aiSidebar">
+    <div class="ai-header">
+      <div class="ai-header-icon">
+        <span class="material-icons-outlined">auto_awesome</span>
+      </div>
+      <div class="ai-header-text">
+        <h3>AI Assistant</h3>
+        <p>Intelligent proposal support</p>
+      </div>
+      <button class="ai-header-close" onclick="toggleAI()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="ai-tabs">
+      <div class="ai-tab active" data-tab="suggest" onclick="setAITab('suggest')">Suggest</div>
+      <div class="ai-tab" data-tab="scenarios" onclick="setAITab('scenarios')">Scenarios</div>
+      <div class="ai-tab" data-tab="wizard" onclick="setAITab('wizard')">Wizard</div>
+      <div class="ai-tab" data-tab="decisions" onclick="setAITab('decisions')">Trail</div>
+      <div class="ai-tab" data-tab="similar" onclick="setAITab('similar')">Similar</div>
+    </div>
+
+    <div class="ai-content">
+      <!-- Smart Suggestions Panel -->
+      <div class="ai-tab-panel active" id="ai-panel-suggest">
+        <!-- Quick Actions Bar -->
+        <div class="quick-actions-bar">
+          <input type="text" id="quickActionInput" placeholder="Try: 'add UV' or 'pharma application'" onkeypress="if(event.key==='Enter')executeQuickAction()">
+          <button onclick="executeQuickAction()">Go</button>
+        </div>
+
+        <div class="quick-actions-chips">
+          <span class="quick-chip" onclick="quickAction('optimize')">Optimize cost</span>
+          <span class="quick-chip" onclick="quickAction('premium')">Go premium</span>
+          <span class="quick-chip" onclick="quickAction('esg')">Max ESG</span>
+          <span class="quick-chip" onclick="quickAction('compare')">Compare options</span>
+        </div>
+
+        <!-- AI Confidence -->
+        <div class="ai-recommendation">
+          <div class="ai-rec-header">
+            <div class="ai-rec-icon">
+              <span class="material-icons-outlined">lightbulb</span>
+            </div>
+            <span class="ai-rec-title">Proposal Confidence</span>
+            <span class="confidence-badge high" id="aiConfidenceBadge">92%</span>
+          </div>
+          <div class="confidence-bar">
+            <div class="confidence-fill high" id="aiConfidenceBar" style="width: 92%"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Suggestions -->
+        <div id="aiSuggestions">
+          <!-- Suggestions will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Scenario Builder Panel -->
+      <div class="ai-tab-panel" id="ai-panel-scenarios">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text);">Solution Scenarios</span>
+          <p style="font-size: 10px; color: var(--muted); margin-top: 4px;">AI-generated options based on your requirements</p>
+        </div>
+        <div class="scenario-grid" id="scenarioGrid">
+          <!-- Scenarios will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Guided Wizard Panel -->
+      <div class="ai-tab-panel" id="ai-panel-wizard">
+        <div class="wizard-progress" id="wizardProgress">
+          <div class="wizard-step current"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+          <div class="wizard-step"></div>
+        </div>
+        <div id="wizardContent">
+          <!-- Wizard questions will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Decisions Panel -->
+      <div class="ai-tab-panel" id="ai-panel-decisions">
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text);">Decision Trail</span>
+            <span style="font-size: 10px; color: var(--muted);" id="decisionCount">0 decisions</span>
+          </div>
+        </div>
+        <div id="decisionTrail">
+          <!-- Decisions will be populated here -->
+        </div>
+      </div>
+
+      <!-- Similar Projects Panel -->
+      <div class="ai-tab-panel" id="ai-panel-similar">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 11px; font-weight: 600; color: var(--text);">Similar Past Projects</span>
+        </div>
+        <div id="similarProjects">
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">Pharma Co - Lab Water</span>
+              <span class="similar-project-match">94% match</span>
+            </div>
+            <div class="similar-project-details">
+              RO + UV + NX Filtration | 200 m³/h | £285,000 | Won
+            </div>
+          </div>
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">BioTech Ltd - Process Water</span>
+              <span class="similar-project-match">87% match</span>
+            </div>
+            <div class="similar-project-details">
+              UF + RO | 150 m³/h | £198,000 | Won
+            </div>
+          </div>
+          <div class="similar-project">
+            <div class="similar-project-header">
+              <span class="similar-project-name">MediCare - Clean Water</span>
+              <span class="similar-project-match">82% match</span>
+            </div>
+            <div class="similar-project-details">
+              RO + Atlantium UV | 100 m³/h | £142,000 | Lost (price)
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding: 10px; background: rgba(59,130,246,0.1); border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+          <div style="font-size: 11px; font-weight: 600; color: #3b82f6; margin-bottom: 4px;">
+            <span class="material-icons-outlined" style="font-size: 14px; vertical-align: middle;">insights</span>
+            Pricing Insight
+          </div>
+          <div style="font-size: 10px; color: var(--muted);">
+            Similar projects closed at £142,000 - £285,000. Consider including technology partners for competitive edge.
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <script>
     // Theme Toggle
     function toggleTheme() {
@@ -3668,13 +4514,384 @@
       });
     }
 
-    // Step icons mapping
+    // ==================== AI FEATURES ====================
+    let aiOpen = false;
+    let decisions = [];
+    let wizardStep = 0;
+    let wizardAnswers = {};
+
+    const WIZARD_QUESTIONS = [
+      {
+        q: "What's the primary application?",
+        options: [
+          { value: 'industrial', label: 'Industrial Process', sub: 'Manufacturing, cooling, boiler feed' },
+          { value: 'pharma', label: 'Pharmaceutical/Lab', sub: 'Ultra-pure water required' },
+          { value: 'food', label: 'Food & Beverage', sub: 'Potable water quality' },
+          { value: 'utilities', label: 'Water Utilities', sub: 'Municipal treatment & CSO' }
+        ]
+      },
+      {
+        q: "What target market sector?",
+        options: [
+          { value: 'water_utilities', label: 'Water Utilities', sub: 'Municipal and CSO applications' },
+          { value: 'manufacturing', label: 'Industrial Manufacturing', sub: 'Process water and wastewater' },
+          { value: 'automotive', label: 'Automotive', sub: 'Pure water for manufacturing' },
+          { value: 'fnb', label: 'Food & Beverage', sub: 'Sterile water production' }
+        ]
+      },
+      {
+        q: "Technology preference?",
+        options: [
+          { value: 'ro', label: 'Reverse Osmosis', sub: 'High-purity water separation' },
+          { value: 'uf', label: 'Ultra Filtration', sub: 'Membrane-based particle removal' },
+          { value: 'uv', label: 'UV Disinfection', sub: 'Chemical-free sterilization' },
+          { value: 'combo', label: 'Integrated Solution', sub: 'Multi-technology approach' }
+        ]
+      },
+      {
+        q: "Include technology partners?",
+        options: [
+          { value: 'nx', label: 'NX Filtration', sub: 'PFAS & micropollutant removal' },
+          { value: 'atlantium', label: 'Atlantium UV', sub: 'Hydro-Optic disinfection' },
+          { value: 'bnovate', label: 'bNovate Monitoring', sub: 'Real-time microbial detection' },
+          { value: 'multiple', label: 'Multiple Partners', sub: 'Integrated best-in-class' }
+        ]
+      },
+      {
+        q: "Installation type preference?",
+        options: [
+          { value: 'skid', label: 'Skid-Mounted', sub: 'Compact, relocatable' },
+          { value: 'container10', label: 'Containerised 10ft', sub: 'Small mobile deployment' },
+          { value: 'container20', label: 'Containerised 20ft', sub: 'Standard plug & play' },
+          { value: 'bespoke', label: 'Bespoke Build', sub: 'Custom site-specific' }
+        ]
+      }
+    ];
+
+    function toggleAI() {
+      aiOpen = !aiOpen;
+      document.getElementById('aiSidebar').classList.toggle('open', aiOpen);
+      document.getElementById('aiToggleBtn').classList.toggle('active', aiOpen);
+      if (aiOpen) {
+        updateAISuggestions();
+        updateScenarios();
+        renderWizard();
+      }
+    }
+
+    function setAITab(tab) {
+      document.querySelectorAll('.ai-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+      document.querySelectorAll('.ai-tab-panel').forEach(p => p.classList.toggle('active', p.id === 'ai-panel-' + tab));
+      if (tab === 'scenarios') updateScenarios();
+      if (tab === 'wizard') renderWizard();
+      if (tab === 'suggest') updateAISuggestions();
+    }
+
+    // ==================== QUICK ACTIONS ====================
+    function executeQuickAction() {
+      const input = document.getElementById('quickActionInput');
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      if (cmd.includes('uv') || cmd.includes('disinfection')) {
+        logDecision('Added UV disinfection to solution', 'User requested UV technology', 'user');
+      } else if (cmd.includes('pharma') || cmd.includes('pharmaceutical')) {
+        logDecision('Set application to Pharmaceutical', 'User specified pharma application', 'user');
+      } else if (cmd.includes('nx') || cmd.includes('pfas')) {
+        logDecision('Added NX Filtration partner', 'User requested PFAS removal capability', 'user');
+      } else if (cmd.includes('container')) {
+        logDecision('Selected containerised deployment', 'User requested plug & play solution', 'user');
+      } else if (cmd.includes('premium') || cmd.includes('best')) {
+        logDecision('Applied premium configuration', 'User requested best-in-class solution', 'user');
+      }
+
+      input.value = '';
+      updateAISuggestions();
+    }
+
+    function quickAction(action) {
+      switch(action) {
+        case 'optimize':
+          logDecision('Applied cost optimization', 'Reduced non-essential options, focused on core functionality', 'user');
+          break;
+        case 'premium':
+          logDecision('Applied premium configuration', 'Added all technology partners, full monitoring suite', 'user');
+          break;
+        case 'esg':
+          logDecision('Maximized ESG impact', 'Prioritized carbon reduction, water recovery, energy efficiency', 'user');
+          break;
+        case 'compare':
+          setAITab('scenarios');
+          break;
+      }
+      updateAISuggestions();
+    }
+
+    // ==================== SMART SUGGESTIONS ====================
+    function updateAISuggestions() {
+      const currentStep = getCurrentStep();
+      const suggestions = [];
+
+      // Calculate confidence based on current step and completeness
+      let confidence = 70 + (currentStep * 5);
+      const confLevel = confidence >= 85 ? 'high' : confidence >= 70 ? 'medium' : 'low';
+
+      document.getElementById('aiConfidenceBadge').textContent = confidence + '%';
+      document.getElementById('aiConfidenceBadge').className = 'confidence-badge ' + confLevel;
+      document.getElementById('aiConfidenceBar').style.width = confidence + '%';
+      document.getElementById('aiConfidenceBar').className = 'confidence-fill ' + confLevel;
+
+      // Generate contextual suggestions based on current step
+      if (currentStep === 1) {
+        suggestions.push({
+          icon: 'opportunity', type: 'opportunity',
+          title: 'Complete water quality analysis',
+          body: 'Detailed feed water data improves solution accuracy by 25%. Consider lab testing phase.',
+          impact: '+25% accuracy',
+          action: 'Start lab testing'
+        });
+      }
+
+      if (currentStep === 2) {
+        suggestions.push({
+          icon: 'save', type: 'optimize',
+          title: 'Consider NX Filtration',
+          body: 'For PFAS and micropollutant removal, NX Filtration offers lower pressure than RO with high recovery.',
+          impact: '+£8,500',
+          action: 'Add NX Filtration'
+        });
+      }
+
+      if (currentStep <= 3) {
+        suggestions.push({
+          icon: 'opportunity', type: 'opportunity',
+          title: 'Add Atlantium UV',
+          body: 'Hydro-Optic UV provides dose-assured, chemical-free disinfection with Log4+ bacterial elimination.',
+          impact: '+£6,500',
+          action: 'Add Atlantium UV'
+        });
+      }
+
+      if (currentStep >= 3) {
+        suggestions.push({
+          icon: 'save', type: 'optimize',
+          title: 'Include bNovate monitoring',
+          body: 'Real-time microbial detection (<30 min) enables data-led decisions and avoids unnecessary shutdowns.',
+          impact: '+£4,500',
+          action: 'Add bNovate'
+        });
+      }
+
+      suggestions.push({
+        icon: 'opportunity', type: 'opportunity',
+        title: 'Pilot validation available',
+        body: 'Deploy pilot system onsite to prove performance and build customer confidence before full-scale.',
+        impact: 'Reduced risk',
+        action: 'Propose pilot phase'
+      });
+
+      // Render suggestions
+      const container = document.getElementById('aiSuggestions');
+      if (suggestions.length === 0) {
+        container.innerHTML = `
+          <div class="suggestion-card highlight">
+            <div class="suggestion-header">
+              <div class="suggestion-icon optimize"><span class="material-icons-outlined">check_circle</span></div>
+              <span class="suggestion-title">Configuration looks good!</span>
+            </div>
+            <div class="suggestion-body">All recommended options are in place. Ready to generate proposal.</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = suggestions.map((s, i) => `
+          <div class="suggestion-card ${i === 0 ? 'highlight' : ''}">
+            <div class="suggestion-header">
+              <div class="suggestion-icon ${s.type}"><span class="material-icons-outlined">${s.icon === 'warning' ? 'warning' : s.icon === 'opportunity' ? 'lightbulb' : 'savings'}</span></div>
+              <span class="suggestion-title">${s.title}</span>
+              <span class="suggestion-impact">${s.impact}</span>
+            </div>
+            <div class="suggestion-body">${s.body}</div>
+            <div class="suggestion-action">
+              <span class="material-icons-outlined">add_circle</span>
+              ${s.action}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function getCurrentStep() {
+      const activeStep = document.querySelector('.workflow-step.active');
+      return activeStep ? parseInt(activeStep.dataset.step) || 1 : 1;
+    }
+
+    // ==================== SCENARIO BUILDER ====================
+    function updateScenarios() {
+      document.getElementById('scenarioGrid').innerHTML = `
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-name">Budget Solution</span>
+            <span class="scenario-price">£85,000</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">RO System</span>
+            <span class="scenario-spec">Skid-mounted</span>
+            <span class="scenario-spec">Essential only</span>
+          </div>
+          <div class="scenario-desc">Core RO system with standard pre-treatment. Meets basic requirements at lowest cost.</div>
+          <button class="scenario-apply" onclick="applyScenario('budget')">Apply This Scenario</button>
+        </div>
+
+        <div class="scenario-card recommended">
+          <div class="scenario-header">
+            <span class="scenario-name">Recommended Solution</span>
+            <span class="scenario-price">£142,000</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">RO + UV</span>
+            <span class="scenario-spec">Atlantium UV</span>
+            <span class="scenario-spec">bNovate</span>
+          </div>
+          <div class="scenario-desc">Optimal balance of performance and cost. Includes partner technologies for reliability.</div>
+          <button class="scenario-apply" onclick="applyScenario('recommended')">Apply This Scenario</button>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-name">Premium Solution</span>
+            <span class="scenario-price">£285,000</span>
+          </div>
+          <div class="scenario-specs">
+            <span class="scenario-spec">Full Integration</span>
+            <span class="scenario-spec">All Partners</span>
+            <span class="scenario-spec">Containerised</span>
+          </div>
+          <div class="scenario-desc">Complete solution with NX Filtration, Atlantium UV, bNovate, containerised plug & play deployment.</div>
+          <button class="scenario-apply" onclick="applyScenario('premium')">Apply This Scenario</button>
+        </div>
+      `;
+    }
+
+    function applyScenario(type) {
+      const scenarios = {
+        budget: 'Budget scenario applied - Core RO system with essential pre-treatment',
+        recommended: 'Recommended scenario applied - RO + Atlantium UV + bNovate monitoring',
+        premium: 'Premium scenario applied - Full integration with all technology partners'
+      };
+      logDecision(`Applied ${type} scenario`, scenarios[type], 'user');
+      setAITab('suggest');
+      updateAISuggestions();
+    }
+
+    // ==================== GUIDED WIZARD ====================
+    function renderWizard() {
+      const progress = document.getElementById('wizardProgress');
+      progress.innerHTML = WIZARD_QUESTIONS.map((_, i) =>
+        `<div class="wizard-step ${i < wizardStep ? 'complete' : i === wizardStep ? 'current' : ''}"></div>`
+      ).join('');
+
+      const content = document.getElementById('wizardContent');
+
+      if (wizardStep >= WIZARD_QUESTIONS.length) {
+        content.innerHTML = `
+          <div class="wizard-complete">
+            <div class="wizard-complete-icon">
+              <span class="material-icons-outlined">check</span>
+            </div>
+            <h4>Configuration Ready!</h4>
+            <p>Based on your answers, we've configured the optimal solution.</p>
+            <button class="scenario-apply" style="margin-top: 16px" onclick="applyWizardConfig()">Apply Configuration</button>
+            <button class="wizard-back" style="margin-top: 8px; width: 100%" onclick="wizardStep=0; renderWizard();">Start Over</button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = WIZARD_QUESTIONS[wizardStep];
+      content.innerHTML = `
+        <div class="wizard-question">
+          <div class="wizard-q-header">
+            <div class="wizard-q-num">${wizardStep + 1}</div>
+            <div class="wizard-q-text">${q.q}</div>
+          </div>
+          <div class="wizard-options">
+            ${q.options.map(o => `
+              <div class="wizard-option ${wizardAnswers[wizardStep] === o.value ? 'selected' : ''}" onclick="selectWizardOption('${o.value}')">
+                <div class="wizard-option-main">${o.label}</div>
+                <div class="wizard-option-sub">${o.sub}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="wizard-nav">
+          ${wizardStep > 0 ? '<button class="wizard-back" onclick="wizardStep--; renderWizard();">Back</button>' : ''}
+          <button class="wizard-next" onclick="nextWizardStep()" ${!wizardAnswers[wizardStep] ? 'disabled style="opacity:0.5"' : ''}>
+            ${wizardStep === WIZARD_QUESTIONS.length - 1 ? 'Complete' : 'Next'}
+          </button>
+        </div>
+      `;
+    }
+
+    function selectWizardOption(value) {
+      wizardAnswers[wizardStep] = value;
+      renderWizard();
+    }
+
+    function nextWizardStep() {
+      if (wizardAnswers[wizardStep]) {
+        wizardStep++;
+        renderWizard();
+      }
+    }
+
+    function applyWizardConfig() {
+      const app = wizardAnswers[0];
+      const market = wizardAnswers[1];
+      const tech = wizardAnswers[2];
+      const partner = wizardAnswers[3];
+      const install = wizardAnswers[4];
+
+      logDecision(
+        'Applied wizard configuration',
+        `${app} application, ${market} market, ${tech} technology, ${partner} partners, ${install} installation`,
+        'user'
+      );
+
+      setAITab('suggest');
+      updateAISuggestions();
+    }
+
+    // ==================== DECISION TRAIL ====================
+    function logDecision(action, reason, type = 'auto') {
+      const now = new Date();
+      const time = now.toTimeString().slice(0, 8);
+      decisions.unshift({ time, action, reason, type });
+      renderDecisions();
+    }
+
+    function renderDecisions() {
+      const trail = document.getElementById('decisionTrail');
+      document.getElementById('decisionCount').textContent = decisions.length + ' decisions';
+      trail.innerHTML = decisions.map(d => `
+        <div class="decision-item ${d.type === 'rule' ? 'warning' : d.type === 'user' ? 'success' : ''}">
+          <div class="decision-header">
+            <span class="decision-time">${d.time}</span>
+            <span class="decision-type ${d.type}">${d.type}</span>
+          </div>
+          <div class="decision-action">${d.action}</div>
+          <div class="ai-decision-reason">${d.reason}</div>
+        </div>
+      `).join('');
+    }
+
+    // Step icons mapping (6-phase methodology)
     const stepIcons = {
-      1: 'input',
-      2: 'architecture',
-      3: 'calculate',
-      4: 'eco',
-      5: 'auto_awesome'
+      1: 'science',
+      2: 'biotech',
+      3: 'precision_manufacturing',
+      4: 'architecture',
+      5: 'calculate',
+      6: 'auto_awesome'
     };
 
     // Restore step icon
@@ -3692,6 +4909,12 @@
 
       // Initialize step 1 as active
       goToStep(1);
+
+      // Initialize AI features
+      updateAISuggestions();
+      updateScenarios();
+      renderWizard();
+      logDecision('Proposal session started', 'New proposal workflow initiated', 'auto');
 
       // Simulate AI processing on step 2
       setTimeout(() => {
