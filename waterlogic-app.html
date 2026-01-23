@@ -646,6 +646,20 @@
     <aside class="sidebar">
       <div class="sidebar-section">
         <div class="sidebar-title">
+          <span class="material-icons-outlined" style="font-size:16px">business</span>
+          Target Market
+        </div>
+        <select class="form-input" id="targetMarket" onchange="recalculate()" style="font-size:12px">
+          <option value="waterUtilities">Water Utilities</option>
+          <option value="industrial">Industrial Manufacturing</option>
+          <option value="automotive">Automotive</option>
+          <option value="foodBeverage" selected>Food & Beverage</option>
+          <option value="adPlants">Anaerobic Digestate (AD) Plants</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
           <span class="material-icons-outlined" style="font-size:16px">water_drop</span>
           System Requirements
         </div>
@@ -762,6 +776,44 @@
           <div class="chip active" id="chipCIP" onclick="toggleChip(this)">CIP System</div>
           <div class="chip" id="chipMonitoring" onclick="toggleChip(this)">Remote Monitoring</div>
         </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined" style="font-size:16px">handshake</span>
+          Technology Partners
+        </div>
+        <div class="chip-group">
+          <div class="chip" id="chipNXFiltration" onclick="toggleChip(this)" style="border-color:rgba(0,160,220,0.5);color:#00a0dc">NX Filtration</div>
+          <div class="chip" id="chipAtlantiumUV" onclick="toggleChip(this)" style="border-color:rgba(247,147,30,0.5);color:#f7931e">Atlantium UV</div>
+          <div class="chip" id="chipBNovate" onclick="toggleChip(this)" style="border-color:rgba(0,178,122,0.5);color:#00b27a">bNovate Monitoring</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined" style="font-size:16px">precision_manufacturing</span>
+          Fabrication
+        </div>
+        <div class="chip-group">
+          <div class="chip active" id="chipStainless" onclick="toggleMaterial(this, 'stainless')">Stainless Steel</div>
+          <div class="chip" id="chipGRP" onclick="toggleMaterial(this, 'grp')">GRP</div>
+          <div class="chip" id="chipPVC" onclick="toggleMaterial(this, 'pvc')">PVC</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">
+          <span class="material-icons-outlined" style="font-size:16px">view_in_ar</span>
+          Solution Type
+        </div>
+        <select class="form-input" id="solutionType" onchange="recalculate()" style="font-size:12px">
+          <option value="skid">Skid-Mounted</option>
+          <option value="container10">Containerised 10ft</option>
+          <option value="container20">Containerised 20ft</option>
+          <option value="container40">Containerised 40ft</option>
+          <option value="bespoke">Bespoke</option>
+        </select>
       </div>
     </aside>
 
@@ -947,6 +999,55 @@
             </div>
           </div>
         </div>
+
+        <!-- ESG & Carbon Impact -->
+        <div class="content-panel full-width">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="material-icons-outlined">eco</span>
+              ESG & Carbon Impact
+            </div>
+            <span class="panel-badge">Sustainability</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+            <div style="padding:20px;background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.05));border-radius:12px;border:1px solid rgba(34,197,94,0.3);text-align:center">
+              <div style="font-size:28px;font-weight:700;color:var(--success)" id="esgCarbonSavings">124</div>
+              <div style="font-size:11px;color:var(--muted)">tCO₂e/yr avoided</div>
+              <div style="font-size:10px;color:var(--success);margin-top:4px">Carbon Savings</div>
+            </div>
+            <div style="padding:20px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.05));border-radius:12px;border:1px solid rgba(59,130,246,0.3);text-align:center">
+              <div style="font-size:28px;font-weight:700;color:#3b82f6" id="esgWaterRecovery">75%</div>
+              <div style="font-size:11px;color:var(--muted)">water recovered</div>
+              <div style="font-size:10px;color:#3b82f6;margin-top:4px">Water Recovery</div>
+            </div>
+            <div style="padding:20px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.05));border-radius:12px;border:1px solid rgba(168,85,247,0.3);text-align:center">
+              <div style="font-size:28px;font-weight:700;color:#a855f7" id="esgEnergyEfficiency">2.9</div>
+              <div style="font-size:11px;color:var(--muted)">kWh/m³</div>
+              <div style="font-size:10px;color:#a855f7;margin-top:4px">Energy Efficiency</div>
+            </div>
+            <div style="padding:20px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.05));border-radius:12px;border:1px solid rgba(245,158,11,0.3);text-align:center">
+              <div style="font-size:28px;font-weight:700;color:var(--warning)" id="esgScore">78</div>
+              <div style="font-size:11px;color:var(--muted)">out of 100</div>
+              <div style="font-size:10px;color:var(--warning);margin-top:4px">ESG Score</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+              <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+              ISO 14001 Aligned
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+              <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+              CDP Water Security
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+              <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+              GRI Standards
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Action Bar -->
@@ -998,8 +1099,20 @@
       boostPump: 2000,
       softener: 3000,
       secondStageRO: 8000,
-      monitoring: 1500
+      monitoring: 1500,
+      // Technology Partners
+      nxFiltration: 8500,
+      atlantiumUV: 6500,
+      bnovateMonitoring: 4500
     };
+
+    const MATERIAL_MULTIPLIERS = {
+      stainless: 1.0,
+      grp: 0.85,
+      pvc: 0.70
+    };
+
+    let selectedMaterial = 'stainless';
 
     const TEMP_CORRECTION = {
       5: 0.45, 10: 0.58, 15: 0.75, 20: 0.88, 25: 1.00, 30: 1.15, 35: 1.30
@@ -1203,7 +1316,26 @@
         selectedComponents.push({ name: 'Permeate Flushing Unit', cost: COMPONENT_PRICES.permeateFlushing, type: 'base' });
       }
 
+      // Technology Partners
+      if (document.getElementById('chipNXFiltration')?.classList.contains('active')) {
+        selectedComponents.push({ name: 'NX Filtration System', cost: COMPONENT_PRICES.nxFiltration, type: 'partner', reason: 'Advanced membrane separation' });
+      }
+      if (document.getElementById('chipAtlantiumUV')?.classList.contains('active')) {
+        selectedComponents.push({ name: 'Atlantium Hydro-Optic UV', cost: COMPONENT_PRICES.atlantiumUV, type: 'partner', reason: 'Log4+ disinfection' });
+      }
+      if (document.getElementById('chipBNovate')?.classList.contains('active')) {
+        selectedComponents.push({ name: 'bNovate Process Intelligence', cost: COMPONENT_PRICES.bnovateMonitoring, type: 'partner', reason: 'Real-time microbial detection' });
+      }
+
+      // Apply material multiplier
+      const multiplier = MATERIAL_MULTIPLIERS[selectedMaterial] || 1.0;
+      selectedComponents = selectedComponents.map(c => ({
+        ...c,
+        cost: Math.round(c.cost * multiplier)
+      }));
+
       renderComponents();
+      updateESGMetrics(data, selectedComponents);
     }
 
     function renderComponents() {
@@ -1213,6 +1345,7 @@
           <div class="component-name">
             ${c.name}
             ${c.type === 'auto' ? `<span class="component-tag auto">Auto</span>` : ''}
+            ${c.type === 'partner' ? `<span class="component-tag" style="background:rgba(99,102,241,0.2);color:var(--accent)">Partner</span>` : ''}
             ${c.reason ? `<span style="font-size:10px;color:var(--muted);margin-left:8px">(${c.reason})</span>` : ''}
           </div>
           <div class="component-price">£${c.cost.toLocaleString()}</div>
@@ -1278,6 +1411,42 @@
     function toggleChip(el) {
       el.classList.toggle('active');
       recalculate();
+    }
+
+    function toggleMaterial(el, material) {
+      document.querySelectorAll('#chipStainless, #chipGRP, #chipPVC').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      selectedMaterial = material;
+      recalculate();
+    }
+
+    function updateESGMetrics(data, selectedComponents) {
+      // Calculate ESG metrics based on system configuration
+      const recovery = data.recovery || 75;
+      const flowRate = data.permeateFlow || 9;
+      const opHours = 8000; // Assumed annual operating hours
+
+      // Carbon savings: ~0.5 kg CO2e per m³ water treated (vs baseline)
+      const annualWaterTreated = flowRate * opHours;
+      const carbonSavings = Math.round((annualWaterTreated * 0.5) / 1000); // tonnes
+
+      // Energy efficiency: base 3.5 kWh/m³, improved with better tech
+      let energyEfficiency = 3.5;
+      if (document.getElementById('chipNXFiltration')?.classList.contains('active')) energyEfficiency -= 0.3;
+      if (document.getElementById('chipAtlantiumUV')?.classList.contains('active')) energyEfficiency -= 0.2;
+
+      // ESG Score calculation
+      let esgScore = 65;
+      esgScore += Math.round(recovery / 5); // Up to +19 for 95% recovery
+      if (document.getElementById('chipNXFiltration')?.classList.contains('active')) esgScore += 5;
+      if (document.getElementById('chipAtlantiumUV')?.classList.contains('active')) esgScore += 4;
+      if (document.getElementById('chipBNovate')?.classList.contains('active')) esgScore += 3;
+      esgScore = Math.min(100, esgScore);
+
+      document.getElementById('esgCarbonSavings').textContent = carbonSavings;
+      document.getElementById('esgWaterRecovery').textContent = recovery + '%';
+      document.getElementById('esgEnergyEfficiency').textContent = energyEfficiency.toFixed(1);
+      document.getElementById('esgScore').textContent = esgScore;
     }
 
     function toggleTheme() {

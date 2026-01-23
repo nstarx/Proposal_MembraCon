@@ -1518,62 +1518,71 @@
             <div class="progress-bar-fill" id="progressFill" style="width:20%;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.3s ease"></div>
           </div>
           <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted)">
-            <span>Step <span id="currentStepNum">1</span> of 5</span>
-            <span id="progressPercent">20%</span>
+            <span>Step <span id="currentStepNum">1</span> of 6</span>
+            <span id="progressPercent">17%</span>
           </div>
         </div>
 
-        <!-- Workflow Steps -->
+        <!-- Workflow Steps - 6-Phase Execution Methodology -->
         <div class="workflow-steps">
-          <div class="workflow-step active" data-step="1" data-content="step-intake" data-shortcut="1" tabindex="0">
+          <div class="workflow-step active" data-step="1" data-content="step-assessment" data-shortcut="1" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
-                <span class="material-icons-outlined">input</span>
+                <span class="material-icons-outlined">science</span>
               </div>
-              <span class="step-name">1. Intake</span>
+              <span class="step-name">1. Assessment</span>
             </div>
-            <div class="step-desc">Customer requirements</div>
+            <div class="step-desc">Technical modelling</div>
           </div>
-          <div class="workflow-step" data-step="2" data-content="step-design" data-shortcut="2" tabindex="0">
+          <div class="workflow-step" data-step="2" data-content="step-lab" data-shortcut="2" tabindex="0">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">biotech</span>
+              </div>
+              <span class="step-name">2. Lab Testing</span>
+            </div>
+            <div class="step-desc">Verification & data</div>
+          </div>
+          <div class="workflow-step" data-step="3" data-content="step-pilot" data-shortcut="3" tabindex="0">
+            <div class="step-header">
+              <div class="step-icon">
+                <span class="material-icons-outlined">precision_manufacturing</span>
+              </div>
+              <span class="step-name">3. Pilot</span>
+            </div>
+            <div class="step-desc">Onsite validation</div>
+          </div>
+          <div class="workflow-step" data-step="4" data-content="step-design" data-shortcut="4" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">architecture</span>
               </div>
-              <span class="step-name">2. Solution Design</span>
+              <span class="step-name">4. Design</span>
             </div>
-            <div class="step-desc">AI-optimized solution</div>
+            <div class="step-desc">Detailed engineering</div>
           </div>
-          <div class="workflow-step" data-step="3" data-content="step-pricing" data-shortcut="3" tabindex="0">
+          <div class="workflow-step" data-step="5" data-content="step-commercial" data-shortcut="5" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">calculate</span>
               </div>
-              <span class="step-name">3. Pricing</span>
+              <span class="step-name">5. Commercial</span>
             </div>
-            <div class="step-desc">CapEx & OpEx modeling</div>
+            <div class="step-desc">Pricing & ROI</div>
           </div>
-          <div class="workflow-step" data-step="4" data-content="step-esg" data-shortcut="4" tabindex="0">
-            <div class="step-header">
-              <div class="step-icon">
-                <span class="material-icons-outlined">eco</span>
-              </div>
-              <span class="step-name">4. ESG Analysis</span>
-            </div>
-            <div class="step-desc">Sustainability metrics</div>
-          </div>
-          <div class="workflow-step" data-step="5" data-content="step-generate" data-shortcut="5" tabindex="0">
+          <div class="workflow-step" data-step="6" data-content="step-generate" data-shortcut="6" tabindex="0">
             <div class="step-header">
               <div class="step-icon">
                 <span class="material-icons-outlined">auto_awesome</span>
               </div>
-              <span class="step-name">5. Generate</span>
+              <span class="step-name">6. Proposal</span>
             </div>
-            <div class="step-desc">Export proposal</div>
+            <div class="step-desc">Export & delivery</div>
           </div>
         </div>
 
-        <!-- Step 1: Intake -->
-        <div class="step-content active" id="step-intake">
+        <!-- Phase 1: Technical Assessment -->
+        <div class="step-content active" id="step-assessment">
         <div class="content-grid">
           <!-- Input Specifications Panel -->
           <div class="content-panel">
@@ -1586,14 +1595,13 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Industry Sector</label>
+              <label class="form-label">Target Market</label>
               <select class="form-input" id="sector">
-                <option value="pharmaceutical">Pharmaceutical</option>
+                <option value="waterUtilities">Water Utilities</option>
+                <option value="industrial">Industrial Manufacturing</option>
+                <option value="automotive">Automotive</option>
                 <option value="foodBeverage">Food & Beverage</option>
-                <option value="power">Power Generation</option>
-                <option value="municipal">Municipal</option>
-                <option value="oilGas">Oil & Gas</option>
-                <option value="semiconductor">Semiconductor</option>
+                <option value="adPlants">Anaerobic Digestate (AD) Plants</option>
               </select>
             </div>
 
@@ -1917,14 +1925,365 @@
           <div style="display:flex;gap:12px">
             <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
             <button class="btn btn-primary" onclick="goToStep(2)">
-              Continue to Solution Design
+              Continue to Lab Testing
               <span class="material-icons-outlined">arrow_forward</span>
             </button>
           </div>
         </div>
-        </div><!-- End Step 1: Intake -->
+        </div><!-- End Phase 1: Technical Assessment -->
 
-        <!-- Step 2: Solution Design -->
+        <!-- Phase 2: Lab-Scale Testing & Verification -->
+        <div class="step-content" id="step-lab">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Lab-Scale Testing</h1>
+          <p class="workflow-subtitle">Validate assessments and generate data for accurate system selection</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Sample Status</div>
+            <div class="metric-value accent">Pending</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">science</span>
+              Awaiting customer samples
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Test Duration</div>
+            <div class="metric-value">5-10 days</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">schedule</span>
+              Typical timeline
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Tests Planned</div>
+            <div class="metric-value success">4</div>
+            <div class="metric-change positive">
+              <span class="material-icons-outlined" style="font-size:14px">checklist</span>
+              Treatment pathways
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Data Points</div>
+            <div class="metric-value">~120</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">analytics</span>
+              Per test cycle
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">biotech</span>
+                Lab Test Requirements
+              </div>
+              <span class="panel-badge">Phase 2</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Sample Collection</label>
+              <div style="padding:16px;background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.3);margin-bottom:16px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span class="material-icons-outlined" style="color:var(--accent);font-size:18px">info</span>
+                  <span style="font-size:13px;font-weight:600;color:var(--accent)">Sample Requirements</span>
+                </div>
+                <ul style="font-size:12px;color:var(--muted);margin:0;padding-left:20px">
+                  <li>Minimum 20L representative feed water sample</li>
+                  <li>Sample within 24hrs of collection</li>
+                  <li>Include sample collection date and location</li>
+                  <li>Note any seasonal variations expected</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Test Systems</label>
+              <div class="chip-group">
+                <div class="chip active">
+                  <span class="material-icons-outlined">water_drop</span>
+                  UF Bench Test
+                </div>
+                <div class="chip active">
+                  <span class="material-icons-outlined">filter_alt</span>
+                  RO Pilot Cell
+                </div>
+                <div class="chip">
+                  <span class="material-icons-outlined">light_mode</span>
+                  UV Validation
+                </div>
+                <div class="chip">
+                  <span class="material-icons-outlined">layers</span>
+                  NF Membrane Test
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Test Objectives</label>
+              <div style="display:grid;gap:8px">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Treatability Assessment</div>
+                    <div style="font-size:11px;color:var(--muted)">Verify treatment pathways work for this specific water</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Recovery Rate Validation</div>
+                    <div style="font-size:11px;color:var(--muted)">Optimize recovery without scaling or fouling</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Membrane Selection</div>
+                    <div style="font-size:11px;color:var(--muted)">Select optimal membrane type and configuration</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">assignment</span>
+                Test Results
+              </div>
+              <span class="panel-badge">Awaiting Data</span>
+            </div>
+
+            <div style="text-align:center;padding:48px 24px;color:var(--muted)">
+              <span class="material-icons-outlined" style="font-size:48px;opacity:0.5;margin-bottom:16px;display:block">science</span>
+              <div style="font-size:14px;font-weight:600;margin-bottom:8px">No Test Results Yet</div>
+              <div style="font-size:12px">Lab test results will appear here once samples are processed</div>
+            </div>
+
+            <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.3)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="material-icons-outlined" style="color:var(--warning);font-size:18px">schedule</span>
+                <span style="font-size:12px;font-weight:600;color:var(--warning)">Skip for Budgetary Proposals</span>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin:0">
+                Lab testing can be skipped for initial budgetary proposals. Results refine accuracy for detailed quotes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="goToStep(1)">
+            <span class="material-icons-outlined">arrow_back</span>
+            Previous
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">
+              Continue to Pilot Validation
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        </div><!-- End Phase 2: Lab-Scale Testing -->
+
+        <!-- Phase 3: Pilot-Scale Validation -->
+        <div class="step-content" id="step-pilot">
+        <div class="workflow-header">
+          <h1 class="workflow-title">Pilot-Scale Validation</h1>
+          <p class="workflow-subtitle">Prove performance under real operating conditions on-site</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Pilot Status</div>
+            <div class="metric-value accent">Optional</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">precision_manufacturing</span>
+              High-confidence projects
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Typical Duration</div>
+            <div class="metric-value">2-4 weeks</div>
+            <div class="metric-change">
+              <span class="material-icons-outlined" style="font-size:14px">date_range</span>
+              On-site operation
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Pilot Capacity</div>
+            <div class="metric-value success">1-5 m³/hr</div>
+            <div class="metric-change positive">
+              <span class="material-icons-outlined" style="font-size:14px">speed</span>
+              Scalable units
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Confidence Gain</div>
+            <div class="metric-value">+15-25%</div>
+            <div class="metric-change positive">
+              <span class="material-icons-outlined" style="font-size:14px">trending_up</span>
+              Risk reduction
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">precision_manufacturing</span>
+                Pilot Plant Options
+              </div>
+              <span class="panel-badge">Phase 3</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Pilot System Type</label>
+              <div class="chip-group">
+                <div class="chip active">
+                  <span class="material-icons-outlined">view_in_ar</span>
+                  Containerised 10ft
+                </div>
+                <div class="chip">
+                  <span class="material-icons-outlined">view_in_ar</span>
+                  Containerised 20ft
+                </div>
+                <div class="chip">
+                  <span class="material-icons-outlined">foundation</span>
+                  Skid-Mounted
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Pilot Objectives</label>
+              <div style="display:grid;gap:8px">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--accent);font-size:20px">verified</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Performance Verification</div>
+                    <div style="font-size:11px;color:var(--muted)">Confirm output quality under actual site conditions</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--accent);font-size:20px">tune</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Design Refinement</div>
+                    <div style="font-size:11px;color:var(--muted)">Optimize chemical dosing, recovery, and CIP cycles</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--card);border-radius:8px;border:1px solid var(--line)">
+                  <span class="material-icons-outlined" style="color:var(--accent);font-size:20px">psychology</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Operator Familiarisation</div>
+                    <div style="font-size:11px;color:var(--muted)">Build operational confidence before full-scale deployment</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;padding:12px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:18px">lightbulb</span>
+                <span style="font-size:13px;font-weight:600;color:var(--success)">Case Study Reference</span>
+              </div>
+              <p style="font-size:12px;color:var(--muted);margin:0">
+                <strong>Water Utilities:</strong> Two 20ft containerised pilot plants delivered 300,000 L/day each with remote monitoring for ceramic membrane technology trials.
+              </p>
+            </div>
+          </div>
+
+          <div class="content-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <span class="material-icons-outlined">handshake</span>
+                Technology Partners
+              </div>
+              <span class="panel-badge">Innovation Ecosystem</span>
+            </div>
+
+            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+              Select advanced technologies from our innovation partners:
+            </p>
+
+            <div style="display:grid;gap:12px">
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(0,160,220,0.1),rgba(0,160,220,0.05));border-radius:12px;border:1px solid rgba(0,160,220,0.3);cursor:pointer" class="partner-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                  <div style="width:40px;height:40px;background:rgba(0,160,220,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center">
+                    <span class="material-icons-outlined" style="color:#00a0dc;font-size:20px">filter_alt</span>
+                  </div>
+                  <div>
+                    <div style="font-size:14px;font-weight:600;color:#00a0dc">NX Filtration</div>
+                    <div style="font-size:11px;color:var(--muted)">Advanced Membrane Separation</div>
+                  </div>
+                </div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px">
+                  <li>PFAS, micropollutants, pesticides removal</li>
+                  <li>Lower pressure than RO, compact footprint</li>
+                  <li>High recovery, minimal reject volumes</li>
+                </ul>
+              </div>
+
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(247,147,30,0.1),rgba(247,147,30,0.05));border-radius:12px;border:1px solid rgba(247,147,30,0.3);cursor:pointer" class="partner-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                  <div style="width:40px;height:40px;background:rgba(247,147,30,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center">
+                    <span class="material-icons-outlined" style="color:#f7931e;font-size:20px">light_mode</span>
+                  </div>
+                  <div>
+                    <div style="font-size:14px;font-weight:600;color:#f7931e">Atlantium Technologies</div>
+                    <div style="font-size:11px;color:var(--muted)">Hydro-Optic UV Disinfection</div>
+                  </div>
+                </div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px">
+                  <li>Dose-assured, chemical-free disinfection</li>
+                  <li>Medium pressure, high intensity polychromatic UV</li>
+                  <li>Log4+ bacterial elimination via Total Internal Reflection</li>
+                </ul>
+              </div>
+
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(0,178,122,0.1),rgba(0,178,122,0.05));border-radius:12px;border:1px solid rgba(0,178,122,0.3);cursor:pointer" class="partner-card">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                  <div style="width:40px;height:40px;background:rgba(0,178,122,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center">
+                    <span class="material-icons-outlined" style="color:#00b27a;font-size:20px">monitoring</span>
+                  </div>
+                  <div>
+                    <div style="font-size:14px;font-weight:600;color:#00b27a">bNovate Technologies</div>
+                    <div style="font-size:11px;color:var(--muted)">Real-Time Process Intelligence</div>
+                  </div>
+                </div>
+                <ul style="font-size:11px;color:var(--muted);margin:0;padding-left:16px">
+                  <li>&lt;30 minutes real-time microbial detection</li>
+                  <li>Data-led decision making</li>
+                  <li>Avoids unnecessary shutdowns, CIP, or chemical dosing</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary" onclick="goToStep(2)">
+            <span class="material-icons-outlined">arrow_back</span>
+            Previous
+          </button>
+          <div style="display:flex;gap:12px">
+            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
+            <button class="btn btn-primary" onclick="goToStep(4)">
+              Continue to Design
+              <span class="material-icons-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+        </div><!-- End Phase 3: Pilot-Scale Validation -->
+
+        <!-- Phase 4: Detailed Design & Engineering -->
         <div class="step-content" id="step-design">
         <div class="workflow-header">
           <h1 class="workflow-title">Solution Design & Comparison</h1>
@@ -2084,25 +2443,25 @@
         </div>
 
         <div class="action-bar">
-          <button class="btn btn-secondary" onclick="goToStep(1)">
+          <button class="btn btn-secondary" onclick="goToStep(3)">
             <span class="material-icons-outlined">arrow_back</span>
-            Back to Intake
+            Back to Pilot
           </button>
           <div style="display:flex;gap:12px">
             <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
-            <button class="btn btn-primary" onclick="goToStep(3)">
-              Continue to Pricing
+            <button class="btn btn-primary" onclick="goToStep(5)">
+              Continue to Commercial
               <span class="material-icons-outlined">arrow_forward</span>
             </button>
           </div>
         </div>
-        </div><!-- End Step 2: Solution Design -->
+        </div><!-- End Phase 4: Detailed Design -->
 
-        <!-- Step 3: Pricing -->
-        <div class="step-content" id="step-pricing">
+        <!-- Phase 5: Commercial Analysis (Pricing & ESG) -->
+        <div class="step-content" id="step-commercial">
         <div class="workflow-header">
-          <h1 class="workflow-title">Pricing Intelligence</h1>
-          <p class="workflow-subtitle">Dynamic CapEx & OpEx modeling with market intelligence</p>
+          <h1 class="workflow-title">Commercial Analysis</h1>
+          <p class="workflow-subtitle">Pricing intelligence with ESG impact assessment and ROI analysis</p>
         </div>
 
         <div class="metrics-grid">
@@ -2318,223 +2677,73 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="action-bar">
-          <button class="btn btn-secondary" onclick="goToStep(2)">
-            <span class="material-icons-outlined">arrow_back</span>
-            Back to Solution Design
-          </button>
-          <div style="display:flex;gap:12px">
-            <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
-            <button class="btn btn-primary" onclick="goToStep(4)">
-              Continue to ESG Analysis
-              <span class="material-icons-outlined">arrow_forward</span>
-            </button>
-          </div>
-        </div>
-        </div><!-- End Step 3: Pricing -->
-
-        <!-- Step 4: ESG -->
-        <div class="step-content" id="step-esg">
-        <div class="workflow-header">
-          <h1 class="workflow-title">ESG Optimization</h1>
-          <p class="workflow-subtitle">Environmental, Social, and Governance analysis</p>
-        </div>
-
-        <div class="content-grid">
-          <div class="content-panel full-width">
-            <div class="panel-header">
-              <div class="panel-title">
-                <span class="material-icons-outlined">speed</span>
-                ESG Performance Dashboard
-              </div>
-            </div>
-
-            <div class="esg-gauges">
-              <div class="esg-gauge water">
-                <div class="gauge-ring">
-                  <svg viewBox="0 0 80 80">
-                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
-                    <circle class="gauge-fill" cx="40" cy="40" r="32"
-                            stroke-dasharray="201"
-                            stroke-dashoffset="36"></circle>
-                  </svg>
-                  <div class="gauge-value" style="color:var(--esg-blue)">82%</div>
-                </div>
-                <div class="esg-label">Water Recovery</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:4px">
-                  328K m³/yr saved
-                </div>
-              </div>
-
-              <div class="esg-gauge carbon">
-                <div class="gauge-ring">
-                  <svg viewBox="0 0 80 80">
-                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
-                    <circle class="gauge-fill" cx="40" cy="40" r="32"
-                            stroke-dasharray="201"
-                            stroke-dashoffset="50"></circle>
-                  </svg>
-                  <div class="gauge-value" style="color:var(--esg-green)">75%</div>
-                </div>
-                <div class="esg-label">Carbon Reduction</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:4px">
-                  1,240 tCO₂e/yr avoided
-                </div>
-              </div>
-
-              <div class="esg-gauge energy">
-                <div class="gauge-ring">
-                  <svg viewBox="0 0 80 80">
-                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
-                    <circle class="gauge-fill" cx="40" cy="40" r="32"
-                            stroke-dasharray="201"
-                            stroke-dashoffset="42"></circle>
-                  </svg>
-                  <div class="gauge-value" style="color:var(--esg-purple)">79%</div>
-                </div>
-                <div class="esg-label">Energy Efficiency</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:4px">
-                  2.9 kWh/m³ vs 4.5 baseline
-                </div>
-              </div>
-            </div>
-          </div>
-
+          <!-- ESG & Carbon Metrics Panel -->
           <div class="content-panel">
             <div class="panel-header">
               <div class="panel-title">
-                <span class="material-icons-outlined">balance</span>
-                ESG Priority Weights
+                <span class="material-icons-outlined">eco</span>
+                ESG & Carbon Impact
+              </div>
+              <span class="panel-badge">Sustainability</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.05));border-radius:12px;border:1px solid rgba(34,197,94,0.3);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:var(--success)">1,240</div>
+                <div style="font-size:11px;color:var(--muted)">tCO₂e/yr avoided</div>
+                <div style="font-size:10px;color:var(--success);margin-top:4px">Carbon Savings</div>
+              </div>
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.05));border-radius:12px;border:1px solid rgba(59,130,246,0.3);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:#3b82f6">82%</div>
+                <div style="font-size:11px;color:var(--muted)">328K m³/yr saved</div>
+                <div style="font-size:10px;color:#3b82f6;margin-top:4px">Water Recovery</div>
+              </div>
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.05));border-radius:12px;border:1px solid rgba(168,85,247,0.3);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:#a855f7">2.9</div>
+                <div style="font-size:11px;color:var(--muted)">kWh/m³ (vs 4.5 baseline)</div>
+                <div style="font-size:10px;color:#a855f7;margin-top:4px">Energy Efficiency</div>
+              </div>
+              <div style="padding:16px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.05));border-radius:12px;border:1px solid rgba(245,158,11,0.3);text-align:center">
+                <div style="font-size:24px;font-weight:700;color:var(--warning)">85</div>
+                <div style="font-size:11px;color:var(--muted)">out of 100</div>
+                <div style="font-size:10px;color:var(--warning);margin-top:4px">ESG Score</div>
               </div>
             </div>
 
-            <div class="range-group">
-              <div class="range-header">
-                <span class="range-label">Water Stewardship</span>
-                <span class="range-value">40%</span>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+                <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+                ISO 14001 Aligned
               </div>
-              <input type="range" value="40" min="0" max="100">
-            </div>
-            <div class="range-group">
-              <div class="range-header">
-                <span class="range-label">Carbon Footprint</span>
-                <span class="range-value">35%</span>
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+                <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+                CDP Water Security
               </div>
-              <input type="range" value="35" min="0" max="100">
-            </div>
-            <div class="range-group">
-              <div class="range-header">
-                <span class="range-label">Energy Intensity</span>
-                <span class="range-value">25%</span>
-              </div>
-              <input type="range" value="25" min="0" max="100">
-            </div>
-
-            <button class="btn btn-secondary" style="width:100%;margin-top:16px">
-              <span class="material-icons-outlined">refresh</span>
-              Recalculate with New Weights
-            </button>
-          </div>
-
-          <div class="content-panel">
-            <div class="panel-header">
-              <div class="panel-title">
-                <span class="material-icons-outlined">verified</span>
-                ESG Compliance
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.1);border-radius:20px;font-size:11px;color:var(--success)">
+                <span class="material-icons-outlined" style="font-size:14px">check_circle</span>
+                GRI Standards
               </div>
             </div>
-
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
-                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
-                <span style="font-size:12px">ISO 14001 Aligned</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
-                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
-                <span style="font-size:12px">GRI Standards Ready</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(34,197,94,0.1);border-radius:8px;border:1px solid rgba(34,197,94,0.3)">
-                <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
-                <span style="font-size:12px">CDP Water Security</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(245,158,11,0.1);border-radius:8px;border:1px solid rgba(245,158,11,0.3)">
-                <span class="material-icons-outlined" style="color:var(--warning)">info</span>
-                <span style="font-size:12px">SASB Metrics: Partial</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="content-panel full-width">
-            <div class="panel-header">
-              <div class="panel-title">
-                <span class="material-icons-outlined">compare_arrows</span>
-                Trade-off Analysis
-              </div>
-            </div>
-
-            <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
-              Compare cost-optimized vs ESG-optimized solutions:
-            </p>
-
-            <table class="solution-table">
-              <thead>
-                <tr>
-                  <th>Scenario</th>
-                  <th>CapEx</th>
-                  <th>OpEx/yr</th>
-                  <th>Water Recovery</th>
-                  <th>Carbon</th>
-                  <th>ESG Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Cost Optimized</strong></td>
-                  <td>£1.15M</td>
-                  <td>£175K</td>
-                  <td>78%</td>
-                  <td>1,450 tCO₂e</td>
-                  <td style="color:var(--warning)">68</td>
-                </tr>
-                <tr style="background:rgba(34,197,94,0.08)">
-                  <td><strong>Balanced (Selected)</strong></td>
-                  <td>£1.24M</td>
-                  <td>£185K</td>
-                  <td>82%</td>
-                  <td>1,240 tCO₂e</td>
-                  <td style="color:var(--esg-green)">85</td>
-                </tr>
-                <tr>
-                  <td><strong>ESG Maximized</strong></td>
-                  <td>£1.45M</td>
-                  <td>£165K</td>
-                  <td>88%</td>
-                  <td>980 tCO₂e</td>
-                  <td style="color:var(--success)">94</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
         <div class="action-bar">
-          <button class="btn btn-secondary" onclick="goToStep(3)">
+          <button class="btn btn-secondary" onclick="goToStep(4)">
             <span class="material-icons-outlined">arrow_back</span>
-            Back to Pricing
+            Back to Design
           </button>
           <div style="display:flex;gap:12px">
             <button class="btn btn-secondary" onclick="saveDraft()">Save Draft</button>
-            <button class="btn btn-primary" onclick="goToStep(5)">
-              Continue to Generate
+            <button class="btn btn-primary" onclick="goToStep(6)">
+              Generate Proposal
               <span class="material-icons-outlined">arrow_forward</span>
             </button>
           </div>
         </div>
-        </div><!-- End Step 4: ESG -->
+        </div><!-- End Phase 5: Commercial Analysis -->
 
-        <!-- Step 5: Generate -->
+        <!-- Phase 6: Proposal Generation -->
         <div class="step-content" id="step-generate">
         <div class="workflow-header">
           <h1 class="workflow-title">Generate Proposal</h1>
@@ -2789,9 +2998,9 @@
         </div>
 
         <div class="action-bar">
-          <button class="btn btn-secondary" onclick="goToStep(4)">
+          <button class="btn btn-secondary" onclick="goToStep(5)">
             <span class="material-icons-outlined">arrow_back</span>
-            Back to ESG
+            Back to Commercial
           </button>
           <div style="display:flex;gap:12px">
             <button class="btn btn-secondary" onclick="saveDraft()">
@@ -2804,7 +3013,7 @@
             </button>
           </div>
         </div>
-        </div><!-- End Step 5: Generate -->
+        </div><!-- End Phase 6: Proposal Generation -->
 
       </div><!-- End view-proposal -->
 
@@ -3169,9 +3378,9 @@
       });
     });
 
-    // Current step state
+    // Current step state - 6-Phase Execution Methodology
     let currentStep = 1;
-    const totalSteps = 5;
+    const totalSteps = 6;
 
     // Workflow steps - click to navigate
     document.querySelectorAll('.workflow-step').forEach(step => {
@@ -3199,12 +3408,12 @@
           s.classList.add('active');
           s.classList.remove('completed');
           // Restore original icon for active step
-          const icons = {1:'input', 2:'architecture', 3:'calculate', 4:'eco', 5:'auto_awesome'};
+          const icons = {1:'science', 2:'biotech', 3:'precision_manufacturing', 4:'architecture', 5:'calculate', 6:'auto_awesome'};
           s.querySelector('.step-icon').innerHTML = `<span class="material-icons-outlined">${icons[sNum]}</span>`;
         } else {
           s.classList.remove('completed');
           // Restore original icon for future steps
-          const icons = {1:'input', 2:'architecture', 3:'calculate', 4:'eco', 5:'auto_awesome'};
+          const icons = {1:'science', 2:'biotech', 3:'precision_manufacturing', 4:'architecture', 5:'calculate', 6:'auto_awesome'};
           s.querySelector('.step-icon').innerHTML = `<span class="material-icons-outlined">${icons[sNum]}</span>`;
         }
       });
@@ -3214,7 +3423,7 @@
         content.classList.remove('active');
       });
 
-      const stepIds = ['step-intake', 'step-design', 'step-pricing', 'step-esg', 'step-generate'];
+      const stepIds = ['step-assessment', 'step-lab', 'step-pilot', 'step-design', 'step-commercial', 'step-generate'];
       const targetContent = document.getElementById(stepIds[stepNum - 1]);
       if (targetContent) {
         targetContent.classList.add('active');

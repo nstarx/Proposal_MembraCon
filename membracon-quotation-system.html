@@ -1699,29 +1699,53 @@
     </div>
   </header>
 
-  <!-- Stage Bar -->
+  <!-- Stage Bar - 6-Phase Execution Methodology -->
   <div class="stage-bar">
     <div class="stage-item active" data-stage="1" onclick="setStage(1)">
       <div class="stage-number">1</div>
       <div class="stage-info">
-        <h3>Quick Estimate</h3>
-        <p>System sizing & pricing</p>
+        <h3>Assessment</h3>
+        <p>Technical modelling</p>
       </div>
     </div>
     <span class="material-icons-outlined stage-arrow">chevron_right</span>
     <div class="stage-item" data-stage="2" onclick="setStage(2)">
       <div class="stage-number">2</div>
       <div class="stage-info">
-        <h3>Detailed Quote</h3>
-        <p>Full BOM & labour</p>
+        <h3>Lab Testing</h3>
+        <p>Verification & data</p>
       </div>
     </div>
     <span class="material-icons-outlined stage-arrow">chevron_right</span>
     <div class="stage-item" data-stage="3" onclick="setStage(3)">
       <div class="stage-number">3</div>
       <div class="stage-info">
+        <h3>Pilot</h3>
+        <p>Onsite validation</p>
+      </div>
+    </div>
+    <span class="material-icons-outlined stage-arrow">chevron_right</span>
+    <div class="stage-item" data-stage="4" onclick="setStage(4)">
+      <div class="stage-number">4</div>
+      <div class="stage-info">
+        <h3>Engineering</h3>
+        <p>Detailed design</p>
+      </div>
+    </div>
+    <span class="material-icons-outlined stage-arrow">chevron_right</span>
+    <div class="stage-item" data-stage="5" onclick="setStage(5)">
+      <div class="stage-number">5</div>
+      <div class="stage-info">
+        <h3>Commercial</h3>
+        <p>Pricing & ROI</p>
+      </div>
+    </div>
+    <span class="material-icons-outlined stage-arrow">chevron_right</span>
+    <div class="stage-item" data-stage="6" onclick="setStage(6)">
+      <div class="stage-number">6</div>
+      <div class="stage-info">
         <h3>Proposal</h3>
-        <p>ROI & export</p>
+        <p>Export & delivery</p>
       </div>
     </div>
   </div>
@@ -1981,12 +2005,216 @@
           </div>
         </div>
 
-        <!-- ==================== STAGE 2 ==================== -->
+        <!-- ==================== STAGE 2: Lab Testing ==================== -->
         <div class="stage-view" id="stage-2">
           <div class="project-header">
             <div class="project-info">
-              <h1>Detailed Quote</h1>
-              <p>Bill of materials and labour breakdown</p>
+              <h1>Lab-Scale Testing</h1>
+              <p>Validate assessments and generate data for accurate system selection</p>
+            </div>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">Sample Status</div>
+              <div class="metric-value accent">Pending</div>
+              <div class="metric-unit">awaiting samples</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Test Duration</div>
+              <div class="metric-value">5-10</div>
+              <div class="metric-unit">days typical</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Tests Planned</div>
+              <div class="metric-value success">4</div>
+              <div class="metric-unit">pathways</div>
+            </div>
+            <div class="metric-card highlight">
+              <div class="metric-label">Data Points</div>
+              <div class="metric-value">~120</div>
+              <div class="metric-unit">per cycle</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">biotech</span>
+                  Lab Test Requirements
+                </div>
+              </div>
+              <div class="section-body">
+                <div style="padding:16px;background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.3);margin-bottom:16px">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                    <span class="material-icons-outlined" style="color:var(--primary);font-size:18px">info</span>
+                    <span style="font-size:13px;font-weight:600;color:var(--primary)">Sample Requirements</span>
+                  </div>
+                  <ul style="font-size:12px;color:var(--text-secondary);margin:0;padding-left:20px">
+                    <li>Minimum 20L representative feed water sample</li>
+                    <li>Sample within 24hrs of collection</li>
+                    <li>Include sample collection date and location</li>
+                    <li>Note any seasonal variations expected</li>
+                  </ul>
+                </div>
+                <div class="divider"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
+                  <span class="chip active">UF Bench Test</span>
+                  <span class="chip active">RO Pilot Cell</span>
+                  <span class="chip">UV Validation</span>
+                  <span class="chip">NF Membrane Test</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">assignment</span>
+                  Test Objectives
+                </div>
+              </div>
+              <div class="section-body">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Treatability Assessment</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Verify treatment pathways work for this specific water</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Recovery Rate Validation</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Optimize recovery without scaling or fouling</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px">
+                  <span class="material-icons-outlined" style="color:var(--success);font-size:20px">check_circle</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Membrane Selection</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Select optimal membrane type and configuration</div>
+                  </div>
+                </div>
+                <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,0.1);border-radius:8px;border:1px solid rgba(245,158,11,0.3)">
+                  <span style="font-size:11px;color:var(--warning)"><span class="material-icons-outlined" style="font-size:14px;vertical-align:middle">schedule</span> Skip for budgetary proposals - results refine accuracy for detailed quotes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STAGE 3: Pilot Validation ==================== -->
+        <div class="stage-view" id="stage-3">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>Pilot-Scale Validation</h1>
+              <p>Prove performance under real operating conditions on-site</p>
+            </div>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">Pilot Status</div>
+              <div class="metric-value accent">Optional</div>
+              <div class="metric-unit">high-confidence</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Typical Duration</div>
+              <div class="metric-value">2-4</div>
+              <div class="metric-unit">weeks on-site</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Pilot Capacity</div>
+              <div class="metric-value success">1-5</div>
+              <div class="metric-unit">m³/hr scalable</div>
+            </div>
+            <div class="metric-card highlight">
+              <div class="metric-label">Confidence Gain</div>
+              <div class="metric-value">+15-25%</div>
+              <div class="metric-unit">risk reduction</div>
+            </div>
+          </div>
+
+          <div class="two-col-grid">
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">precision_manufacturing</span>
+                  Pilot Plant Options
+                </div>
+              </div>
+              <div class="section-body">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+                  <span class="chip active">Containerised 10ft</span>
+                  <span class="chip">Containerised 20ft</span>
+                  <span class="chip">Skid-Mounted</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px">
+                  <span class="material-icons-outlined" style="color:var(--primary);font-size:20px">verified</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Performance Verification</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Confirm output quality under actual site conditions</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-tertiary);border-radius:8px;margin-bottom:8px">
+                  <span class="material-icons-outlined" style="color:var(--primary);font-size:20px">tune</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:600">Design Refinement</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Optimize chemical dosing, recovery, and CIP cycles</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-header">
+                <div class="section-title">
+                  <span class="material-icons-outlined">handshake</span>
+                  Technology Partners
+                </div>
+                <span class="section-badge">Innovation Ecosystem</span>
+              </div>
+              <div class="section-body">
+                <div style="padding:12px;background:linear-gradient(135deg,rgba(0,160,220,0.1),rgba(0,160,220,0.05));border-radius:10px;border:1px solid rgba(0,160,220,0.3);margin-bottom:8px;cursor:pointer">
+                  <div style="font-size:13px;font-weight:600;color:#00a0dc">NX Filtration</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Advanced membrane separation - PFAS, micropollutants</div>
+                </div>
+                <div style="padding:12px;background:linear-gradient(135deg,rgba(247,147,30,0.1),rgba(247,147,30,0.05));border-radius:10px;border:1px solid rgba(247,147,30,0.3);margin-bottom:8px;cursor:pointer">
+                  <div style="font-size:13px;font-weight:600;color:#f7931e">Atlantium Technologies</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Hydro-Optic UV - Log4+ bacterial elimination</div>
+                </div>
+                <div style="padding:12px;background:linear-gradient(135deg,rgba(0,178,122,0.1),rgba(0,178,122,0.05));border-radius:10px;border:1px solid rgba(0,178,122,0.3);cursor:pointer">
+                  <div style="font-size:13px;font-weight:600;color:#00b27a">bNovate Technologies</div>
+                  <div style="font-size:11px;color:var(--text-muted)">Real-time microbial detection <30 min</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">lightbulb</span>
+                Case Study Reference
+              </div>
+            </div>
+            <div class="section-body">
+              <div style="padding:16px;background:rgba(34,197,94,0.1);border-radius:10px;border:1px solid rgba(34,197,94,0.3)">
+                <div style="font-size:14px;font-weight:600;color:var(--success);margin-bottom:8px">Water Utilities - Containerised Pilot</div>
+                <p style="font-size:12px;color:var(--text-secondary);margin:0">Two 20ft containerised pilot plants delivered <strong>300,000 L/day</strong> each with remote monitoring for ceramic membrane technology trials. Designed, built and tested within limited timelines.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STAGE 4: Engineering ==================== -->
+        <div class="stage-view" id="stage-4">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>Detailed Engineering</h1>
+              <p>Bill of materials, fabrication and labour breakdown</p>
               <div class="project-meta">
                 <div class="meta-item">
                   <span class="material-icons-outlined">business</span>
@@ -2134,12 +2362,12 @@
           </div>
         </div>
 
-        <!-- ==================== STAGE 3 ==================== -->
-        <div class="stage-view" id="stage-3">
+        <!-- ==================== STAGE 5: Commercial Analysis ==================== -->
+        <div class="stage-view" id="stage-5">
           <div class="project-header">
             <div class="project-info">
-              <h1>ROI & Proposal</h1>
-              <p>Customer value proposition and document generation</p>
+              <h1>Commercial Analysis</h1>
+              <p>ROI analysis and ESG impact assessment</p>
             </div>
           </div>
 
@@ -2224,15 +2452,109 @@
             </div>
           </div>
 
+          <!-- ESG & Carbon Impact -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">eco</span>
+                ESG & Carbon Impact
+              </div>
+              <span class="section-badge">Sustainability</span>
+            </div>
+            <div class="section-body">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+                <div style="padding:16px;background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(34,197,94,0.05));border-radius:10px;border:1px solid rgba(34,197,94,0.3);text-align:center">
+                  <div style="font-size:22px;font-weight:700;color:var(--success)">124</div>
+                  <div style="font-size:10px;color:var(--text-muted)">tCO₂e/yr avoided</div>
+                </div>
+                <div style="padding:16px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.05));border-radius:10px;border:1px solid rgba(59,130,246,0.3);text-align:center">
+                  <div style="font-size:22px;font-weight:700;color:#3b82f6">75%</div>
+                  <div style="font-size:10px;color:var(--text-muted)">Water Recovery</div>
+                </div>
+                <div style="padding:16px;background:linear-gradient(135deg,rgba(168,85,247,0.1),rgba(168,85,247,0.05));border-radius:10px;border:1px solid rgba(168,85,247,0.3);text-align:center">
+                  <div style="font-size:22px;font-weight:700;color:#a855f7">2.9</div>
+                  <div style="font-size:10px;color:var(--text-muted)">kWh/m³</div>
+                </div>
+                <div style="padding:16px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.05));border-radius:10px;border:1px solid rgba(245,158,11,0.3);text-align:center">
+                  <div style="font-size:22px;font-weight:700;color:var(--warning)">78</div>
+                  <div style="font-size:10px;color:var(--text-muted)">ESG Score</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <span class="chip" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--success)">ISO 14001</span>
+                <span class="chip" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--success)">CDP Water</span>
+                <span class="chip" style="background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:var(--success)">GRI Standards</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STAGE 6: Proposal Generation ==================== -->
+        <div class="stage-view" id="stage-6">
+          <div class="project-header">
+            <div class="project-info">
+              <h1>Proposal Generation</h1>
+              <p>Review and export your complete proposal</p>
+            </div>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">System Price</div>
+              <div class="metric-value accent">£79,075</div>
+              <div class="metric-unit">excl. VAT</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Payback</div>
+              <div class="metric-value success">1.5</div>
+              <div class="metric-unit">years</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Gross Margin</div>
+              <div class="metric-value warning">31%</div>
+              <div class="metric-unit">target</div>
+            </div>
+            <div class="metric-card highlight">
+              <div class="metric-label">Confidence</div>
+              <div class="metric-value">High</div>
+              <div class="metric-unit">6-phase validated</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">
+                <span class="material-icons-outlined">checklist</span>
+                Proposal Summary
+              </div>
+            </div>
+            <div class="section-body">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+                <div style="padding:12px;background:var(--bg-tertiary);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">System Model</div>
+                  <div style="font-size:14px;font-weight:600">MEMR09 (9 m³/hr)</div>
+                </div>
+                <div style="padding:12px;background:var(--bg-tertiary);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Configuration</div>
+                  <div style="font-size:14px;font-weight:600">RO + UV + CIP</div>
+                </div>
+                <div style="padding:12px;background:var(--bg-tertiary);border-radius:8px">
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Lead Time</div>
+                  <div style="font-size:14px;font-weight:600">8-10 weeks</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="section">
             <div class="section-header">
               <div class="section-title">
                 <span class="material-icons-outlined">file_download</span>
-                Export Proposal
+                Export Options
               </div>
             </div>
             <div class="section-body">
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
                 <button class="btn btn-secondary" style="padding:14px">
                   <span class="material-icons-outlined">picture_as_pdf</span>
                   Export PDF
@@ -2244,6 +2566,10 @@
                 <button class="btn btn-secondary" style="padding:14px">
                   <span class="material-icons-outlined">description</span>
                   Export Word
+                </button>
+                <button class="btn btn-primary" style="padding:14px">
+                  <span class="material-icons-outlined">send</span>
+                  Send to Customer
                 </button>
               </div>
             </div>
@@ -2628,7 +2954,7 @@
       document.querySelectorAll('.stage-view').forEach((el, i) => el.classList.toggle('active', i+1 === s));
     }
 
-    function nextStage() { if (currentStage < 3) setStage(currentStage + 1); }
+    function nextStage() { if (currentStage < 6) setStage(currentStage + 1); }
     function prevStage() { if (currentStage > 1) setStage(currentStage - 1); }
 
     function setMode(mode) {
