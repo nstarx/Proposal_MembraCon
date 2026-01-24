@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reactive AI Design Guide - WaterLogic</title>
+
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --panel: #0d1424;
+      --card: #111b2e;
+      --card-hover: #162035;
+      --muted: #8fa3c0;
+      --text: #e8f0ff;
+      --line: #1e2d4a;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #a855f7;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --muted: #64748b;
+      --text: #1e293b;
+      --line: #e2e8f0;
+      --accent: #4f46e5;
+      --accent2: #0891b2;
+      --accent3: #9333ea;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text span { color: var(--accent2); }
+
+    .header-spacer { flex: 1; }
+
+    .header-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-link:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .header-link.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .header-link.primary:hover {
+      opacity: 0.9;
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* Main Content */
+    .main {
+      margin-top: 60px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 40px 24px;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 60px 0;
+      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.05));
+      border-radius: 24px;
+      margin-bottom: 48px;
+      border: 1px solid var(--line);
+    }
+
+    .hero-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 40px;
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .section-icon.purple { background: rgba(168,85,247,0.15); color: var(--accent3); }
+    .section-icon.blue { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .section-icon.cyan { background: rgba(34,211,238,0.15); color: var(--accent2); }
+    .section-icon.green { background: rgba(34,197,94,0.15); color: var(--success); }
+    .section-icon.yellow { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+    .section h2 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 32px;
+      background: var(--panel);
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      margin-bottom: 24px;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-box {
+      width: 120px;
+      height: 80px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .flow-box.input { background: rgba(99,102,241,0.15); border: 2px solid var(--accent); color: var(--accent); }
+    .flow-box.process { background: rgba(168,85,247,0.15); border: 2px solid var(--accent3); color: var(--accent3); }
+    .flow-box.output { background: rgba(34,197,94,0.15); border: 2px solid var(--success); color: var(--success); }
+
+    .flow-arrow {
+      font-size: 24px;
+      color: var(--muted);
+    }
+
+    /* Simulator */
+    .simulator {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .simulator-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .simulator-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .simulator-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .simulator-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .simulator-grid { grid-template-columns: 1fr; }
+    }
+
+    .simulator-inputs h4,
+    .simulator-outputs h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .input-group input[type="number"],
+    .input-group input[type="range"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .input-group input[type="range"] {
+      padding: 0;
+      height: 8px;
+      -webkit-appearance: none;
+      background: var(--line);
+      border: none;
+    }
+
+    .input-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .input-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Result Cards */
+    .result-card {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .result-card.success {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .result-card.warning {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.3);
+    }
+
+    .result-card.danger {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+
+    .result-card.info {
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.3);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .result-header .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .result-card.success .result-header { color: var(--success); }
+    .result-card.warning .result-header { color: var(--warning); }
+    .result-card.danger .result-header { color: var(--danger); }
+    .result-card.info .result-header { color: var(--accent); }
+
+    .result-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .result-body {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.accent2 { color: var(--accent2); }
+    .stat-value.accent3 { color: var(--accent3); }
+    .stat-value.success { color: var(--success); }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Component List */
+    .component-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .component-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .component-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .component-reason {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .component-cost {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Confidence Bar */
+    .confidence-display {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .confidence-score {
+      font-size: 36px;
+      font-weight: 800;
+    }
+
+    .confidence-score.high { color: var(--success); }
+    .confidence-score.medium { color: var(--warning); }
+    .confidence-score.low { color: var(--danger); }
+
+    .confidence-details {
+      flex: 1;
+    }
+
+    .confidence-bar-bg {
+      height: 12px;
+      background: var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .confidence-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+
+    .confidence-bar-fill.high { background: var(--success); }
+    .confidence-bar-fill.medium { background: var(--warning); }
+    .confidence-bar-fill.low { background: var(--danger); }
+
+    .confidence-breakdown {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Example Box */
+    .example-box {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(34,211,238,0.05));
+      border-radius: 12px;
+      border: 1px solid rgba(99,102,241,0.2);
+      margin: 16px 0;
+    }
+
+    .example-box h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .example-box p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .example-box code {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--card);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--accent2);
+    }
+
+    /* Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .data-table th {
+      background: var(--panel);
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table tr:hover td {
+      background: var(--card-hover);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge.critical { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .badge.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .badge.info { background: rgba(99,102,241,0.15); color: var(--accent); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 48px 24px;
+      border-top: 1px solid var(--line);
+      margin-top: 64px;
+    }
+
+    .footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .footer-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="proposal-app.html" class="logo">
+      <div class="logo-icon">
+        <span class="material-icons-outlined">water_drop</span>
+      </div>
+      <div class="logo-text">Water<span>Logic</span></div>
+    </a>
+    <div class="header-spacer"></div>
+    <div class="header-links">
+      <a href="index.html" class="header-link">
+        <span class="material-icons-outlined">home</span>
+        Home
+      </a>
+      <a href="md/reactive-ai-design.md" class="header-link" target="_blank">
+        <span class="material-icons-outlined">description</span>
+        Technical Docs
+      </a>
+      <a href="proposal-app.html" class="header-link primary">
+        <span class="material-icons-outlined">rocket_launch</span>
+        Launch App
+      </a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span class="material-icons-outlined" id="themeIcon">light_mode</span>
+    </button>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-icon">
+        <span class="material-icons-outlined">psychology</span>
+      </div>
+      <h1>Reactive AI Design</h1>
+      <p>Understanding how WaterLogic's intelligent system automatically analyzes your inputs and provides real-time recommendations for water treatment solutions.</p>
+    </section>
+
+    <!-- What is Reactive AI -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon purple">
+          <span class="material-icons-outlined">auto_awesome</span>
+        </div>
+        <div>
+          <h2>What is Reactive AI?</h2>
+          <p class="section-subtitle">Instant intelligence that responds to every change</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <p>Think of Reactive AI like a smart assistant that's always watching what you type. The moment you enter a number - like water temperature or flow rate - the system instantly:</p>
+
+        <div class="grid-3" style="margin-top: 20px;">
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">1</div>
+            <h4 style="margin-bottom: 8px;">Analyzes</h4>
+            <p style="font-size: 13px; color: var(--muted);">Checks your input against industry thresholds and safety limits</p>
+          </div>
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">2</div>
+            <h4 style="margin-bottom: 8px;">Calculates</h4>
+            <p style="font-size: 13px; color: var(--muted);">Determines the right equipment, sizing, and pricing automatically</p>
+          </div>
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">3</div>
+            <h4 style="margin-bottom: 8px;">Advises</h4>
+            <p style="font-size: 13px; color: var(--muted);">Shows warnings, suggests improvements, and updates the quote</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-diagram">
+        <div class="flow-step">
+          <div class="flow-box input">
+            <span class="material-icons-outlined">edit</span>
+            You Type
+          </div>
+        </div>
+        <span class="flow-arrow material-icons-outlined">arrow_forward</span>
+        <div class="flow-step">
+          <div class="flow-box process">
+            <span class="material-icons-outlined">psychology</span>
+            AI Analyzes
+          </div>
+        </div>
+        <span class="flow-arrow material-icons-outlined">arrow_forward</span>
+        <div class="flow-step">
+          <div class="flow-box output">
+            <span class="material-icons-outlined">insights</span>
+            Results Update
+          </div>
+        </div>
+      </div>
+
+      <div class="example-box">
+        <h4><span class="material-icons-outlined">lightbulb</span> Real Example</h4>
+        <p>You enter <code>Iron: 0.15 mg/L</code> in the water quality form.</p>
+        <p>Within milliseconds, the system:</p>
+        <p>- Detects iron is above the 0.1 mg/L threshold</p>
+        <p>- Automatically adds "Iron Removal System" (£3,500) to the quote</p>
+        <p>- Updates the total price and shows a warning message</p>
+      </div>
+    </section>
+
+    <!-- Water Quality Simulator -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon blue">
+          <span class="material-icons-outlined">science</span>
+        </div>
+        <div>
+          <h2>Water Quality Simulator</h2>
+          <p class="section-subtitle">See how different water conditions trigger alarms and component selection</p>
+        </div>
+      </div>
+
+      <div class="simulator">
+        <div class="simulator-header">
+          <span class="material-icons-outlined" style="color: var(--accent);">tune</span>
+          <h3>Try It Yourself</h3>
+          <span class="simulator-badge">Interactive</span>
+        </div>
+
+        <div class="simulator-grid">
+          <div class="simulator-inputs">
+            <h4>Adjust Water Parameters</h4>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>SDI (Silt Density Index)</label>
+                <span class="input-value" id="sdiValue">3</span>
+              </div>
+              <input type="range" id="sdiSlider" min="0" max="10" step="0.5" value="3" oninput="updateWaterSimulator()">
+              <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted);">
+                <span>0 (Clean)</span>
+                <span style="color: var(--danger);">6+ (Pre-treatment needed)</span>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>pH Level</label>
+                <span class="input-value" id="phValue">7.0</span>
+              </div>
+              <input type="range" id="phSlider" min="1" max="14" step="0.1" value="7" oninput="updateWaterSimulator()">
+              <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted);">
+                <span style="color: var(--danger);">1 (Acidic)</span>
+                <span>7 (Neutral)</span>
+                <span style="color: var(--danger);">14 (Alkaline)</span>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Iron (mg/L)</label>
+                <span class="input-value" id="ironValue">0.02</span>
+              </div>
+              <input type="range" id="ironSlider" min="0" max="0.5" step="0.01" value="0.02" oninput="updateWaterSimulator()">
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Hardness (mg/L CaCO₃)</label>
+                <span class="input-value" id="hardnessValue">150</span>
+              </div>
+              <input type="range" id="hardnessSlider" min="0" max="500" step="10" value="150" oninput="updateWaterSimulator()">
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Chlorine (ppm)</label>
+                <span class="input-value" id="chlorineValue">0</span>
+              </div>
+              <input type="range" id="chlorineSlider" min="0" max="1" step="0.01" value="0" oninput="updateWaterSimulator()">
+            </div>
+          </div>
+
+          <div class="simulator-outputs">
+            <h4>AI Analysis Results</h4>
+            <div id="waterResults">
+              <!-- Results will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Sizing Simulator -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon cyan">
+          <span class="material-icons-outlined">precision_manufacturing</span>
+        </div>
+        <div>
+          <h2>System Sizing Simulator</h2>
+          <p class="section-subtitle">Watch how the AI selects the right RO system based on your requirements</p>
+        </div>
+      </div>
+
+      <div class="simulator">
+        <div class="simulator-header">
+          <span class="material-icons-outlined" style="color: var(--accent2);">architecture</span>
+          <h3>RO System Selection</h3>
+          <span class="simulator-badge">Live Calculation</span>
+        </div>
+
+        <div class="simulator-grid">
+          <div class="simulator-inputs">
+            <h4>Your Requirements</h4>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Permeate Flow Required (m³/hr)</label>
+                <span class="input-value" id="flowValue">9</span>
+              </div>
+              <input type="range" id="flowSlider" min="0.25" max="16" step="0.25" value="9" oninput="updateSizingSimulator()">
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Water Temperature (°C)</label>
+                <span class="input-value" id="tempValue">20</span>
+              </div>
+              <input type="range" id="tempSlider" min="5" max="35" step="1" value="20" oninput="updateSizingSimulator()">
+              <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--muted);">
+                <span style="color: var(--warning);">5°C (45% flux)</span>
+                <span>25°C (100%)</span>
+                <span style="color: var(--success);">35°C (130%)</span>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Recovery Target (%)</label>
+                <span class="input-value" id="recoveryValue">75</span>
+              </div>
+              <input type="range" id="recoverySlider" min="50" max="90" step="1" value="75" oninput="updateSizingSimulator()">
+            </div>
+          </div>
+
+          <div class="simulator-outputs">
+            <h4>AI-Selected System</h4>
+            <div id="sizingResults">
+              <!-- Results will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing Simulator -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon green">
+          <span class="material-icons-outlined">calculate</span>
+        </div>
+        <div>
+          <h2>Pricing Simulator</h2>
+          <p class="section-subtitle">See real-time pricing updates as you configure the system</p>
+        </div>
+      </div>
+
+      <div class="simulator">
+        <div class="simulator-header">
+          <span class="material-icons-outlined" style="color: var(--success);">payments</span>
+          <h3>Live Price Calculator</h3>
+          <span class="simulator-badge">Auto-Updates</span>
+        </div>
+
+        <div class="simulator-grid">
+          <div class="simulator-inputs">
+            <h4>Configuration Options</h4>
+
+            <div class="input-group">
+              <label>Base System</label>
+              <select id="systemSelect" onchange="updatePricingSimulator()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text);">
+                <option value="MEMR01">MEMR01 - 1 m³/hr (£3,500)</option>
+                <option value="MEMR04">MEMR04 - 4 m³/hr (£5,500)</option>
+                <option value="MEMR09" selected>MEMR09 - 9 m³/hr (£15,954)</option>
+                <option value="MEMR012">MEMR012 - 12 m³/hr (£23,250)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="optContainer" onchange="updatePricingSimulator()">
+                Container (20ft) - £5,500
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="optUV" onchange="updatePricingSimulator()">
+                UV Disinfection - £2,500
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="optCIP" checked onchange="updatePricingSimulator()">
+                CIP System - £4,716
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="optRemote" onchange="updatePricingSimulator()">
+                Remote Monitoring - £3,500
+              </label>
+            </div>
+
+            <div class="input-group">
+              <div class="input-row">
+                <label>Markup (%)</label>
+                <span class="input-value" id="markupValue">30</span>
+              </div>
+              <input type="range" id="markupSlider" min="10" max="50" step="1" value="30" oninput="updatePricingSimulator()">
+            </div>
+          </div>
+
+          <div class="simulator-outputs">
+            <h4>Price Breakdown</h4>
+            <div id="pricingResults">
+              <!-- Results will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Confidence Score -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon yellow">
+          <span class="material-icons-outlined">verified</span>
+        </div>
+        <div>
+          <h2>AI Confidence Score</h2>
+          <p class="section-subtitle">How the system measures proposal quality and completeness</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <p>The AI assigns a confidence score to every proposal based on data completeness, system health, and configuration quality. This helps you understand when a proposal is ready to send or needs more work.</p>
+
+        <div class="grid-2" style="margin-top: 24px;">
+          <div>
+            <h4 style="margin-bottom: 16px;">Score Components</h4>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Factor</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Base score</td>
+                  <td>+50</td>
+                </tr>
+                <tr>
+                  <td>Each required field completed</td>
+                  <td>+5</td>
+                </tr>
+                <tr>
+                  <td>Each optional field provided</td>
+                  <td>+3</td>
+                </tr>
+                <tr>
+                  <td>Recovery in optimal range (70-85%)</td>
+                  <td>+5</td>
+                </tr>
+                <tr>
+                  <td>Markup in healthy range (25-40%)</td>
+                  <td>+5</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--danger);">Each critical alarm</td>
+                  <td style="color: var(--danger);">-10</td>
+                </tr>
+                <tr>
+                  <td style="color: var(--warning);">Each warning</td>
+                  <td style="color: var(--warning);">-3</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom: 16px;">Confidence Levels</h4>
+            <div class="result-card success">
+              <div class="result-header">
+                <span class="material-icons-outlined">check_circle</span>
+                <span class="result-title">HIGH (85%+)</span>
+              </div>
+              <div class="result-body">Proposal is complete and validated. Ready to generate and send to customer.</div>
+            </div>
+            <div class="result-card warning">
+              <div class="result-header">
+                <span class="material-icons-outlined">warning</span>
+                <span class="result-title">MEDIUM (70-84%)</span>
+              </div>
+              <div class="result-body">Some data missing or warnings present. Review before sending.</div>
+            </div>
+            <div class="result-card danger">
+              <div class="result-header">
+                <span class="material-icons-outlined">error</span>
+                <span class="result-title">LOW (&lt;70%)</span>
+              </div>
+              <div class="result-body">Critical issues or missing data. Address alarms before proceeding.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Thresholds Reference -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon purple">
+          <span class="material-icons-outlined">rule</span>
+        </div>
+        <div>
+          <h2>Water Quality Thresholds</h2>
+          <p class="section-subtitle">The rules the AI uses to evaluate water conditions</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><span class="material-icons-outlined" style="color: var(--danger);">error</span> Critical Alarms (Blocks Proposal)</h3>
+        <p>These conditions must be resolved before a proposal can be generated:</p>
+        <table class="data-table" style="margin-top: 16px;">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Threshold</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SDI</td>
+              <td><span class="badge critical">&gt; 6</span></td>
+              <td>Pre-treatment required; RO at risk of rapid fouling</td>
+            </tr>
+            <tr>
+              <td>pH</td>
+              <td><span class="badge critical">&lt; 5 or &gt; 9</span></td>
+              <td>Risk of irreversible membrane damage</td>
+            </tr>
+            <tr>
+              <td>Chlorine</td>
+              <td><span class="badge critical">&gt; 0.05 ppm</span></td>
+              <td>Carbon filter + SMBS mandatory</td>
+            </tr>
+            <tr>
+              <td>Iron</td>
+              <td><span class="badge critical">&gt; 0.3 mg/L</span></td>
+              <td>Dedicated iron removal system required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="material-icons-outlined" style="color: var(--warning);">warning</span> Warnings (Review Recommended)</h3>
+        <p>These conditions should be addressed but don't block proposal generation:</p>
+        <table class="data-table" style="margin-top: 16px;">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Threshold</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Temperature</td>
+              <td><span class="badge warning">&lt; 15°C</span></td>
+              <td>Flux reduction expected - consider oversizing</td>
+            </tr>
+            <tr>
+              <td>Hardness</td>
+              <td><span class="badge warning">&gt; 300 mg/L</span></td>
+              <td>Softener or antiscalant required</td>
+            </tr>
+            <tr>
+              <td>TDS</td>
+              <td><span class="badge warning">&gt; 1000 ppm</span></td>
+              <td>High-rejection membranes recommended</td>
+            </tr>
+            <tr>
+              <td>TSS</td>
+              <td><span class="badge warning">&gt; 5 ppm</span></td>
+              <td>Full pre-treatment required</td>
+            </tr>
+            <tr>
+              <td>Turbidity</td>
+              <td><span class="badge warning">&gt; 5 NTU</span></td>
+              <td>Sand/multimedia filter needed</td>
+            </tr>
+            <tr>
+              <td>Pressure</td>
+              <td><span class="badge warning">&lt; 3 BAR</span></td>
+              <td>Boost pump required</td>
+            </tr>
+            <tr>
+              <td>Target Quality</td>
+              <td><span class="badge warning">&lt; 10 µS/cm</span></td>
+              <td>Second stage RO required</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section">
+      <div class="section-header">
+        <div class="section-icon cyan">
+          <span class="material-icons-outlined">integration_instructions</span>
+        </div>
+        <div>
+          <h2>How It All Works Together</h2>
+          <p class="section-subtitle">The complete reactive flow from input to output</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grid-2">
+          <div>
+            <h4 style="margin-bottom: 16px;">Step-by-Step Process</h4>
+            <ol style="padding-left: 20px; color: var(--muted); font-size: 14px;">
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">User enters data</strong><br>
+                Any form input change triggers the reactive system
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">State updates</strong><br>
+                The proxy-based store captures the change automatically
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">Calculations run</strong><br>
+                System sizing, water analysis, and pricing all recalculate
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">Thresholds checked</strong><br>
+                Water quality is evaluated against all alarm thresholds
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">Components selected</strong><br>
+                Pre-treatment equipment is auto-added based on conditions
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">UI updates</strong><br>
+                All displays refresh with new values, warnings, and prices
+              </li>
+              <li style="margin-bottom: 12px;">
+                <strong style="color: var(--text);">Decision logged</strong><br>
+                Every change is recorded in the audit trail
+              </li>
+            </ol>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 16px;">Speed & Performance</h4>
+            <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+              <div class="stat-card">
+                <div class="stat-value accent">&lt;100ms</div>
+                <div class="stat-label">Input Capture</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value accent2">&lt;200ms</div>
+                <div class="stat-label">Calculations</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value accent3">&lt;300ms</div>
+                <div class="stat-label">UI Update</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value success">100ms</div>
+                <div class="stat-label">Debounce</div>
+              </div>
+            </div>
+            <div class="example-box" style="margin-top: 16px;">
+              <h4><span class="material-icons-outlined">speed</span> Why Debouncing?</h4>
+              <p>When you drag a slider, dozens of values fire in quick succession. Debouncing waits 100ms after you stop moving before running calculations. This prevents lag and keeps the UI smooth.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="hero" style="margin-top: 48px;">
+      <h2 style="font-size: 28px; margin-bottom: 16px;">Ready to Try It?</h2>
+      <p style="margin-bottom: 24px;">Experience the reactive AI system in the full WaterLogic proposal application.</p>
+      <a href="proposal-app.html" class="header-link primary" style="display: inline-flex; font-size: 16px; padding: 12px 24px;">
+        <span class="material-icons-outlined">rocket_launch</span>
+        Launch WaterLogic App
+      </a>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>MembraCon WaterLogic - Intelligent Proposal System</p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="proposal-app.html">Proposal App</a>
+      <a href="md/reactive-ai-design.md" target="_blank">Technical Documentation</a>
+      <a href="md/PRD-WaterLogic-Proposal-System.md" target="_blank">PRD</a>
+    </div>
+  </footer>
+
+  <script>
+    // Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const currentTheme = html.getAttribute('data-theme');
+
+      if (currentTheme === 'light') {
+        html.removeAttribute('data-theme');
+        themeIcon.textContent = 'light_mode';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeIcon.textContent = 'dark_mode';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Load saved theme
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('themeIcon').textContent = 'dark_mode';
+      }
+    })();
+
+    // Water Quality Simulator
+    function updateWaterSimulator() {
+      const sdi = parseFloat(document.getElementById('sdiSlider').value);
+      const ph = parseFloat(document.getElementById('phSlider').value);
+      const iron = parseFloat(document.getElementById('ironSlider').value);
+      const hardness = parseFloat(document.getElementById('hardnessSlider').value);
+      const chlorine = parseFloat(document.getElementById('chlorineSlider').value);
+
+      // Update displayed values
+      document.getElementById('sdiValue').textContent = sdi.toFixed(1);
+      document.getElementById('phValue').textContent = ph.toFixed(1);
+      document.getElementById('ironValue').textContent = iron.toFixed(2);
+      document.getElementById('hardnessValue').textContent = hardness;
+      document.getElementById('chlorineValue').textContent = chlorine.toFixed(2);
+
+      // Analyze and generate results
+      let html = '';
+      const alarms = [];
+      const warnings = [];
+      const components = [];
+
+      // Check critical alarms
+      if (sdi > 6) {
+        alarms.push({ param: 'SDI', value: sdi, message: 'Pre-treatment required; RO at risk of rapid fouling' });
+        components.push({ name: 'Pre-treatment Package', cost: 8500, reason: 'SDI > 6' });
+      }
+      if (ph < 5 || ph > 9) {
+        alarms.push({ param: 'pH', value: ph, message: 'Risk of irreversible membrane damage' });
+        components.push({ name: 'pH Adjustment Dosing', cost: 1400, reason: 'pH outside 5-9 range' });
+      }
+      if (chlorine > 0.05) {
+        alarms.push({ param: 'Chlorine', value: chlorine, message: 'Carbon filter + SMBS mandatory' });
+        components.push({ name: 'Carbon Filter', cost: 1062, reason: 'Chlorine > 0.05 ppm' });
+      }
+      if (iron > 0.3) {
+        alarms.push({ param: 'Iron', value: iron, message: 'Dedicated iron removal system required' });
+        components.push({ name: 'Dedicated Iron System', cost: 5500, reason: 'Iron > 0.3 mg/L' });
+      } else if (iron > 0.1) {
+        warnings.push({ param: 'Iron', value: iron, message: 'Iron removal recommended' });
+        components.push({ name: 'Iron Removal', cost: 3500, reason: 'Iron > 0.1 mg/L' });
+      }
+
+      // Check warnings
+      if (hardness > 300) {
+        warnings.push({ param: 'Hardness', value: hardness, message: 'Softener or antiscalant required' });
+        components.push({ name: 'Water Softener', cost: 4500, reason: 'Hardness > 300 mg/L' });
+      } else if (hardness > 100) {
+        components.push({ name: 'Antiscalant Dosing', cost: 1400, reason: 'Hardness > 100 mg/L' });
+      }
+
+      // Render alarms
+      alarms.forEach(a => {
+        html += `
+          <div class="result-card danger">
+            <div class="result-header">
+              <span class="material-icons-outlined">error</span>
+              <span class="result-title">CRITICAL: ${a.param} = ${a.value}</span>
+            </div>
+            <div class="result-body">${a.message}</div>
+          </div>
+        `;
+      });
+
+      // Render warnings
+      warnings.forEach(w => {
+        html += `
+          <div class="result-card warning">
+            <div class="result-header">
+              <span class="material-icons-outlined">warning</span>
+              <span class="result-title">WARNING: ${w.param} = ${w.value}</span>
+            </div>
+            <div class="result-body">${w.message}</div>
+          </div>
+        `;
+      });
+
+      // Render success if no issues
+      if (alarms.length === 0 && warnings.length === 0) {
+        html += `
+          <div class="result-card success">
+            <div class="result-header">
+              <span class="material-icons-outlined">check_circle</span>
+              <span class="result-title">Water Quality OK</span>
+            </div>
+            <div class="result-body">All parameters within acceptable ranges.</div>
+          </div>
+        `;
+      }
+
+      // Render auto-components
+      if (components.length > 0) {
+        html += `<h4 style="margin: 16px 0 12px; font-size: 13px; color: var(--muted);">Auto-Selected Components</h4>`;
+        html += `<div class="component-list">`;
+        let totalCost = 0;
+        components.forEach(c => {
+          totalCost += c.cost;
+          html += `
+            <div class="component-item">
+              <div>
+                <div class="component-name">${c.name}</div>
+                <div class="component-reason">${c.reason}</div>
+              </div>
+              <div class="component-cost">£${c.cost.toLocaleString()}</div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        html += `
+          <div style="margin-top: 12px; padding: 12px; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(34,211,238,0.05)); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; font-weight: 600;">Pre-treatment Total</span>
+            <span style="font-size: 18px; font-weight: 700; color: var(--accent);">£${totalCost.toLocaleString()}</span>
+          </div>
+        `;
+      }
+
+      document.getElementById('waterResults').innerHTML = html;
+    }
+
+    // System Sizing Simulator
+    const MEMR_SYSTEMS = [
+      { model: 'MEMR0025', flow: 0.25, cost: 1700, membranes: 1 },
+      { model: 'MEMR005', flow: 0.5, cost: 2200, membranes: 2 },
+      { model: 'MEMR01', flow: 1, cost: 3500, membranes: 4 },
+      { model: 'MEMR02', flow: 2, cost: 4500, membranes: 2 },
+      { model: 'MEMR04', flow: 4, cost: 5500, membranes: 4 },
+      { model: 'MEMR06', flow: 6, cost: 12100, membranes: 6 },
+      { model: 'MEMR09', flow: 9, cost: 15954, membranes: 9 },
+      { model: 'MEMR012', flow: 12, cost: 23250, membranes: 12 },
+      { model: 'MEMR016', flow: 16, cost: 27500, membranes: 16 }
+    ];
+
+    const TEMP_FACTORS = { 5: 0.45, 10: 0.58, 15: 0.75, 20: 0.88, 25: 1.00, 30: 1.15, 35: 1.30 };
+
+    function updateSizingSimulator() {
+      const flow = parseFloat(document.getElementById('flowSlider').value);
+      const temp = parseInt(document.getElementById('tempSlider').value);
+      const recovery = parseInt(document.getElementById('recoverySlider').value);
+
+      document.getElementById('flowValue').textContent = flow;
+      document.getElementById('tempValue').textContent = temp;
+      document.getElementById('recoveryValue').textContent = recovery;
+
+      // Get temperature factor
+      const tempKey = Object.keys(TEMP_FACTORS).reduce((a, b) =>
+        Math.abs(b - temp) < Math.abs(a - temp) ? b : a
+      );
+      const tempFactor = TEMP_FACTORS[tempKey];
+
+      // Adjust flow for temperature
+      const adjustedFlow = flow / tempFactor;
+
+      // Select system
+      const system = MEMR_SYSTEMS.find(s => s.flow >= adjustedFlow) || MEMR_SYSTEMS[MEMR_SYSTEMS.length - 1];
+
+      // Calculate flows
+      const feedFlow = flow / (recovery / 100);
+      const rejectFlow = feedFlow - flow;
+
+      let html = `
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="stat-card">
+            <div class="stat-value accent">${system.model}</div>
+            <div class="stat-label">Selected System</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value success">£${system.cost.toLocaleString()}</div>
+            <div class="stat-label">Base Cost</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value accent2">${feedFlow.toFixed(2)}</div>
+            <div class="stat-label">Feed Flow (m³/hr)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value accent3">${rejectFlow.toFixed(2)}</div>
+            <div class="stat-label">Reject Flow (m³/hr)</div>
+          </div>
+        </div>
+      `;
+
+      // Temperature warning
+      if (temp < 15) {
+        html += `
+          <div class="result-card warning" style="margin-top: 12px;">
+            <div class="result-header">
+              <span class="material-icons-outlined">warning</span>
+              <span class="result-title">Temperature Adjustment Applied</span>
+            </div>
+            <div class="result-body">At ${temp}°C, membrane flux is only ${Math.round(tempFactor * 100)}% of rated capacity. System oversized from ${flow} to ${adjustedFlow.toFixed(2)} m³/hr capacity.</div>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="example-box" style="margin-top: 16px;">
+          <h4><span class="material-icons-outlined">calculate</span> Calculation</h4>
+          <p>Required: <code>${flow} m³/hr</code> @ <code>${temp}°C</code></p>
+          <p>Temp factor: <code>${tempFactor}</code> (${Math.round(tempFactor * 100)}% of 25°C capacity)</p>
+          <p>Adjusted capacity needed: <code>${flow} ÷ ${tempFactor} = ${adjustedFlow.toFixed(2)} m³/hr</code></p>
+          <p>Selected: <code>${system.model}</code> (${system.flow} m³/hr, ${system.membranes} membranes)</p>
+        </div>
+      `;
+
+      document.getElementById('sizingResults').innerHTML = html;
+    }
+
+    // Pricing Simulator
+    function updatePricingSimulator() {
+      const systemPrices = {
+        'MEMR01': { cost: 3500, cip: 3500 },
+        'MEMR04': { cost: 5500, cip: 3500 },
+        'MEMR09': { cost: 15954, cip: 4716 },
+        'MEMR012': { cost: 23250, cip: 4716 }
+      };
+
+      const system = document.getElementById('systemSelect').value;
+      const container = document.getElementById('optContainer').checked;
+      const uv = document.getElementById('optUV').checked;
+      const cip = document.getElementById('optCIP').checked;
+      const remote = document.getElementById('optRemote').checked;
+      const markup = parseInt(document.getElementById('markupSlider').value);
+
+      document.getElementById('markupValue').textContent = markup;
+
+      const sysData = systemPrices[system];
+      let baseCost = sysData.cost;
+      if (cip) baseCost += sysData.cip;
+
+      let optionsCost = 0;
+      if (container) optionsCost += 5500;
+      if (uv) optionsCost += 2500;
+      if (remote) optionsCost += 3500;
+
+      const totalCost = baseCost + optionsCost;
+      const overheads = totalCost * 0.12; // 12% overheads
+      const sellingPrice = (totalCost + overheads) * (1 + markup / 100);
+      const grossMargin = ((sellingPrice - totalCost) / sellingPrice * 100).toFixed(1);
+
+      let html = `
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="stat-card">
+            <div class="stat-value accent">£${baseCost.toLocaleString()}</div>
+            <div class="stat-label">Base System${cip ? ' + CIP' : ''}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value accent2">£${optionsCost.toLocaleString()}</div>
+            <div class="stat-label">Options</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value accent3">£${Math.round(overheads).toLocaleString()}</div>
+            <div class="stat-label">Overheads (12%)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value success">${grossMargin}%</div>
+            <div class="stat-label">Gross Margin</div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; padding: 20px; background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.1)); border-radius: 12px; border: 1px solid rgba(99,102,241,0.3); text-align: center;">
+          <div style="font-size: 12px; color: var(--muted); margin-bottom: 4px;">SELLING PRICE</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--accent);">£${Math.round(sellingPrice).toLocaleString()}</div>
+        </div>
+        <div class="example-box" style="margin-top: 16px;">
+          <h4><span class="material-icons-outlined">receipt</span> Price Formula</h4>
+          <p>Base + Options = <code>£${baseCost.toLocaleString()} + £${optionsCost.toLocaleString()} = £${totalCost.toLocaleString()}</code></p>
+          <p>+ Overheads (12%) = <code>£${Math.round(overheads).toLocaleString()}</code></p>
+          <p>× Markup (${markup}%) = <code>£${Math.round(sellingPrice).toLocaleString()}</code></p>
+        </div>
+      `;
+
+      document.getElementById('pricingResults').innerHTML = html;
+    }
+
+    // Initialize simulators
+    document.addEventListener('DOMContentLoaded', () => {
+      updateWaterSimulator();
+      updateSizingSimulator();
+      updatePricingSimulator();
+    });
+  </script>
+</body>
+</html>

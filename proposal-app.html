@@ -163,6 +163,22 @@
       background: #e2e8f0;
     }
 
+    /* Light theme reactive elements */
+    [data-theme="light"] .reactive-alarm.critical {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.25);
+    }
+
+    [data-theme="light"] .reactive-alarm.warning {
+      background: rgba(245,158,11,0.08);
+      border-color: rgba(245,158,11,0.25);
+    }
+
+    [data-theme="light"] .suggestion-card.critical-card {
+      background: rgba(239,68,68,0.05);
+      border-color: rgba(239,68,68,0.25);
+    }
+
     /* Smooth theme transition */
     * {
       transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -1570,6 +1586,18 @@
     .suggestion-icon.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
     .suggestion-icon.opportunity { background: rgba(59,130,246,0.15); color: #3b82f6; }
     .suggestion-icon.save { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .suggestion-icon.critical { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .suggestion-icon.success { background: rgba(34,197,94,0.15); color: var(--success); }
+
+    .suggestion-card.critical-card {
+      border: 1px solid rgba(239,68,68,0.4);
+      background: rgba(239,68,68,0.08);
+    }
+
+    .suggestion-impact.critical {
+      background: rgba(239,68,68,0.15);
+      color: var(--danger);
+    }
 
     .suggestion-title {
       font-size: 11px;
@@ -2327,11 +2355,11 @@
               <div class="form-row three-cols">
                 <div class="input-field">
                   <label class="input-label" for="feedTDS">TDS (ppm) <span class="shortcut-key">T</span></label>
-                  <input type="number" class="form-input" id="feedTDS" value="45" data-shortcut="t">
+                  <input type="number" class="form-input" id="feedTDS" value="500" data-shortcut="t" data-reactive="feedTDS">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedTSS">TSS (ppm) <span class="shortcut-key">S</span></label>
-                  <input type="number" class="form-input" id="feedTSS" value="1" data-shortcut="s">
+                  <input type="number" class="form-input" id="feedTSS" value="5" data-shortcut="s" data-reactive="feedTSS">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedBOD">BOD (mg/L) <span class="shortcut-key">B</span></label>
@@ -2345,44 +2373,55 @@
               <div class="form-row three-cols">
                 <div class="input-field">
                   <label class="input-label" for="feedConductivity">Conductivity (µS/cm) <span class="shortcut-key">C</span></label>
-                  <input type="number" class="form-input" id="feedConductivity" value="11" data-shortcut="c">
+                  <input type="number" class="form-input" id="feedConductivity" value="500" data-shortcut="c" data-reactive="feedConductivity">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedPH">pH <span class="shortcut-key">P</span></label>
-                  <input type="number" class="form-input" id="feedPH" value="6" step="0.1" min="0" max="14" data-shortcut="p">
+                  <input type="number" class="form-input" id="feedPH" value="7" step="0.1" min="0" max="14" data-shortcut="p" data-reactive="ph">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedChlorine">Chlorine (ppm) <span class="shortcut-key">L</span></label>
-                  <input type="number" class="form-input" id="feedChlorine" value="0.01" step="0.01" data-shortcut="l">
+                  <input type="number" class="form-input" id="feedChlorine" value="0" step="0.01" data-shortcut="l" data-reactive="chlorine">
                 </div>
               </div>
               <div class="form-row three-cols" style="margin-top:12px">
                 <div class="input-field">
                   <label class="input-label" for="feedTurbidity">Turbidity (NTU) <span class="shortcut-key">U</span></label>
-                  <input type="number" class="form-input" id="feedTurbidity" value="1" step="0.1" data-shortcut="u">
+                  <input type="number" class="form-input" id="feedTurbidity" value="1" step="0.1" data-shortcut="u" data-reactive="turbidity">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedSDI">SDI <span class="shortcut-key">D</span></label>
-                  <input type="number" class="form-input" id="feedSDI" value="3" step="0.1" data-shortcut="d">
+                  <input type="number" class="form-input" id="feedSDI" value="3" step="0.1" data-shortcut="d" data-reactive="sdi">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedIron">Iron (mg/L) <span class="shortcut-key">I</span></label>
-                  <input type="number" class="form-input" id="feedIron" value="0.01" step="0.01" data-shortcut="i">
+                  <input type="number" class="form-input" id="feedIron" value="0.02" step="0.01" data-shortcut="i" data-reactive="iron">
                 </div>
               </div>
               <div class="form-row three-cols" style="margin-top:12px">
                 <div class="input-field">
                   <label class="input-label" for="feedHardness">Hardness (mg/L CaCO₃) <span class="shortcut-key">A</span></label>
-                  <input type="number" class="form-input" id="feedHardness" value="100" data-shortcut="a">
+                  <input type="number" class="form-input" id="feedHardness" value="150" data-shortcut="a" data-reactive="hardness">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedTemp">Temperature (°C) <span class="shortcut-key">E</span></label>
-                  <input type="number" class="form-input" id="feedTemp" value="15" data-shortcut="e">
+                  <input type="number" class="form-input" id="feedTemp" value="20" data-shortcut="e" data-reactive="temperature">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="feedPressure">Feed Pressure (BAR) <span class="shortcut-key">R</span></label>
-                  <input type="number" class="form-input" id="feedPressure" value="4" step="0.1" data-shortcut="r">
+                  <input type="number" class="form-input" id="feedPressure" value="4" step="0.1" data-shortcut="r" data-reactive="feedPressure">
                 </div>
+              </div>
+            </div>
+
+            <!-- Reactive AI Alarms Panel -->
+            <div class="form-group">
+              <label class="form-label">
+                <span class="material-icons-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px">smart_toy</span>
+                AI Water Quality Analysis
+              </label>
+              <div id="reactiveAlarms">
+                <!-- Reactive alarms and warnings will be rendered here -->
               </div>
             </div>
 
@@ -2399,7 +2438,7 @@
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="outConductivity">Permeate Quality (µS/cm) <span class="shortcut-key">Q</span></label>
-                  <input type="number" class="form-input" id="outConductivity" value="15" data-shortcut="q">
+                  <input type="number" class="form-input" id="outConductivity" value="12" data-shortcut="q" data-reactive="permeateQuality">
                 </div>
               </div>
             </div>
@@ -2409,29 +2448,48 @@
               <div class="form-row three-cols">
                 <div class="input-field">
                   <label class="input-label" for="recovery">Recovery (%) <span class="shortcut-key">Y</span></label>
-                  <input type="number" class="form-input" id="recovery" value="75" min="50" max="95" data-shortcut="y">
+                  <input type="number" class="form-input" id="recovery" value="75" min="50" max="95" data-shortcut="y" data-reactive="recoveryTarget">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="componentMarkup">Component Markup (%) <span class="shortcut-key">M</span></label>
-                  <input type="number" class="form-input" id="componentMarkup" value="30" min="0" max="100" data-shortcut="m">
+                  <input type="number" class="form-input" id="componentMarkup" value="30" min="0" max="100" data-shortcut="m" data-reactive="componentMarkup">
                 </div>
                 <div class="input-field">
                   <label class="input-label" for="permeateFlow">Permeate Flow (m³/hr) <span class="shortcut-key">X</span></label>
-                  <input type="number" class="form-input" id="permeateFlow" value="9" data-shortcut="x">
+                  <input type="number" class="form-input" id="permeateFlow" value="9" data-shortcut="x" data-reactive="permeateFlow">
                 </div>
+              </div>
+            </div>
+
+            <!-- Reactive Auto-Components Panel -->
+            <div class="form-group">
+              <label class="form-label">
+                <span class="material-icons-outlined" style="font-size:16px;vertical-align:middle;margin-right:4px">auto_fix_high</span>
+                AI Auto-Selected Pre-Treatment
+              </label>
+              <div id="reactiveComponents">
+                <!-- Reactive auto-components will be rendered here -->
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">System Configuration</label>
               <div class="chip-group">
-                <div class="chip" id="chipContainer">
+                <div class="chip" id="chipContainer" data-reactive-toggle="containerRequired" onclick="toggleReactiveChip(this)">
                   <span class="material-icons-outlined">view_in_ar</span>
                   Container Required
                 </div>
-                <div class="chip active" id="chipUV">
+                <div class="chip" id="chipUV" data-reactive-toggle="uvRequired" onclick="toggleReactiveChip(this)">
                   <span class="material-icons-outlined">light_mode</span>
                   UV Required
+                </div>
+                <div class="chip active" id="chipCIP" data-reactive-toggle="cipRequired" onclick="toggleReactiveChip(this)">
+                  <span class="material-icons-outlined">cleaning_services</span>
+                  CIP System
+                </div>
+                <div class="chip" id="chipRemote" data-reactive-toggle="remoteMonitoring" onclick="toggleReactiveChip(this)">
+                  <span class="material-icons-outlined">wifi</span>
+                  Remote Monitoring
                 </div>
               </div>
             </div>
@@ -2514,30 +2572,25 @@
               </div>
             </div>
 
-            <!-- Calculated Values Panel -->
+            <!-- Reactive System Info Display -->
             <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid var(--line)">
               <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">
-                RO System Calculations
+                <span class="material-icons-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px">auto_awesome</span>
+                AI-Calculated System Design
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
-                <div style="color:var(--muted)">Feed Flow (m³/hr):</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcFeedFlow">11.25</div>
-                <div style="color:var(--muted)">Reject Flow (m³/hr):</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcRejectFlow">2.25</div>
-                <div style="color:var(--muted)">Permeate Flow (m³/hr):</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPermeateFlow">9.00</div>
-                <div style="color:var(--muted)">Membrane Area (m²) 8080:</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcMembraneArea">37</div>
-                <div style="color:var(--muted)">Number of Membranes:</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcNumMembranes">9</div>
-                <div style="color:var(--muted)">Total Membrane Area (m²):</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcTotalArea">333</div>
-                <div style="color:var(--muted)">Pressure Vessels:</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPressureVessels">3</div>
-                <div style="color:var(--muted)">Estimated µS/cm 1st Stage:</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcConductivity">1.08</div>
-                <div style="color:var(--muted)">Pump Power (kW):</div>
-                <div style="text-align:right;font-weight:600;color:var(--accent2)" id="calcPumpPower">7.5</div>
+              <div id="reactiveSystemInfo">
+                <!-- Reactive system calculations will be rendered here -->
+              </div>
+            </div>
+
+            <!-- Reactive Pricing Summary -->
+            <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(34,211,238,0.05));border-radius:12px;border:1px solid rgba(99,102,241,0.2)">
+              <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">
+                <span class="material-icons-outlined" style="font-size:14px;vertical-align:middle;margin-right:4px">calculate</span>
+                Real-Time Pricing
+              </div>
+              <div id="reactivePricing">
+                <!-- Reactive pricing will be rendered here -->
               </div>
             </div>
 
@@ -2547,19 +2600,7 @@
                 <span style="font-size:13px;font-weight:600;color:var(--success)">Solution Validated</span>
               </div>
               <p style="font-size:12px;color:var(--muted);margin:0">
-                UF + RO + UV train meets all output quality requirements with 89% confidence.
-                Expected water recovery: 75%. Total energy: 2.9 kWh/m³.
-              </p>
-            </div>
-
-            <!-- Warning Panel (from spreadsheet) -->
-            <div style="margin-top:16px;padding:12px;background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.3)">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <span class="material-icons-outlined" style="color:var(--warning);font-size:18px">warning</span>
-                <span style="font-size:12px;font-weight:600;color:var(--warning)">Temperature Warning</span>
-              </div>
-              <p style="font-size:11px;color:var(--muted);margin:0">
-                Temperature is low - check this could affect flow. Perhaps increase size of system.
+                Configuration meets all requirements. Real-time calculations update automatically as you change parameters.
               </p>
             </div>
 
@@ -4903,6 +4944,778 @@
       }
     }
 
+    // ==================== REACTIVE AI SYSTEM ====================
+    // Reactive State Management - Proxy-based observable store
+    const ReactiveStore = {
+      _state: {},
+      _watchers: new Map(),
+      _debounceTimers: {},
+
+      // Initialize state with defaults from PRD
+      init(initialState) {
+        this._state = initialState;
+        return new Proxy(this._state, {
+          set: (target, property, value) => {
+            const oldValue = target[property];
+            target[property] = value;
+            if (oldValue !== value) {
+              this._notify(property, value, oldValue);
+            }
+            return true;
+          },
+          get: (target, property) => target[property]
+        });
+      },
+
+      // Watch for changes to specific properties
+      watch(property, callback, debounceMs = 100) {
+        if (!this._watchers.has(property)) {
+          this._watchers.set(property, []);
+        }
+        this._watchers.get(property).push({ callback, debounceMs });
+      },
+
+      // Notify watchers of changes with debouncing
+      _notify(property, newValue, oldValue) {
+        const watchers = this._watchers.get(property) || [];
+        const globalWatchers = this._watchers.get('*') || [];
+
+        [...watchers, ...globalWatchers].forEach(({ callback, debounceMs }) => {
+          const timerId = `${property}_${callback.name || 'anon'}`;
+          clearTimeout(this._debounceTimers[timerId]);
+          this._debounceTimers[timerId] = setTimeout(() => {
+            callback(newValue, oldValue, property);
+          }, debounceMs);
+        });
+      },
+
+      // Get current state
+      getState() {
+        return { ...this._state };
+      }
+    };
+
+    // ==================== WATER QUALITY THRESHOLDS (from PRD) ====================
+    const THRESHOLDS = {
+      // Critical Alarms (Red) - Block proposal
+      critical: {
+        sdi: { max: 6, message: 'SDI HIGH - Pre-treatment required; RO at risk of rapid fouling' },
+        ph: { min: 5, max: 9, message: 'pH out of range - Risk of irreversible membrane damage' },
+        chlorine: { max: 0.05, message: 'Chlorine HIGH - Carbon filter + SMBS mandatory' },
+        iron: { max: 0.3, message: 'Iron Levels HIGH - Dedicated iron removal system required' }
+      },
+      // Warnings (Yellow) - Display but allow continuation
+      warnings: {
+        temperature: { min: 15, message: 'Temperature is low - flux reduction expected' },
+        hardness: { max: 300, message: 'Hard water detected - Softener or antiscalant required' },
+        tds: { max: 1000, message: 'TDS HIGH - High-rejection membranes recommended' },
+        tss: { max: 5, message: 'TSS HIGH - Full pre-treatment required' },
+        turbidity: { max: 5, message: 'Turbidity HIGH - Sand/multimedia filter needed' },
+        pressure: { min: 3, message: 'Pressure LOW - Boost pump required' },
+        conductivityTarget: { max: 10, message: 'Ultra-pure target - Second stage RO required' }
+      },
+      // Pre-treatment triggers
+      pretreatment: {
+        chlorine: { threshold: 0.05, component: 'Carbon Filter', cost: 1062 },
+        iron_low: { threshold: 0.1, component: 'Iron Removal', cost: 3500 },
+        iron_high: { threshold: 0.3, component: 'Dedicated Iron System', cost: 5500 },
+        hardness_moderate: { threshold: 100, component: 'Antiscalant Dosing', cost: 1400 },
+        hardness_high: { threshold: 300, component: 'Water Softener', cost: 4500 },
+        turbidity: { threshold: 5, component: 'Sand Filter', cost: 2500 },
+        tss: { threshold: 5, component: 'Multimedia Filter', cost: 3000 },
+        sdi: { threshold: 6, component: 'Pre-treatment Package', cost: 8500 },
+        pressure: { threshold: 3, component: 'Boost Pump', cost: 2500, condition: 'below' },
+        ph_low: { threshold: 6, component: 'pH Adjustment Dosing', cost: 1400, condition: 'below' },
+        ph_high: { threshold: 8.5, component: 'pH Adjustment Dosing', cost: 1400, condition: 'above' }
+      }
+    };
+
+    // ==================== RO SYSTEM SIZING DATA (from PRD) ====================
+    const MEMR_SYSTEMS = [
+      { model: 'MEMR0025', flow: 0.25, baseCost: 1700, membranes: 1, power: 0, cip: 3500 },
+      { model: 'MEMR005', flow: 0.5, baseCost: 2200, membranes: 2, power: 0, cip: 3500 },
+      { model: 'MEMR01', flow: 1, baseCost: 3500, membranes: 4, power: 0, cip: 3500 },
+      { model: 'MEMR02', flow: 2, baseCost: 4500, membranes: 2, power: 3, cip: 3500 },
+      { model: 'MEMR04', flow: 4, baseCost: 5500, membranes: 4, power: 4, cip: 3500 },
+      { model: 'MEMR06', flow: 6, baseCost: 12100, membranes: 6, power: 7.5, cip: 3500 },
+      { model: 'MEMR09', flow: 9, baseCost: 15954, membranes: 9, power: 7.5, cip: 4716 },
+      { model: 'MEMR012', flow: 12, baseCost: 23250, membranes: 12, power: 11, cip: 4716 },
+      { model: 'MEMR016', flow: 16, baseCost: 27500, membranes: 16, power: 11, cip: 4716 }
+    ];
+
+    const TEMP_CORRECTION = {
+      5: 0.45, 10: 0.58, 15: 0.75, 20: 0.88, 25: 1.00, 30: 1.15, 35: 1.30
+    };
+
+    // ==================== INITIALIZE REACTIVE STATE ====================
+    const state = ReactiveStore.init({
+      // Customer & Project
+      customerName: '',
+      projectName: '',
+      industrySector: 'General Industrial',
+      location: '',
+
+      // Water Quality Parameters
+      permeateFlow: 9,
+      permeateQuality: 12,
+      feedConductivity: 500,
+      feedPressure: 4,
+      feedTDS: 500,
+      feedTSS: 5,
+      chlorine: 0,
+      turbidity: 1,
+      sdi: 3,
+      ph: 7,
+      iron: 0.02,
+      hardness: 150,
+      temperature: 20,
+
+      // System Configuration
+      containerRequired: false,
+      containerSize: '20ft',
+      uvRequired: false,
+      cipRequired: true,
+      remoteMonitoring: false,
+      recoveryTarget: 75,
+      componentMarkup: 30,
+
+      // Calculated Results
+      selectedModel: null,
+      feedFlow: 0,
+      rejectFlow: 0,
+      membraneCount: 0,
+      estimatedConductivity: 0,
+
+      // AI Analysis Results
+      alarms: [],
+      warnings: [],
+      recommendations: [],
+      autoComponents: [],
+
+      // Pricing
+      baseCost: 0,
+      pretreatmentCost: 0,
+      optionsCost: 0,
+      totalCost: 0,
+      sellingPrice: 0,
+      grossMargin: 0,
+
+      // Confidence
+      aiConfidence: 70,
+      dataCompleteness: 0
+    });
+
+    // ==================== REACTIVE CALCULATION ENGINE ====================
+    const CalculationEngine = {
+      // Calculate RO system sizing
+      calculateSizing() {
+        const { permeateFlow, recoveryTarget, feedConductivity, temperature } = state;
+
+        // Temperature correction factor
+        const tempKey = Object.keys(TEMP_CORRECTION).reduce((a, b) =>
+          Math.abs(b - temperature) < Math.abs(a - temperature) ? b : a
+        );
+        const tempFactor = TEMP_CORRECTION[tempKey];
+
+        // Adjusted flow for temperature
+        const adjustedFlow = permeateFlow / tempFactor;
+
+        // Select appropriate system
+        const system = MEMR_SYSTEMS.find(s => s.flow >= adjustedFlow) || MEMR_SYSTEMS[MEMR_SYSTEMS.length - 1];
+
+        // Calculate flows
+        const feedFlow = permeateFlow / (recoveryTarget / 100);
+        const rejectFlow = feedFlow - permeateFlow;
+
+        // Estimate permeate conductivity (98% rejection rate)
+        const estimatedConductivity = feedConductivity * 0.02;
+
+        // Update state
+        state.selectedModel = system;
+        state.feedFlow = feedFlow.toFixed(2);
+        state.rejectFlow = rejectFlow.toFixed(2);
+        state.membraneCount = system.membranes;
+        state.estimatedConductivity = estimatedConductivity.toFixed(1);
+
+        return system;
+      },
+
+      // Analyze water quality and generate alarms/warnings
+      analyzeWaterQuality() {
+        const alarms = [];
+        const warnings = [];
+        const recommendations = [];
+        const autoComponents = [];
+
+        // Check critical alarms
+        if (state.sdi > THRESHOLDS.critical.sdi.max) {
+          alarms.push({ type: 'critical', param: 'SDI', value: state.sdi, message: THRESHOLDS.critical.sdi.message });
+        }
+        if (state.ph < THRESHOLDS.critical.ph.min || state.ph > THRESHOLDS.critical.ph.max) {
+          alarms.push({ type: 'critical', param: 'pH', value: state.ph, message: THRESHOLDS.critical.ph.message });
+        }
+        if (state.chlorine > THRESHOLDS.critical.chlorine.max) {
+          alarms.push({ type: 'critical', param: 'Chlorine', value: state.chlorine, message: THRESHOLDS.critical.chlorine.message });
+        }
+        if (state.iron > THRESHOLDS.critical.iron.max) {
+          alarms.push({ type: 'critical', param: 'Iron', value: state.iron, message: THRESHOLDS.critical.iron.message });
+        }
+
+        // Check warnings
+        if (state.temperature < THRESHOLDS.warnings.temperature.min) {
+          warnings.push({ type: 'warning', param: 'Temperature', value: state.temperature, message: THRESHOLDS.warnings.temperature.message });
+        }
+        if (state.hardness > THRESHOLDS.warnings.hardness.max) {
+          warnings.push({ type: 'warning', param: 'Hardness', value: state.hardness, message: THRESHOLDS.warnings.hardness.message });
+        }
+        if (state.feedTDS > THRESHOLDS.warnings.tds.max) {
+          warnings.push({ type: 'warning', param: 'TDS', value: state.feedTDS, message: THRESHOLDS.warnings.tds.message });
+        }
+        if (state.feedTSS > THRESHOLDS.warnings.tss.max) {
+          warnings.push({ type: 'warning', param: 'TSS', value: state.feedTSS, message: THRESHOLDS.warnings.tss.message });
+        }
+        if (state.turbidity > THRESHOLDS.warnings.turbidity.max) {
+          warnings.push({ type: 'warning', param: 'Turbidity', value: state.turbidity, message: THRESHOLDS.warnings.turbidity.message });
+        }
+        if (state.feedPressure < THRESHOLDS.warnings.pressure.min) {
+          warnings.push({ type: 'warning', param: 'Pressure', value: state.feedPressure, message: THRESHOLDS.warnings.pressure.message });
+        }
+        if (state.permeateQuality < THRESHOLDS.warnings.conductivityTarget.max) {
+          warnings.push({ type: 'warning', param: 'Target Quality', value: state.permeateQuality, message: THRESHOLDS.warnings.conductivityTarget.message });
+        }
+
+        // Auto-select pre-treatment components
+        if (state.chlorine > THRESHOLDS.pretreatment.chlorine.threshold) {
+          autoComponents.push({ name: 'Carbon Filter', cost: THRESHOLDS.pretreatment.chlorine.cost, reason: `Chlorine > ${THRESHOLDS.pretreatment.chlorine.threshold} ppm` });
+        }
+        if (state.iron > THRESHOLDS.pretreatment.iron_high.threshold) {
+          autoComponents.push({ name: 'Dedicated Iron System', cost: THRESHOLDS.pretreatment.iron_high.cost, reason: `Iron > ${THRESHOLDS.pretreatment.iron_high.threshold} mg/L` });
+        } else if (state.iron > THRESHOLDS.pretreatment.iron_low.threshold) {
+          autoComponents.push({ name: 'Iron Removal', cost: THRESHOLDS.pretreatment.iron_low.cost, reason: `Iron > ${THRESHOLDS.pretreatment.iron_low.threshold} mg/L` });
+        }
+        if (state.hardness > THRESHOLDS.pretreatment.hardness_high.threshold) {
+          autoComponents.push({ name: 'Water Softener', cost: THRESHOLDS.pretreatment.hardness_high.cost, reason: `Hardness > ${THRESHOLDS.pretreatment.hardness_high.threshold} mg/L` });
+        } else if (state.hardness > THRESHOLDS.pretreatment.hardness_moderate.threshold) {
+          autoComponents.push({ name: 'Antiscalant Dosing', cost: THRESHOLDS.pretreatment.hardness_moderate.cost, reason: `Hardness > ${THRESHOLDS.pretreatment.hardness_moderate.threshold} mg/L` });
+        }
+        if (state.turbidity > THRESHOLDS.pretreatment.turbidity.threshold) {
+          autoComponents.push({ name: 'Sand Filter', cost: THRESHOLDS.pretreatment.turbidity.cost, reason: `Turbidity > ${THRESHOLDS.pretreatment.turbidity.threshold} NTU` });
+        }
+        if (state.feedTSS > THRESHOLDS.pretreatment.tss.threshold) {
+          autoComponents.push({ name: 'Multimedia Filter', cost: THRESHOLDS.pretreatment.tss.cost, reason: `TSS > ${THRESHOLDS.pretreatment.tss.threshold} ppm` });
+        }
+        if (state.sdi > THRESHOLDS.pretreatment.sdi.threshold) {
+          autoComponents.push({ name: 'Pre-treatment Package', cost: THRESHOLDS.pretreatment.sdi.cost, reason: `SDI > ${THRESHOLDS.pretreatment.sdi.threshold}` });
+        }
+        if (state.feedPressure < THRESHOLDS.pretreatment.pressure.threshold) {
+          autoComponents.push({ name: 'Boost Pump', cost: THRESHOLDS.pretreatment.pressure.cost, reason: `Pressure < ${THRESHOLDS.pretreatment.pressure.threshold} BAR` });
+        }
+        if (state.ph < THRESHOLDS.pretreatment.ph_low.threshold || state.ph > THRESHOLDS.pretreatment.ph_high.threshold) {
+          autoComponents.push({ name: 'pH Adjustment Dosing', cost: THRESHOLDS.pretreatment.ph_low.cost, reason: `pH outside 6-8.5 range` });
+        }
+        if (state.permeateQuality < 10) {
+          autoComponents.push({ name: 'Second Stage RO', cost: 15000, reason: `Target conductivity < 10 µS/cm` });
+        }
+
+        // Update state
+        state.alarms = alarms;
+        state.warnings = warnings;
+        state.recommendations = recommendations;
+        state.autoComponents = autoComponents;
+
+        return { alarms, warnings, autoComponents };
+      },
+
+      // Calculate pricing
+      calculatePricing() {
+        const system = state.selectedModel;
+        if (!system) return;
+
+        const markup = state.componentMarkup / 100;
+
+        // Base system cost
+        let baseCost = system.baseCost;
+
+        // Add CIP if flow > 4 or explicitly required
+        if (state.cipRequired || state.permeateFlow >= 4) {
+          baseCost += system.cip;
+        }
+
+        // Pre-treatment costs
+        const pretreatmentCost = state.autoComponents.reduce((sum, c) => sum + c.cost, 0);
+
+        // Options costs
+        let optionsCost = 0;
+        if (state.containerRequired) {
+          const containerPrices = { '10ft': 3000, '20ft': 5500, '40ft': 10500 };
+          optionsCost += containerPrices[state.containerSize] || 5500;
+        }
+        if (state.uvRequired) {
+          optionsCost += 2500;
+        }
+        if (state.remoteMonitoring) {
+          optionsCost += 3500;
+        }
+
+        // Calculate totals
+        const totalCost = baseCost + pretreatmentCost + optionsCost;
+
+        // Workshop overhead (5%) + Contingency (5%) + Social Impact (2%)
+        const overheads = totalCost * 0.12;
+
+        // Selling price with markup
+        const sellingPrice = (totalCost + overheads) * (1 + markup);
+
+        // Gross margin
+        const grossMargin = ((sellingPrice - totalCost) / sellingPrice * 100).toFixed(1);
+
+        // Update state
+        state.baseCost = baseCost;
+        state.pretreatmentCost = pretreatmentCost;
+        state.optionsCost = optionsCost;
+        state.totalCost = totalCost;
+        state.sellingPrice = Math.round(sellingPrice);
+        state.grossMargin = grossMargin;
+      },
+
+      // Calculate AI confidence score
+      calculateConfidence() {
+        let score = 50; // Base score
+        let completeness = 0;
+        const requiredFields = ['customerName', 'projectName', 'permeateFlow', 'feedConductivity', 'ph', 'temperature'];
+        const optionalFields = ['feedTDS', 'feedTSS', 'sdi', 'hardness', 'iron', 'chlorine', 'turbidity'];
+
+        // Check required fields
+        requiredFields.forEach(field => {
+          if (state[field] && state[field] !== '' && state[field] !== 0) {
+            score += 5;
+            completeness += 100 / (requiredFields.length + optionalFields.length);
+          }
+        });
+
+        // Check optional fields for bonus
+        optionalFields.forEach(field => {
+          if (state[field] !== undefined && state[field] !== null) {
+            score += 3;
+            completeness += 100 / (requiredFields.length + optionalFields.length);
+          }
+        });
+
+        // Deduct for alarms
+        score -= state.alarms.length * 10;
+
+        // Deduct for warnings
+        score -= state.warnings.length * 3;
+
+        // Bonus for reasonable values
+        if (state.recoveryTarget >= 70 && state.recoveryTarget <= 85) score += 5;
+        if (state.componentMarkup >= 25 && state.componentMarkup <= 40) score += 5;
+
+        // Clamp score
+        state.aiConfidence = Math.max(20, Math.min(98, score));
+        state.dataCompleteness = Math.min(100, completeness);
+
+        return state.aiConfidence;
+      },
+
+      // Run all calculations
+      runAll() {
+        this.calculateSizing();
+        this.analyzeWaterQuality();
+        this.calculatePricing();
+        this.calculateConfidence();
+        this.updateUI();
+      },
+
+      // Update UI elements
+      updateUI() {
+        // Update confidence display
+        const confidence = state.aiConfidence;
+        const confLevel = confidence >= 85 ? 'high' : confidence >= 70 ? 'medium' : 'low';
+
+        const confBadge = document.getElementById('aiConfidenceBadge');
+        const confBar = document.getElementById('aiConfidenceBar');
+        if (confBadge) {
+          confBadge.textContent = confidence + '%';
+          confBadge.className = 'confidence-badge ' + confLevel;
+        }
+        if (confBar) {
+          confBar.style.width = confidence + '%';
+          confBar.className = 'confidence-fill ' + confLevel;
+        }
+
+        // Update alarms display
+        this.renderAlarms();
+
+        // Update auto-components panel
+        this.renderAutoComponents();
+
+        // Update pricing display
+        this.renderPricing();
+
+        // Update suggestions
+        updateAISuggestions();
+      },
+
+      // Render alarms and warnings
+      renderAlarms() {
+        const container = document.getElementById('reactiveAlarms');
+        if (!container) return;
+
+        let html = '';
+
+        state.alarms.forEach(alarm => {
+          html += `
+            <div class="reactive-alarm critical" style="padding:12px;margin-bottom:8px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:10px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="material-icons-outlined" style="color:var(--danger);font-size:18px">error</span>
+                <span style="font-size:13px;font-weight:600;color:var(--danger)">${alarm.param}: ${alarm.value}</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted)">${alarm.message}</div>
+            </div>
+          `;
+        });
+
+        state.warnings.forEach(warning => {
+          html += `
+            <div class="reactive-alarm warning" style="padding:12px;margin-bottom:8px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.4);border-radius:10px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span class="material-icons-outlined" style="color:var(--warning);font-size:18px">warning</span>
+                <span style="font-size:13px;font-weight:600;color:var(--warning)">${warning.param}: ${warning.value}</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted)">${warning.message}</div>
+            </div>
+          `;
+        });
+
+        if (state.alarms.length === 0 && state.warnings.length === 0) {
+          html = `
+            <div style="padding:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:10px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="material-icons-outlined" style="color:var(--success);font-size:18px">check_circle</span>
+                <span style="font-size:12px;color:var(--success)">Water quality within acceptable ranges</span>
+              </div>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      },
+
+      // Render auto-selected components
+      renderAutoComponents() {
+        const container = document.getElementById('reactiveComponents');
+        if (!container) return;
+
+        if (state.autoComponents.length === 0) {
+          container.innerHTML = `
+            <div style="padding:12px;background:var(--card);border:1px solid var(--line);border-radius:10px">
+              <div style="font-size:12px;color:var(--muted)">No additional pre-treatment required based on current water quality parameters.</div>
+            </div>
+          `;
+          return;
+        }
+
+        let html = `<div style="display:flex;flex-direction:column;gap:8px">`;
+        state.autoComponents.forEach(comp => {
+          html += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--text)">${comp.name}</div>
+                <div style="font-size:10px;color:var(--muted)">${comp.reason}</div>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--accent)">£${comp.cost.toLocaleString()}</div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+
+        container.innerHTML = html;
+      },
+
+      // Render pricing summary
+      renderPricing() {
+        const container = document.getElementById('reactivePricing');
+        if (!container) return;
+
+        container.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+            <div style="padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Base System</div>
+              <div style="font-size:18px;font-weight:700;color:var(--text)">£${state.baseCost.toLocaleString()}</div>
+              <div style="font-size:10px;color:var(--muted)">${state.selectedModel?.model || '-'}</div>
+            </div>
+            <div style="padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Pre-treatment</div>
+              <div style="font-size:18px;font-weight:700;color:var(--accent2)">£${state.pretreatmentCost.toLocaleString()}</div>
+              <div style="font-size:10px;color:var(--muted)">${state.autoComponents.length} components</div>
+            </div>
+            <div style="padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Options</div>
+              <div style="font-size:18px;font-weight:700;color:var(--accent3)">£${state.optionsCost.toLocaleString()}</div>
+              <div style="font-size:10px;color:var(--muted)">Container, UV, etc.</div>
+            </div>
+            <div style="padding:12px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(34,211,238,0.1));border-radius:10px;border:1px solid rgba(99,102,241,0.3)">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Selling Price</div>
+              <div style="font-size:18px;font-weight:700;color:var(--accent)">£${state.sellingPrice.toLocaleString()}</div>
+              <div style="font-size:10px;color:var(--success)">${state.grossMargin}% margin</div>
+            </div>
+          </div>
+        `;
+
+        // Update system info display
+        const sysInfo = document.getElementById('reactiveSystemInfo');
+        if (sysInfo && state.selectedModel) {
+          sysInfo.innerHTML = `
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px">
+              <div style="text-align:center;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+                <div style="font-size:20px;font-weight:700;color:var(--accent)">${state.feedFlow}</div>
+                <div style="font-size:10px;color:var(--muted)">Feed Flow m³/hr</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+                <div style="font-size:20px;font-weight:700;color:var(--accent2)">${state.rejectFlow}</div>
+                <div style="font-size:10px;color:var(--muted)">Reject Flow m³/hr</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+                <div style="font-size:20px;font-weight:700;color:var(--accent3)">${state.membraneCount}</div>
+                <div style="font-size:10px;color:var(--muted)">Membranes</div>
+              </div>
+              <div style="text-align:center;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--line)">
+                <div style="font-size:20px;font-weight:700;color:var(--success)">${state.estimatedConductivity}</div>
+                <div style="font-size:10px;color:var(--muted)">Est. µS/cm</div>
+              </div>
+            </div>
+          `;
+        }
+      }
+    };
+
+    // ==================== REACTIVE INPUT BINDINGS ====================
+    function bindReactiveInputs() {
+      // Bind all inputs with data-reactive attribute
+      document.querySelectorAll('[data-reactive]').forEach(input => {
+        const stateKey = input.dataset.reactive;
+
+        // Set initial value from state
+        if (input.type === 'checkbox') {
+          input.checked = state[stateKey] || false;
+        } else if (input.type === 'range') {
+          input.value = state[stateKey] || input.value;
+        } else {
+          input.value = state[stateKey] || '';
+        }
+
+        // Bind change event - use 'input' for immediate feedback on numbers and ranges
+        const eventType = (input.type === 'range' || input.type === 'number') ? 'input' : 'change';
+        input.addEventListener(eventType, (e) => {
+          let value;
+          if (input.type === 'checkbox') {
+            value = e.target.checked;
+          } else if (input.type === 'number' || input.type === 'range') {
+            value = parseFloat(e.target.value) || 0;
+          } else {
+            value = e.target.value;
+          }
+
+          state[stateKey] = value;
+
+          // Log the change as an AI decision
+          logDecision(
+            `${stateKey} updated to ${value}`,
+            `User input change triggered recalculation`,
+            'user'
+          );
+
+          // Trigger recalculation
+          CalculationEngine.runAll();
+        });
+      });
+    }
+
+    // Toggle reactive chip (for system configuration options)
+    function toggleReactiveChip(chip) {
+      const stateKey = chip.dataset.reactiveToggle;
+      if (!stateKey) return;
+
+      chip.classList.toggle('active');
+      const isActive = chip.classList.contains('active');
+      state[stateKey] = isActive;
+
+      logDecision(
+        `${stateKey} ${isActive ? 'enabled' : 'disabled'}`,
+        `User toggled system configuration option`,
+        'user'
+      );
+
+      CalculationEngine.runAll();
+    }
+
+    // ==================== REACTIVE WATCHERS ====================
+    // Watch for any state change and recalculate
+    ReactiveStore.watch('*', (newVal, oldVal, prop) => {
+      // Skip calculated fields to prevent infinite loops
+      const calculatedFields = ['selectedModel', 'feedFlow', 'rejectFlow', 'membraneCount',
+        'estimatedConductivity', 'alarms', 'warnings', 'recommendations', 'autoComponents',
+        'baseCost', 'pretreatmentCost', 'optionsCost', 'totalCost', 'sellingPrice',
+        'grossMargin', 'aiConfidence', 'dataCompleteness'];
+
+      if (!calculatedFields.includes(prop)) {
+        console.log(`[Reactive] ${prop}: ${oldVal} → ${newVal}`);
+      }
+    }, 50);
+
+    // ==================== ENHANCED AI SUGGESTIONS WITH REACTIVITY ====================
+    function getReactiveSuggestions() {
+      const suggestions = [];
+      const currentStepNum = getCurrentStep();
+
+      // Priority suggestions based on alarms
+      state.alarms.forEach(alarm => {
+        suggestions.push({
+          icon: 'error',
+          type: 'critical',
+          title: `Critical: ${alarm.param}`,
+          body: alarm.message,
+          impact: 'Blocks proposal',
+          action: 'Resolve issue',
+          priority: 100
+        });
+      });
+
+      // Warning-based suggestions
+      state.warnings.forEach(warning => {
+        suggestions.push({
+          icon: 'warning',
+          type: 'warning',
+          title: `Warning: ${warning.param}`,
+          body: warning.message,
+          impact: 'Review recommended',
+          action: 'View options',
+          priority: 50
+        });
+      });
+
+      // Data completeness suggestions
+      if (state.dataCompleteness < 50) {
+        suggestions.push({
+          icon: 'assignment',
+          type: 'opportunity',
+          title: 'Complete water quality data',
+          body: `Only ${Math.round(state.dataCompleteness)}% of parameters entered. More data improves AI accuracy.`,
+          impact: `+${Math.round((100 - state.dataCompleteness) / 4)}% confidence`,
+          action: 'Add parameters',
+          priority: 40
+        });
+      }
+
+      // Industry-specific recommendations
+      if (state.industrySector === 'Pharmaceutical' && !state.uvRequired) {
+        suggestions.push({
+          icon: 'lightbulb',
+          type: 'opportunity',
+          title: 'UV recommended for Pharma',
+          body: 'Pharmaceutical applications typically require UV disinfection for compliance.',
+          impact: '+£2,500',
+          action: 'Add UV system',
+          priority: 30
+        });
+      }
+
+      // ESG optimization suggestion
+      if (state.recoveryTarget < 80) {
+        suggestions.push({
+          icon: 'eco',
+          type: 'optimize',
+          title: 'Increase water recovery',
+          body: `Current ${state.recoveryTarget}% recovery. Higher recovery improves ESG score.`,
+          impact: '+ESG points',
+          action: 'Optimize recovery',
+          priority: 20
+        });
+      }
+
+      // Technology partner suggestions based on conditions
+      if (state.feedTDS > 500 || state.sdi > 4) {
+        suggestions.push({
+          icon: 'handshake',
+          type: 'opportunity',
+          title: 'Consider NX Filtration',
+          body: 'For challenging feed water, NX hollow fiber nanofiltration offers superior pre-treatment.',
+          impact: '+£8,500',
+          action: 'Add NX Filtration',
+          priority: 25
+        });
+      }
+
+      // Sort by priority (highest first)
+      return suggestions.sort((a, b) => b.priority - a.priority).slice(0, 5);
+    }
+
+    // Override the original updateAISuggestions with reactive version
+    const originalUpdateAISuggestions = updateAISuggestions;
+    updateAISuggestions = function() {
+      const suggestions = getReactiveSuggestions();
+      const container = document.getElementById('aiSuggestions');
+      if (!container) return;
+
+      if (suggestions.length === 0) {
+        container.innerHTML = `
+          <div class="suggestion-card highlight">
+            <div class="suggestion-header">
+              <div class="suggestion-icon success"><span class="material-icons-outlined">check_circle</span></div>
+              <span class="suggestion-title">Configuration optimal!</span>
+            </div>
+            <div class="suggestion-body">All parameters within range. Ready to proceed with proposal generation.</div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = suggestions.map((s, i) => `
+          <div class="suggestion-card ${i === 0 ? 'highlight' : ''} ${s.type === 'critical' ? 'critical-card' : ''}">
+            <div class="suggestion-header">
+              <div class="suggestion-icon ${s.type}">
+                <span class="material-icons-outlined">${s.icon}</span>
+              </div>
+              <span class="suggestion-title">${s.title}</span>
+              <span class="suggestion-impact ${s.type === 'critical' ? 'critical' : ''}">${s.impact}</span>
+            </div>
+            <div class="suggestion-body">${s.body}</div>
+            <div class="suggestion-action" onclick="handleSuggestionAction('${s.action}')">
+              <span class="material-icons-outlined">add_circle</span>
+              ${s.action}
+            </div>
+          </div>
+        `).join('');
+      }
+    };
+
+    // Handle suggestion actions
+    function handleSuggestionAction(action) {
+      switch(action.toLowerCase()) {
+        case 'add uv system':
+          state.uvRequired = true;
+          document.querySelector('[data-reactive="uvRequired"]')?.click();
+          logDecision('Added UV system', 'AI suggestion accepted', 'user');
+          break;
+        case 'optimize recovery':
+          state.recoveryTarget = 82;
+          const recoverySlider = document.querySelector('[data-reactive="recoveryTarget"]');
+          if (recoverySlider) recoverySlider.value = 82;
+          logDecision('Optimized recovery to 82%', 'AI suggestion accepted', 'user');
+          break;
+        case 'add nx filtration':
+          logDecision('Added NX Filtration partner', 'AI suggestion for challenging water accepted', 'user');
+          break;
+        case 'add parameters':
+          // Open the AI sidebar to the wizard
+          if (!aiOpen) toggleAI();
+          setAITab('wizard');
+          break;
+        default:
+          logDecision(`Action: ${action}`, 'Suggestion interaction', 'user');
+      }
+      CalculationEngine.runAll();
+    }
+
     // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       initOpexChart();
@@ -4910,11 +5723,16 @@
       // Initialize step 1 as active
       goToStep(1);
 
+      // Initialize reactive system
+      bindReactiveInputs();
+      CalculationEngine.runAll();
+
       // Initialize AI features
       updateAISuggestions();
       updateScenarios();
       renderWizard();
-      logDecision('Proposal session started', 'New proposal workflow initiated', 'auto');
+      logDecision('Proposal session started', 'New proposal workflow initiated with reactive AI', 'auto');
+      logDecision('Reactive engine initialized', 'Real-time calculations and AI suggestions active', 'auto');
 
       // Simulate AI processing on step 2
       setTimeout(() => {
@@ -4922,10 +5740,10 @@
         if (processing) {
           processing.innerHTML = `
             <span class="material-icons-outlined" style="color:var(--success);font-size:24px">check_circle</span>
-            <span class="ai-text" style="color:var(--success)">Optimization complete - 3 solutions ranked</span>
+            <span class="ai-text" style="color:var(--success)">Reactive AI ready - ${state.autoComponents.length} auto-components</span>
           `;
         }
-      }, 3000);
+      }, 2000);
     });
   </script>
 </body>
