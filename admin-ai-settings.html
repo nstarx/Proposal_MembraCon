@@ -755,6 +755,174 @@
       font-size: 13px;
       font-weight: 500;
     }
+
+    /* Help Tooltip System */
+    .help-icon {
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 50%;
+      padding: 2px;
+    }
+
+    .help-icon:hover {
+      color: var(--accent) !important;
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .help-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .help-popup-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .help-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 480px;
+      width: 90%;
+      z-index: 2001;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .help-popup-overlay.show + .help-popup,
+    .help-popup.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .help-popup-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .help-popup-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .help-popup-icon.critical {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .help-popup-icon.warning {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .help-popup-icon.info {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent);
+    }
+
+    .help-popup-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .help-popup-close {
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .help-popup-close:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
+
+    .help-popup-content {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .help-popup-content p {
+      margin-bottom: 12px;
+    }
+
+    .help-popup-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .help-popup-content strong {
+      color: var(--text);
+    }
+
+    .help-popup-content code {
+      background: var(--panel);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--accent2);
+    }
+
+    .help-popup-content ul {
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+
+    .help-popup-content li {
+      margin-bottom: 6px;
+    }
+
+    .help-popup-tip {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: 8px;
+      font-size: 13px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .help-popup-tip .material-icons-outlined {
+      font-size: 18px;
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -910,7 +1078,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="SDI HIGH - Pre-treatment required; RO at risk of rapid fouling" id="critical-sdi-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="6" step="0.5" id="critical-sdi-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Silt Density Index - measures fouling potential">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('sdi')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -918,7 +1086,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="pH out of range - Risk of irreversible membrane damage" id="critical-ph-message">
             <input type="number" class="threshold-input" value="5" step="0.1" id="critical-ph-min">
             <input type="number" class="threshold-input" value="9" step="0.1" id="critical-ph-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Membrane safe range is 5-9">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('ph')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -926,7 +1094,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Chlorine HIGH - Carbon filter + SMBS mandatory" id="critical-chlorine-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="0.05" step="0.01" id="critical-chlorine-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Free chlorine destroys polyamide membranes">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('chlorine')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -934,7 +1102,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Iron Levels HIGH - Dedicated iron removal system required" id="critical-iron-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="0.3" step="0.05" id="critical-iron-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Iron above this level causes severe fouling">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('iron')" title="Click for details">help_outline</span>
           </div>
         </div>
 
@@ -969,7 +1137,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Temperature is low - flux reduction expected" id="warning-temp-message">
             <input type="number" class="threshold-input" value="15" step="1" id="warning-temp-min">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Below this triggers flux compensation">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('temperature')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -977,7 +1145,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Hard water detected - Softener or antiscalant required" id="warning-hardness-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="300" step="10" id="warning-hardness-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="CaCO3 mg/L - causes scaling">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('hardness')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -985,7 +1153,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="TDS HIGH - High-rejection membranes recommended" id="warning-tds-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="1000" step="50" id="warning-tds-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Total Dissolved Solids in ppm">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('tds')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -993,7 +1161,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="TSS HIGH - Full pre-treatment required" id="warning-tss-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="5" step="1" id="warning-tss-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Total Suspended Solids in ppm">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('tss')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -1001,7 +1169,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Turbidity HIGH - Sand/multimedia filter needed" id="warning-turbidity-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="5" step="0.5" id="warning-turbidity-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="NTU units">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('turbidity')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -1009,7 +1177,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Pressure LOW - Boost pump required" id="warning-pressure-message">
             <input type="number" class="threshold-input" value="3" step="0.5" id="warning-pressure-min">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Feed pressure in BAR">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('pressure')" title="Click for details">help_outline</span>
           </div>
 
           <div class="threshold-row">
@@ -1017,7 +1185,7 @@
             <input type="text" class="threshold-input" style="grid-column: 2;" value="Ultra-pure target - Second stage RO required" id="warning-quality-message">
             <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
             <input type="number" class="threshold-input" value="10" step="1" id="warning-quality-max">
-            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Permeate conductivity target in uS/cm">help_outline</span>
+            <span class="material-icons-outlined help-icon" onclick="showHelp('quality')" title="Click for details">help_outline</span>
           </div>
         </div>
       </div>
@@ -2028,7 +2196,256 @@
     <span class="toast-message" id="toastMessage">Settings saved successfully!</span>
   </div>
 
+  <!-- Help Popup -->
+  <div class="help-popup-overlay" id="helpOverlay" onclick="closeHelpPopup()"></div>
+  <div class="help-popup" id="helpPopup">
+    <div class="help-popup-header">
+      <div class="help-popup-icon" id="helpPopupIcon">
+        <span class="material-icons-outlined">help_outline</span>
+      </div>
+      <div class="help-popup-title" id="helpPopupTitle">Parameter Help</div>
+      <button class="help-popup-close" onclick="closeHelpPopup()">
+        <span class="material-icons-outlined">close</span>
+      </button>
+    </div>
+    <div class="help-popup-content" id="helpPopupContent">
+      Help content will appear here.
+    </div>
+  </div>
+
   <script>
+    // Help Popup System
+    const helpContent = {
+      sdi: {
+        title: 'SDI (Silt Density Index)',
+        type: 'critical',
+        content: `
+          <p><strong>SDI measures the fouling potential</strong> of water on reverse osmosis membranes. It's a critical parameter that determines how quickly your membranes will clog.</p>
+          <p>Values above <code>6</code> indicate severe fouling risk that can permanently damage membranes within hours of operation.</p>
+          <ul>
+            <li><strong>SDI &lt; 3:</strong> Excellent feed water, suitable for spiral-wound RO</li>
+            <li><strong>SDI 3-5:</strong> Acceptable with proper pre-treatment</li>
+            <li><strong>SDI &gt; 5:</strong> High fouling risk, UF pre-treatment mandatory</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>SDI is measured using a 0.45 micron filter over 15 minutes. High SDI requires multimedia filtration or ultrafiltration pre-treatment.</span>
+          </div>
+        `
+      },
+      ph: {
+        title: 'pH Level',
+        type: 'critical',
+        content: `
+          <p><strong>pH determines membrane compatibility</strong> and chemical stability. Polyamide RO membranes have a strict operating range.</p>
+          <p>Operating outside the <code>5-9</code> range causes irreversible membrane hydrolysis (degradation of the polymer structure).</p>
+          <ul>
+            <li><strong>pH &lt; 5:</strong> Acid attack on membrane structure</li>
+            <li><strong>pH 5-9:</strong> Safe operating range</li>
+            <li><strong>pH &gt; 9:</strong> Alkaline degradation, especially at high temperatures</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>pH adjustment using acid/caustic dosing may be needed. For cleaning, pH can temporarily go to 2-12 for short periods.</span>
+          </div>
+        `
+      },
+      chlorine: {
+        title: 'Free Chlorine',
+        type: 'critical',
+        content: `
+          <p><strong>Chlorine is lethal to polyamide membranes.</strong> Even trace amounts cause oxidative damage that cannot be reversed.</p>
+          <p>Maximum safe level is <code>0.05 ppm</code> (essentially zero). Municipal water typically contains 1-3 ppm.</p>
+          <ul>
+            <li><strong>Damage mechanism:</strong> Chlorine breaks polymer chains, increasing salt passage</li>
+            <li><strong>Symptoms:</strong> Declining rejection, increased permeate conductivity</li>
+            <li><strong>Protection:</strong> Activated carbon filter + SMBS dosing</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Always use ORP monitoring or free chlorine analyzers before RO. Carbon filters remove chlorine but have limited capacity.</span>
+          </div>
+        `
+      },
+      iron: {
+        title: 'Iron Content',
+        type: 'critical',
+        content: `
+          <p><strong>Iron causes severe membrane fouling</strong> through oxidation and precipitation. It forms rust-colored deposits that are difficult to remove.</p>
+          <p>Levels above <code>0.3 mg/L</code> require dedicated iron removal systems upstream of RO.</p>
+          <ul>
+            <li><strong>Fe &lt; 0.1 mg/L:</strong> Acceptable for direct RO feed</li>
+            <li><strong>Fe 0.1-0.3 mg/L:</strong> Monitor closely, consider treatment</li>
+            <li><strong>Fe &gt; 0.3 mg/L:</strong> Iron removal mandatory (greensand, oxidation+filtration)</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Ferrous iron (Fe2+) in groundwater oxidizes to ferric iron (Fe3+) upon exposure to air, forming insoluble precipitates.</span>
+          </div>
+        `
+      },
+      temperature: {
+        title: 'Feed Water Temperature',
+        type: 'warning',
+        content: `
+          <p><strong>Temperature directly affects membrane flux.</strong> Cold water is more viscous, reducing permeate flow rate.</p>
+          <p>Below <code>15°C</code>, significant flux reduction occurs requiring compensation in system sizing.</p>
+          <ul>
+            <li><strong>5°C:</strong> ~50% flux reduction vs 25°C baseline</li>
+            <li><strong>15°C:</strong> ~25% flux reduction</li>
+            <li><strong>25°C:</strong> Standard design temperature (TCF = 1.0)</li>
+            <li><strong>35°C:</strong> ~20% flux increase, but accelerated fouling</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Temperature Correction Factor (TCF) is applied to normalize flux calculations. High temperatures may require reduced recovery rates.</span>
+          </div>
+        `
+      },
+      hardness: {
+        title: 'Total Hardness',
+        type: 'warning',
+        content: `
+          <p><strong>Hardness (CaCO3 equivalent) causes mineral scaling</strong> on membrane surfaces, reducing efficiency and lifespan.</p>
+          <p>Levels above <code>300 mg/L</code> require softening or antiscalant treatment.</p>
+          <ul>
+            <li><strong>&lt; 100 mg/L:</strong> Soft water, minimal scaling risk</li>
+            <li><strong>100-300 mg/L:</strong> Moderate hardness, antiscalant recommended</li>
+            <li><strong>&gt; 300 mg/L:</strong> Hard water, softener or aggressive antiscalant program needed</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Hardness is primarily calcium and magnesium. Scale forms when these exceed their solubility limits at the membrane surface.</span>
+          </div>
+        `
+      },
+      tds: {
+        title: 'TDS (Total Dissolved Solids)',
+        type: 'warning',
+        content: `
+          <p><strong>TDS indicates overall salinity</strong> and affects membrane selection, recovery rates, and energy consumption.</p>
+          <p>Above <code>1000 ppm</code>, high-rejection membranes and potentially higher pressures are needed.</p>
+          <ul>
+            <li><strong>&lt; 500 ppm:</strong> Fresh water, standard membranes</li>
+            <li><strong>500-1500 ppm:</strong> Brackish water, standard to high-rejection</li>
+            <li><strong>1500-5000 ppm:</strong> Brackish, high-rejection membranes</li>
+            <li><strong>&gt; 5000 ppm:</strong> High salinity, seawater membranes may be needed</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Recovery rate is limited by concentrate TDS. Higher feed TDS = lower maximum recovery to prevent precipitation.</span>
+          </div>
+        `
+      },
+      tss: {
+        title: 'TSS (Total Suspended Solids)',
+        type: 'warning',
+        content: `
+          <p><strong>TSS measures particulate matter</strong> that can physically block membrane pores and spacers.</p>
+          <p>Levels above <code>5 mg/L</code> require full pre-treatment (multimedia filter, cartridge filters).</p>
+          <ul>
+            <li><strong>&lt; 1 mg/L:</strong> Low suspended solids, direct RO feed possible</li>
+            <li><strong>1-5 mg/L:</strong> Moderate, cartridge pre-filtration needed</li>
+            <li><strong>&gt; 5 mg/L:</strong> High TSS, multimedia or UF pre-treatment required</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>TSS and turbidity are related but different. TSS is a weight measurement while turbidity measures light scattering.</span>
+          </div>
+        `
+      },
+      turbidity: {
+        title: 'Turbidity',
+        type: 'warning',
+        content: `
+          <p><strong>Turbidity measures water clarity</strong> using light scattering. High turbidity indicates particles that foul membranes.</p>
+          <p>Values above <code>5 NTU</code> require sand or multimedia filtration.</p>
+          <ul>
+            <li><strong>&lt; 1 NTU:</strong> Excellent clarity, suitable for RO</li>
+            <li><strong>1-5 NTU:</strong> Moderate, enhanced pre-filtration recommended</li>
+            <li><strong>&gt; 5 NTU:</strong> High turbidity, coagulation/flocculation + MMF needed</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>NTU = Nephelometric Turbidity Units. Unlike TSS, turbidity can detect very fine colloidal particles.</span>
+          </div>
+        `
+      },
+      pressure: {
+        title: 'Feed Pressure',
+        type: 'warning',
+        content: `
+          <p><strong>Adequate feed pressure is essential</strong> for RO operation. Low pressure means insufficient driving force for water permeation.</p>
+          <p>Below <code>3 BAR</code>, a booster pump is required for proper operation.</p>
+          <ul>
+            <li><strong>&lt; 2 BAR:</strong> Critically low, system won't function properly</li>
+            <li><strong>2-3 BAR:</strong> Marginal, boost pump recommended</li>
+            <li><strong>3-6 BAR:</strong> Adequate for most brackish water applications</li>
+            <li><strong>&gt; 6 BAR:</strong> Good pressure, may reduce pump sizing</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>RO requires pressure to overcome osmotic pressure + system losses. Seawater RO typically needs 55-70 BAR.</span>
+          </div>
+        `
+      },
+      quality: {
+        title: 'Target Water Quality',
+        type: 'warning',
+        content: `
+          <p><strong>Permeate conductivity target</strong> determines if single-pass RO is sufficient or if additional treatment is needed.</p>
+          <p>Targets below <code>10 µS/cm</code> typically require double-pass RO or EDI polishing.</p>
+          <ul>
+            <li><strong>&gt; 50 µS/cm:</strong> Single-pass RO sufficient</li>
+            <li><strong>10-50 µS/cm:</strong> High-rejection membranes, optimized design</li>
+            <li><strong>&lt; 10 µS/cm:</strong> Double-pass RO or EDI required</li>
+            <li><strong>&lt; 1 µS/cm:</strong> EDI or mixed-bed polishing mandatory</li>
+          </ul>
+          <div class="help-popup-tip">
+            <span class="material-icons-outlined">lightbulb</span>
+            <span>Ultra-pure water (semiconductor, pharma) may require &lt;0.1 µS/cm, needing multiple treatment stages.</span>
+          </div>
+        `
+      }
+    };
+
+    function showHelp(key) {
+      const help = helpContent[key];
+      if (!help) return;
+
+      const overlay = document.getElementById('helpOverlay');
+      const popup = document.getElementById('helpPopup');
+      const icon = document.getElementById('helpPopupIcon');
+      const title = document.getElementById('helpPopupTitle');
+      const content = document.getElementById('helpPopupContent');
+
+      // Set content
+      title.textContent = help.title;
+      content.innerHTML = help.content;
+
+      // Set icon style
+      icon.className = 'help-popup-icon ' + help.type;
+      icon.innerHTML = help.type === 'critical'
+        ? '<span class="material-icons-outlined">error</span>'
+        : help.type === 'warning'
+          ? '<span class="material-icons-outlined">warning</span>'
+          : '<span class="material-icons-outlined">info</span>';
+
+      // Show popup
+      overlay.classList.add('show');
+      popup.classList.add('show');
+    }
+
+    function closeHelpPopup() {
+      document.getElementById('helpOverlay').classList.remove('show');
+      document.getElementById('helpPopup').classList.remove('show');
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeHelpPopup();
+    });
+
     // Theme Toggle
     function toggleTheme() {
       const html = document.documentElement;

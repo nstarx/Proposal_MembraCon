@@ -1167,6 +1167,57 @@
       color: #00d4aa;
     }
 
+    /* Scenario Toggle Switch */
+    .scenario-toggle {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .scenario-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .scenario-toggle-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--line);
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+
+    .scenario-toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--muted);
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .scenario-toggle input:checked + .scenario-toggle-slider {
+      background: rgba(0,212,170,0.3);
+    }
+
+    .scenario-toggle input:checked + .scenario-toggle-slider::before {
+      transform: translateX(16px);
+      background: #00d4aa;
+    }
+
+    .scenario-toggle:hover .scenario-toggle-slider {
+      background: rgba(0,212,170,0.2);
+    }
+
     .decision-tree-svg {
       width: 100%;
       height: 340px;
@@ -2918,6 +2969,13 @@
                 <button class="scenario-btn" onclick="applyTreeScenario('pharma')" title="WFI-grade water">
                   <span>💊</span> Pharma
                 </button>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+                  <label class="scenario-toggle" title="When enabled, selecting a use case will update the Input Specifications with typical values">
+                    <input type="checkbox" id="updateInputsToggle" checked>
+                    <span class="scenario-toggle-slider"></span>
+                  </label>
+                  <span style="font-size:10px;color:var(--muted);">Update Inputs</span>
+                </div>
               </div>
               <!-- Decision Tree SVG Container -->
               <div id="decisionTreeContainer" class="decision-tree-svg">
@@ -6317,42 +6375,117 @@
     };
 
     const DECISION_SCENARIOS = [
-      { id: 'food-bev', name: 'Food & Beverage', tss: 200, tds: 800, path: 'DAF → NF → UV' },
-      { id: 'semiconductor', name: 'Semiconductor', tss: 30, tds: 3500, path: 'Direct → RO → UV' },
-      { id: 'municipal', name: 'Municipal Reuse', tss: 80, tds: 1200, path: 'UF → NF → UV' },
-      { id: 'pharma', name: 'Pharmaceutical', tss: 15, tds: 400, path: 'Direct → Polish → UV' }
+      {
+        id: 'food-bev',
+        name: 'Food & Beverage',
+        path: 'DAF → NF → UV',
+        params: {
+          feedTSS: 200, feedTDS: 800, feedBOD: 350, feedConductivity: 1200,
+          feedPH: 6.8, feedChlorine: 0.5, feedTurbidity: 25, feedSDI: 5.5,
+          feedIron: 0.15, feedHardness: 280, feedTemp: 25, feedPressure: 4
+        }
+      },
+      {
+        id: 'semiconductor',
+        name: 'Semiconductor',
+        path: 'Direct → RO → UV',
+        params: {
+          feedTSS: 30, feedTDS: 3500, feedBOD: 5, feedConductivity: 5200,
+          feedPH: 7.2, feedChlorine: 0.02, feedTurbidity: 0.5, feedSDI: 2.5,
+          feedIron: 0.01, feedHardness: 450, feedTemp: 22, feedPressure: 5
+        }
+      },
+      {
+        id: 'municipal',
+        name: 'Municipal Reuse',
+        path: 'UF → NF → UV',
+        params: {
+          feedTSS: 80, feedTDS: 1200, feedBOD: 180, feedConductivity: 1800,
+          feedPH: 7.5, feedChlorine: 1.5, feedTurbidity: 8, feedSDI: 4.5,
+          feedIron: 0.08, feedHardness: 200, feedTemp: 18, feedPressure: 3.5
+        }
+      },
+      {
+        id: 'pharma',
+        name: 'Pharmaceutical',
+        path: 'Direct → Polish → UV',
+        params: {
+          feedTSS: 15, feedTDS: 400, feedBOD: 10, feedConductivity: 600,
+          feedPH: 7.0, feedChlorine: 0.1, feedTurbidity: 0.3, feedSDI: 2,
+          feedIron: 0.02, feedHardness: 80, feedTemp: 20, feedPressure: 4.5
+        }
+      }
     ];
 
     function applyTreeScenario(scenarioId) {
       const scenario = DECISION_SCENARIOS.find(s => s.id === scenarioId);
       if (!scenario) return;
 
+      // Check if we should update input fields
+      const updateInputsToggle = document.getElementById('updateInputsToggle');
+      const shouldUpdateInputs = updateInputsToggle ? updateInputsToggle.checked : true;
+
       // Update scenario button states
       document.querySelectorAll('.tree-scenarios .scenario-btn').forEach(btn => {
         btn.classList.toggle('active', btn.onclick.toString().includes(scenarioId));
       });
 
-      // Update state values (this would update the reactive system)
-      state.feedTSS = scenario.tss;
-      state.feedTDS = scenario.tds;
+      const params = scenario.params;
 
-      // Re-render tree with new values
-      renderDecisionTree();
+      // Only update input fields if toggle is enabled
+      if (shouldUpdateInputs) {
+        // Update all input fields with scenario parameters
+        Object.keys(params).forEach(key => {
+          const input = document.getElementById(key);
+          if (input) {
+            input.value = params[key];
+            // Trigger input event to activate reactive system
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+
+        // Update state values for the reactive system
+        state.feedTSS = params.feedTSS;
+        state.feedTDS = params.feedTDS;
+        state.ph = params.feedPH;
+        state.chlorine = params.feedChlorine;
+        state.turbidity = params.feedTurbidity;
+        state.sdi = params.feedSDI;
+        state.iron = params.feedIron;
+        state.hardness = params.feedHardness;
+        state.temperature = params.feedTemp;
+        state.feedPressure = params.feedPressure;
+        state.feedConductivity = params.feedConductivity;
+
+        // Trigger reactive analysis
+        if (typeof analyzeWaterQuality === 'function') {
+          analyzeWaterQuality();
+        }
+      }
+
+      // Re-render tree with scenario values (for visualization only if toggle is off)
+      renderDecisionTree(shouldUpdateInputs ? null : params);
+
+      // Build summary of key changes
+      const summary = `TSS=${params.feedTSS}, TDS=${params.feedTDS}, pH=${params.feedPH}, Hardness=${params.feedHardness}`;
 
       // Show notification
-      showNotification('science', `Applied ${scenario.name} scenario: TSS=${scenario.tss}, TDS=${scenario.tds}`, 'success');
-
-      // Log decision
-      logDecision(`Applied ${scenario.name} use case`, `TSS=${scenario.tss} mg/L, TDS=${scenario.tds} mg/L`, 'user');
+      if (shouldUpdateInputs) {
+        showNotification('science', `Applied ${scenario.name} scenario — ${summary}`, 'success');
+        logDecision(`Applied ${scenario.name} use case`, `Water quality parameters updated: ${summary}`, 'user');
+      } else {
+        showNotification('account_tree', `Viewing ${scenario.name} scenario (inputs unchanged)`, 'info');
+        logDecision(`Previewing ${scenario.name} use case`, `Tree visualization only — inputs not modified`, 'auto');
+      }
     }
 
-    function renderDecisionTree() {
+    function renderDecisionTree(previewParams = null) {
       const container = document.getElementById('decisionTreeContainer');
       if (!container) return;
 
-      // Get current values from state
-      const tss = state.feedTSS || 50;
-      const tds = state.feedTDS || 500;
+      // Get current values from state or preview params
+      const tss = previewParams ? previewParams.feedTSS : (state.feedTSS || 50);
+      const tds = previewParams ? previewParams.feedTDS : (state.feedTDS || 500);
 
       const width = container.clientWidth || 500;
       const height = 320;
@@ -6496,6 +6629,104 @@
         .text(`Current: TSS=${tss} mg/L, TDS=${tds} mg/L`);
     }
 
+    // ==================== MARKET PRESETS ====================
+    const MARKET_PRESETS = {
+      waterUtilities: {
+        name: 'Water Utilities',
+        flowRate: 500, opHours: 8760,
+        feedTSS: 50, feedTDS: 800, feedBOD: 80, feedConductivity: 1200,
+        feedPH: 7.2, feedChlorine: 1.0, feedTurbidity: 5, feedSDI: 4,
+        feedIron: 0.05, feedHardness: 180, feedTemp: 15, feedPressure: 4,
+        outTDS: 50, outTSS: 1
+      },
+      industrial: {
+        name: 'Industrial Manufacturing',
+        flowRate: 150, opHours: 6000,
+        feedTSS: 80, feedTDS: 1500, feedBOD: 150, feedConductivity: 2200,
+        feedPH: 6.8, feedChlorine: 0.2, feedTurbidity: 10, feedSDI: 5,
+        feedIron: 0.1, feedHardness: 300, feedTemp: 25, feedPressure: 3.5,
+        outTDS: 100, outTSS: 5
+      },
+      automotive: {
+        name: 'Automotive',
+        flowRate: 100, opHours: 5000,
+        feedTSS: 120, feedTDS: 1200, feedBOD: 200, feedConductivity: 1800,
+        feedPH: 7.0, feedChlorine: 0.1, feedTurbidity: 15, feedSDI: 5.5,
+        feedIron: 0.2, feedHardness: 250, feedTemp: 22, feedPressure: 4,
+        outTDS: 50, outTSS: 2
+      },
+      foodBeverage: {
+        name: 'Food & Beverage',
+        flowRate: 200, opHours: 7000,
+        feedTSS: 200, feedTDS: 800, feedBOD: 350, feedConductivity: 1200,
+        feedPH: 6.8, feedChlorine: 0.5, feedTurbidity: 25, feedSDI: 5.5,
+        feedIron: 0.15, feedHardness: 280, feedTemp: 25, feedPressure: 4,
+        outTDS: 20, outTSS: 0.5
+      },
+      adPlants: {
+        name: 'AD Plants',
+        flowRate: 80, opHours: 8000,
+        feedTSS: 500, feedTDS: 5000, feedBOD: 800, feedConductivity: 7500,
+        feedPH: 7.8, feedChlorine: 0, feedTurbidity: 100, feedSDI: 6,
+        feedIron: 0.5, feedHardness: 400, feedTemp: 35, feedPressure: 3,
+        outTDS: 500, outTSS: 10
+      }
+    };
+
+    function applyMarketPreset(marketId) {
+      const preset = MARKET_PRESETS[marketId];
+      if (!preset) return;
+
+      // Update all input fields with preset values
+      Object.keys(preset).forEach(key => {
+        if (key === 'name') return; // Skip the name property
+        const input = document.getElementById(key);
+        if (input) {
+          input.value = preset[key];
+          // Trigger input event to activate reactive system
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+
+      // Update state values for the reactive system
+      state.feedTSS = preset.feedTSS;
+      state.feedTDS = preset.feedTDS;
+      state.ph = preset.feedPH;
+      state.chlorine = preset.feedChlorine;
+      state.turbidity = preset.feedTurbidity;
+      state.sdi = preset.feedSDI;
+      state.iron = preset.feedIron;
+      state.hardness = preset.feedHardness;
+      state.temperature = preset.feedTemp;
+      state.feedPressure = preset.feedPressure;
+      state.feedConductivity = preset.feedConductivity;
+      state.industrySector = preset.name;
+
+      // Trigger reactive analysis
+      if (typeof analyzeWaterQuality === 'function') {
+        analyzeWaterQuality();
+      }
+
+      // Update AI suggestions and scenarios
+      if (typeof updateAISuggestions === 'function') {
+        updateAISuggestions();
+      }
+      if (typeof updateScenarios === 'function') {
+        updateScenarios();
+      }
+
+      // Re-render decision tree if visible
+      if (typeof renderDecisionTree === 'function') {
+        renderDecisionTree();
+      }
+
+      // Show notification
+      showNotification('factory', `Applied ${preset.name} preset — typical water quality parameters loaded`, 'success');
+
+      // Log decision
+      logDecision(`Selected ${preset.name} market`, `Water quality parameters auto-populated with industry-typical values`, 'user');
+    }
+
     // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       initOpexChart();
@@ -6505,6 +6736,14 @@
 
       // Initialize step 1 as active
       goToStep(1);
+
+      // Wire up Target Market dropdown to auto-populate parameters
+      const sectorSelect = document.getElementById('sector');
+      if (sectorSelect) {
+        sectorSelect.addEventListener('change', (e) => {
+          applyMarketPreset(e.target.value);
+        });
+      }
 
       // Initialize reactive system
       bindReactiveInputs();
