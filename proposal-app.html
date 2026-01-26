@@ -1811,6 +1811,127 @@
     .ai-tab-panel { display: none; }
     .ai-tab-panel.active { display: block; }
 
+    /* Value History Styles */
+    .value-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: calc(100vh - 320px);
+      overflow-y: auto;
+    }
+
+    .history-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .history-item {
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .history-item:hover {
+      border-color: var(--accent);
+      background: rgba(99,102,241,0.05);
+    }
+
+    .history-item.preset {
+      border-left: 3px solid var(--accent2);
+    }
+
+    .history-item.water {
+      border-left: 3px solid var(--esg-blue);
+    }
+
+    .history-item.flow {
+      border-left: 3px solid var(--success);
+    }
+
+    .history-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .history-item-field {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .history-item-time {
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .history-item-values {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .history-old-value {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .history-arrow {
+      color: var(--accent);
+      font-size: 14px;
+    }
+
+    .history-new-value {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .history-item-source {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .history-item-source .material-icons-outlined {
+      font-size: 12px;
+    }
+
+    .history-filter {
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .history-filter:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .history-filter.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
     /* Quick Actions Bar */
     .quick-actions-bar {
       display: flex;
@@ -4426,8 +4547,8 @@
       <div class="ai-tab active" data-tab="suggest" onclick="setAITab('suggest')">Suggest</div>
       <div class="ai-tab" data-tab="scenarios" onclick="setAITab('scenarios')">Scenarios</div>
       <div class="ai-tab" data-tab="wizard" onclick="setAITab('wizard')">Wizard</div>
+      <div class="ai-tab" data-tab="history" onclick="setAITab('history')">History</div>
       <div class="ai-tab" data-tab="decisions" onclick="setAITab('decisions')">Trail</div>
-      <div class="ai-tab" data-tab="similar" onclick="setAITab('similar')">Similar</div>
     </div>
 
     <div class="ai-content">
@@ -4488,6 +4609,33 @@
         </div>
         <div id="wizardContent">
           <!-- Wizard questions will be populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Value History Panel -->
+      <div class="ai-tab-panel" id="ai-panel-history">
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; font-weight: 600; color: var(--text);">Value Change History</span>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <span style="font-size: 10px; color: var(--muted);" id="historyCount">0 changes</span>
+              <button onclick="clearValueHistory()" style="padding: 4px 8px; font-size: 9px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; color: var(--muted); cursor: pointer;" title="Clear history">Clear</button>
+            </div>
+          </div>
+          <p style="font-size: 10px; color: var(--muted); margin-top: 4px;">Track all input value modifications during this session</p>
+        </div>
+        <div class="history-filters" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+          <button class="history-filter active" data-filter="all" onclick="filterHistory('all')">All</button>
+          <button class="history-filter" data-filter="water" onclick="filterHistory('water')">Water Quality</button>
+          <button class="history-filter" data-filter="flow" onclick="filterHistory('flow')">Flow/Ops</button>
+          <button class="history-filter" data-filter="preset" onclick="filterHistory('preset')">Presets</button>
+        </div>
+        <div id="valueHistory" class="value-history-list">
+          <div class="history-empty">
+            <span class="material-icons-outlined" style="font-size: 32px; opacity: 0.3; margin-bottom: 8px;">history</span>
+            <p>No changes recorded yet</p>
+            <p style="font-size: 10px; margin-top: 4px;">Modify any input field to start tracking</p>
+          </div>
         </div>
       </div>
 
@@ -5584,6 +5732,119 @@
       dataCompleteness: 0
     });
 
+    // ==================== VALUE HISTORY TRACKING ====================
+    const valueHistory = [];
+    let currentHistoryFilter = 'all';
+
+    // Field metadata for display names and categories
+    const FIELD_META = {
+      feedTDS: { name: 'TDS', unit: 'ppm', category: 'water' },
+      feedTSS: { name: 'TSS', unit: 'ppm', category: 'water' },
+      feedBOD: { name: 'BOD', unit: 'mg/L', category: 'water' },
+      feedConductivity: { name: 'Conductivity', unit: 'µS/cm', category: 'water' },
+      feedPH: { name: 'pH', unit: '', category: 'water' },
+      feedChlorine: { name: 'Chlorine', unit: 'ppm', category: 'water' },
+      feedTurbidity: { name: 'Turbidity', unit: 'NTU', category: 'water' },
+      feedSDI: { name: 'SDI', unit: '', category: 'water' },
+      feedIron: { name: 'Iron', unit: 'mg/L', category: 'water' },
+      feedHardness: { name: 'Hardness', unit: 'mg/L CaCO3', category: 'water' },
+      feedTemp: { name: 'Temperature', unit: '°C', category: 'water' },
+      feedPressure: { name: 'Pressure', unit: 'BAR', category: 'water' },
+      flowRate: { name: 'Flow Rate', unit: 'm³/h', category: 'flow' },
+      opHours: { name: 'Operating Hours', unit: 'hrs/year', category: 'flow' },
+      outTDS: { name: 'Target TDS', unit: 'ppm', category: 'flow' },
+      outTSS: { name: 'Target TSS', unit: 'ppm', category: 'flow' },
+      sector: { name: 'Target Market', unit: '', category: 'preset' }
+    };
+
+    function recordValueChange(fieldId, oldValue, newValue, source = 'manual') {
+      // Don't record if values are the same
+      if (oldValue === newValue) return;
+
+      const meta = FIELD_META[fieldId] || { name: fieldId, unit: '', category: 'other' };
+      const timestamp = new Date();
+
+      valueHistory.unshift({
+        id: Date.now(),
+        fieldId,
+        fieldName: meta.name,
+        unit: meta.unit,
+        category: meta.category,
+        oldValue,
+        newValue,
+        source,
+        timestamp
+      });
+
+      // Limit history to 100 entries
+      if (valueHistory.length > 100) {
+        valueHistory.pop();
+      }
+
+      renderValueHistory();
+    }
+
+    function renderValueHistory() {
+      const container = document.getElementById('valueHistory');
+      const countEl = document.getElementById('historyCount');
+      if (!container) return;
+
+      const filtered = currentHistoryFilter === 'all'
+        ? valueHistory
+        : valueHistory.filter(h => h.category === currentHistoryFilter);
+
+      countEl.textContent = `${valueHistory.length} change${valueHistory.length !== 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="history-empty">
+            <span class="material-icons-outlined" style="font-size: 32px; opacity: 0.3; margin-bottom: 8px;">history</span>
+            <p>${currentHistoryFilter === 'all' ? 'No changes recorded yet' : 'No changes in this category'}</p>
+            <p style="font-size: 10px; margin-top: 4px;">Modify any input field to start tracking</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(entry => {
+        const timeStr = entry.timestamp.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const sourceIcon = entry.source === 'preset' ? 'auto_fix_high' : entry.source === 'scenario' ? 'account_tree' : 'edit';
+        const sourceLabel = entry.source === 'preset' ? 'Market preset' : entry.source === 'scenario' ? 'Use case scenario' : 'Manual edit';
+
+        return `
+          <div class="history-item ${entry.category}" data-category="${entry.category}">
+            <div class="history-item-header">
+              <span class="history-item-field">${entry.fieldName}</span>
+              <span class="history-item-time">${timeStr}</span>
+            </div>
+            <div class="history-item-values">
+              <span class="history-old-value">${entry.oldValue}${entry.unit ? ' ' + entry.unit : ''}</span>
+              <span class="material-icons-outlined history-arrow">arrow_forward</span>
+              <span class="history-new-value">${entry.newValue}${entry.unit ? ' ' + entry.unit : ''}</span>
+            </div>
+            <div class="history-item-source">
+              <span class="material-icons-outlined">${sourceIcon}</span>
+              ${sourceLabel}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterHistory(filter) {
+      currentHistoryFilter = filter;
+      document.querySelectorAll('.history-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderValueHistory();
+    }
+
+    function clearValueHistory() {
+      valueHistory.length = 0;
+      renderValueHistory();
+      showNotification('delete', 'Value history cleared', 'info');
+    }
+
     // ==================== REACTIVE CALCULATION ENGINE ====================
     const CalculationEngine = {
       // Calculate RO system sizing
@@ -6434,11 +6695,14 @@
 
       // Only update input fields if toggle is enabled
       if (shouldUpdateInputs) {
-        // Update all input fields with scenario parameters
+        // Update all input fields with scenario parameters and record history
         Object.keys(params).forEach(key => {
           const input = document.getElementById(key);
           if (input) {
+            const oldValue = input.value;
             input.value = params[key];
+            // Record change in history
+            recordValueChange(key, oldValue, params[key], 'scenario');
             // Trigger input event to activate reactive system
             input.dispatchEvent(new Event('input', { bubbles: true }));
           }
@@ -6677,12 +6941,15 @@
       const preset = MARKET_PRESETS[marketId];
       if (!preset) return;
 
-      // Update all input fields with preset values
+      // Update all input fields with preset values and record history
       Object.keys(preset).forEach(key => {
         if (key === 'name') return; // Skip the name property
         const input = document.getElementById(key);
         if (input) {
+          const oldValue = input.value;
           input.value = preset[key];
+          // Record change in history
+          recordValueChange(key, oldValue, preset[key], 'preset');
           // Trigger input event to activate reactive system
           input.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -6741,9 +7008,33 @@
       const sectorSelect = document.getElementById('sector');
       if (sectorSelect) {
         sectorSelect.addEventListener('change', (e) => {
+          const oldValue = e.target.dataset.prevValue || 'waterUtilities';
+          recordValueChange('sector', oldValue, e.target.value, 'manual');
+          e.target.dataset.prevValue = e.target.value;
           applyMarketPreset(e.target.value);
         });
       }
+
+      // Track manual input changes for value history
+      const trackedInputIds = Object.keys(FIELD_META);
+      trackedInputIds.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          // Store initial value
+          input.dataset.prevValue = input.value;
+
+          // Listen for user-initiated changes (not programmatic)
+          input.addEventListener('change', (e) => {
+            // Only record if it's a manual change (not from preset/scenario)
+            if (!e.isTrusted) return;
+            const oldValue = input.dataset.prevValue || '';
+            if (oldValue !== input.value) {
+              recordValueChange(id, oldValue, input.value, 'manual');
+              input.dataset.prevValue = input.value;
+            }
+          });
+        }
+      });
 
       // Initialize reactive system
       bindReactiveInputs();
