@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin - Reactive AI Settings - WaterLogic</title>
+
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0f1a;
+      --panel: #0d1424;
+      --card: #111b2e;
+      --card-hover: #162035;
+      --muted: #8fa3c0;
+      --text: #e8f0ff;
+      --line: #1e2d4a;
+      --accent: #6366f1;
+      --accent2: #22d3ee;
+      --accent3: #a855f7;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --admin: #ec4899;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --muted: #64748b;
+      --text: #1e293b;
+      --line: #e2e8f0;
+      --accent: #4f46e5;
+      --accent2: #0891b2;
+      --accent3: #9333ea;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --admin: #db2777;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 1000;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--admin), var(--accent3));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .logo-text span { color: var(--admin); }
+
+    .admin-badge {
+      padding: 4px 10px;
+      background: linear-gradient(135deg, var(--admin), var(--accent3));
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .header-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-link {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-link:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .header-link.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      margin-top: 60px;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 20px 0;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      padding: 0 16px;
+      margin-bottom: 24px;
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(168,85,247,0.1));
+      color: var(--admin);
+    }
+
+    .nav-item .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      padding: 2px 8px;
+      background: var(--card);
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .nav-item.active .nav-badge {
+      background: rgba(236,72,153,0.2);
+      color: var(--admin);
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: 260px;
+      padding: 24px;
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .card-icon.danger { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .card-icon.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .card-icon.success { background: rgba(34,197,94,0.15); color: var(--success); }
+    .card-icon.accent { background: rgba(99,102,241,0.15); color: var(--accent); }
+    .card-icon.cyan { background: rgba(34,211,238,0.15); color: var(--accent2); }
+    .card-icon.purple { background: rgba(168,85,247,0.15); color: var(--accent3); }
+    .card-icon.admin { background: rgba(236,72,153,0.15); color: var(--admin); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .card-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Form Elements */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-label .unit {
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group .form-input {
+      flex: 1;
+    }
+
+    .input-addon {
+      padding: 10px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Threshold Row */
+    .threshold-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 100px 100px auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .threshold-row:hover {
+      border-color: var(--accent);
+    }
+
+    .threshold-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .threshold-message {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .threshold-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .threshold-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Component Row */
+    .component-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 120px 80px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .component-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .component-trigger {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* System Row */
+    .system-row {
+      display: grid;
+      grid-template-columns: 100px repeat(5, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+
+    .system-model {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239,68,68,0.25);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #16a34a);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .btn .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: var(--line);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .toggle.active {
+      background: var(--accent);
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .toggle.active .toggle-knob {
+      left: 22px;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+    }
+
+    /* Info Box */
+    .info-box {
+      padding: 16px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .info-box.warning {
+      background: rgba(245,158,11,0.08);
+      border-color: rgba(245,158,11,0.2);
+    }
+
+    .info-box.danger {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.2);
+    }
+
+    .info-box-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .info-box-header .material-icons-outlined {
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .info-box.warning .info-box-header .material-icons-outlined {
+      color: var(--warning);
+    }
+
+    .info-box.danger .info-box-header .material-icons-outlined {
+      color: var(--danger);
+    }
+
+    .info-box-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .info-box p {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Section Content */
+    .section-content {
+      display: none;
+    }
+
+    .section-content.active {
+      display: block;
+    }
+
+    /* Table Styles */
+    .table-header {
+      display: grid;
+      gap: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .table-header.thresholds {
+      grid-template-columns: 140px 1fr 100px 100px auto;
+    }
+
+    .table-header.components {
+      grid-template-columns: 200px 1fr 120px 80px;
+    }
+
+    .table-header.systems {
+      grid-template-columns: 100px repeat(5, 1fr) auto;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 260px;
+      right: 0;
+      padding: 16px 24px;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .action-bar-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .action-bar-info .material-icons-outlined {
+      font-size: 18px;
+      color: var(--warning);
+    }
+
+    .action-bar-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      padding: 20px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .stat-value.danger { color: var(--danger); }
+    .stat-value.warning { color: var(--warning); }
+    .stat-value.success { color: var(--success); }
+    .stat-value.accent { color: var(--accent); }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .action-bar { left: 0; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Content padding for action bar */
+    .main {
+      padding-bottom: 100px;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      right: 24px;
+      padding: 16px 24px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 1000;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-color: rgba(34,197,94,0.3);
+    }
+
+    .toast.success .material-icons-outlined {
+      color: var(--success);
+    }
+
+    .toast-message {
+      font-size: 13px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <a href="proposal-app.html" class="logo">
+      <div class="logo-icon">
+        <span class="material-icons-outlined">admin_panel_settings</span>
+      </div>
+      <div class="logo-text">Water<span>Logic</span></div>
+    </a>
+    <span class="admin-badge">Admin</span>
+    <div class="header-spacer"></div>
+    <div class="header-links">
+      <a href="reactive-ai-guide.html" class="header-link">
+        <span class="material-icons-outlined">menu_book</span>
+        AI Guide
+      </a>
+      <a href="proposal-app.html" class="header-link primary">
+        <span class="material-icons-outlined">rocket_launch</span>
+        Launch App
+      </a>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span class="material-icons-outlined" id="themeIcon">light_mode</span>
+    </button>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">AI Configuration</div>
+        <div class="nav-item active" onclick="showSection('thresholds')">
+          <span class="material-icons-outlined">warning</span>
+          Alarm Thresholds
+          <span class="nav-badge">12</span>
+        </div>
+        <div class="nav-item" onclick="showSection('pretreatment')">
+          <span class="material-icons-outlined">build</span>
+          Pre-Treatment Rules
+          <span class="nav-badge">11</span>
+        </div>
+        <div class="nav-item" onclick="showSection('systems')">
+          <span class="material-icons-outlined">precision_manufacturing</span>
+          RO Systems
+          <span class="nav-badge">9</span>
+        </div>
+        <div class="nav-item" onclick="showSection('temperature')">
+          <span class="material-icons-outlined">thermostat</span>
+          Temp Correction
+          <span class="nav-badge">7</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Scoring & Pricing</div>
+        <div class="nav-item" onclick="showSection('confidence')">
+          <span class="material-icons-outlined">verified</span>
+          Confidence Scoring
+        </div>
+        <div class="nav-item" onclick="showSection('pricing')">
+          <span class="material-icons-outlined">payments</span>
+          Pricing Rules
+        </div>
+        <div class="nav-item" onclick="showSection('options')">
+          <span class="material-icons-outlined">add_circle</span>
+          Optional Components
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Behavior</div>
+        <div class="nav-item" onclick="showSection('behavior')">
+          <span class="material-icons-outlined">tune</span>
+          AI Behavior
+        </div>
+        <div class="nav-item" onclick="showSection('export')">
+          <span class="material-icons-outlined">download</span>
+          Export / Import
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value danger">4</div>
+          <div class="stat-label">Critical Alarms</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value warning">7</div>
+          <div class="stat-label">Warning Thresholds</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value accent">11</div>
+          <div class="stat-label">Pre-treatment Rules</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value success">9</div>
+          <div class="stat-label">RO Systems</div>
+        </div>
+      </div>
+
+      <!-- Section: Alarm Thresholds -->
+      <div class="section-content active" id="section-thresholds">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--danger);">warning</span>
+            Alarm Thresholds
+          </h1>
+          <p>Configure critical alarms and warnings that trigger during water quality analysis</p>
+        </div>
+
+        <!-- Critical Alarms -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon danger">
+              <span class="material-icons-outlined">error</span>
+            </div>
+            <div>
+              <div class="card-title">Critical Alarms</div>
+              <div class="card-subtitle">Block proposal generation until resolved</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="resetCriticalDefaults()">
+                <span class="material-icons-outlined">restart_alt</span>
+                Reset Defaults
+              </button>
+            </div>
+          </div>
+
+          <div class="info-box danger">
+            <div class="info-box-header">
+              <span class="material-icons-outlined">info</span>
+              <span class="info-box-title">Critical Alarm Behavior</span>
+            </div>
+            <p>When any critical alarm is triggered, the AI will block proposal generation and display a red alert requiring user action.</p>
+          </div>
+
+          <div class="table-header thresholds">
+            <span>Parameter</span>
+            <span>Alert Message</span>
+            <span>Min Value</span>
+            <span>Max Value</span>
+            <span></span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">SDI</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="SDI HIGH - Pre-treatment required; RO at risk of rapid fouling" id="critical-sdi-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="6" step="0.5" id="critical-sdi-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Silt Density Index - measures fouling potential">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">pH</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="pH out of range - Risk of irreversible membrane damage" id="critical-ph-message">
+            <input type="number" class="threshold-input" value="5" step="0.1" id="critical-ph-min">
+            <input type="number" class="threshold-input" value="9" step="0.1" id="critical-ph-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Membrane safe range is 5-9">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Chlorine</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Chlorine HIGH - Carbon filter + SMBS mandatory" id="critical-chlorine-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="0.05" step="0.01" id="critical-chlorine-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Free chlorine destroys polyamide membranes">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Iron</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Iron Levels HIGH - Dedicated iron removal system required" id="critical-iron-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="0.3" step="0.05" id="critical-iron-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Iron above this level causes severe fouling">help_outline</span>
+          </div>
+        </div>
+
+        <!-- Warnings -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon warning">
+              <span class="material-icons-outlined">warning</span>
+            </div>
+            <div>
+              <div class="card-title">Warning Thresholds</div>
+              <div class="card-subtitle">Display alerts but allow continuation</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="resetWarningDefaults()">
+                <span class="material-icons-outlined">restart_alt</span>
+                Reset Defaults
+              </button>
+            </div>
+          </div>
+
+          <div class="table-header thresholds">
+            <span>Parameter</span>
+            <span>Alert Message</span>
+            <span>Min Value</span>
+            <span>Max Value</span>
+            <span></span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Temperature</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Temperature is low - flux reduction expected" id="warning-temp-message">
+            <input type="number" class="threshold-input" value="15" step="1" id="warning-temp-min">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Below this triggers flux compensation">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Hardness</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Hard water detected - Softener or antiscalant required" id="warning-hardness-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="300" step="10" id="warning-hardness-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="CaCO3 mg/L - causes scaling">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">TDS</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="TDS HIGH - High-rejection membranes recommended" id="warning-tds-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="1000" step="50" id="warning-tds-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Total Dissolved Solids in ppm">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">TSS</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="TSS HIGH - Full pre-treatment required" id="warning-tss-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="5" step="1" id="warning-tss-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Total Suspended Solids in ppm">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Turbidity</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Turbidity HIGH - Sand/multimedia filter needed" id="warning-turbidity-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="5" step="0.5" id="warning-turbidity-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="NTU units">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Pressure</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Pressure LOW - Boost pump required" id="warning-pressure-message">
+            <input type="number" class="threshold-input" value="3" step="0.5" id="warning-pressure-min">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Feed pressure in BAR">help_outline</span>
+          </div>
+
+          <div class="threshold-row">
+            <div class="threshold-name">Target Quality</div>
+            <input type="text" class="threshold-input" style="grid-column: 2;" value="Ultra-pure target - Second stage RO required" id="warning-quality-message">
+            <input type="number" class="threshold-input" placeholder="N/A" disabled style="opacity:0.5">
+            <input type="number" class="threshold-input" value="10" step="1" id="warning-quality-max">
+            <span class="material-icons-outlined" style="color:var(--muted);cursor:help" title="Permeate conductivity target in uS/cm">help_outline</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Pre-Treatment Rules -->
+      <div class="section-content" id="section-pretreatment">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--accent);">build</span>
+            Pre-Treatment Rules
+          </h1>
+          <p>Configure automatic component selection based on water quality parameters</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <span class="material-icons-outlined">auto_fix_high</span>
+            </div>
+            <div>
+              <div class="card-title">Auto-Selected Components</div>
+              <div class="card-subtitle">Components automatically added when thresholds are exceeded</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="addPretreatmentRule()">
+                <span class="material-icons-outlined">add</span>
+                Add Rule
+              </button>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <div class="info-box-header">
+              <span class="material-icons-outlined">info</span>
+              <span class="info-box-title">How Pre-Treatment Selection Works</span>
+            </div>
+            <p>When a water quality parameter exceeds its threshold, the corresponding component is automatically added to the proposal with its cost. Multiple components can be triggered simultaneously.</p>
+          </div>
+
+          <div class="table-header components">
+            <span>Component</span>
+            <span>Trigger Condition</span>
+            <span>Threshold</span>
+            <span>Cost (GBP)</span>
+          </div>
+
+          <div class="component-row" id="pretreat-chlorine">
+            <div class="component-name">Carbon Filter</div>
+            <div class="component-trigger">Chlorine exceeds threshold</div>
+            <input type="number" class="threshold-input" value="0.05" step="0.01" id="pretreat-chlorine-threshold">
+            <input type="number" class="threshold-input" value="1062" step="50" id="pretreat-chlorine-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-iron-low">
+            <div class="component-name">Iron Removal</div>
+            <div class="component-trigger">Iron > low threshold (moderate)</div>
+            <input type="number" class="threshold-input" value="0.1" step="0.01" id="pretreat-iron-low-threshold">
+            <input type="number" class="threshold-input" value="3500" step="100" id="pretreat-iron-low-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-iron-high">
+            <div class="component-name">Dedicated Iron System</div>
+            <div class="component-trigger">Iron > high threshold (severe)</div>
+            <input type="number" class="threshold-input" value="0.3" step="0.01" id="pretreat-iron-high-threshold">
+            <input type="number" class="threshold-input" value="5500" step="100" id="pretreat-iron-high-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-hardness-mod">
+            <div class="component-name">Antiscalant Dosing</div>
+            <div class="component-trigger">Hardness > moderate threshold</div>
+            <input type="number" class="threshold-input" value="100" step="10" id="pretreat-hardness-mod-threshold">
+            <input type="number" class="threshold-input" value="1400" step="50" id="pretreat-hardness-mod-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-hardness-high">
+            <div class="component-name">Water Softener</div>
+            <div class="component-trigger">Hardness > high threshold</div>
+            <input type="number" class="threshold-input" value="300" step="10" id="pretreat-hardness-high-threshold">
+            <input type="number" class="threshold-input" value="4500" step="100" id="pretreat-hardness-high-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-turbidity">
+            <div class="component-name">Sand Filter</div>
+            <div class="component-trigger">Turbidity exceeds threshold</div>
+            <input type="number" class="threshold-input" value="5" step="0.5" id="pretreat-turbidity-threshold">
+            <input type="number" class="threshold-input" value="2500" step="100" id="pretreat-turbidity-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-tss">
+            <div class="component-name">Multimedia Filter</div>
+            <div class="component-trigger">TSS exceeds threshold</div>
+            <input type="number" class="threshold-input" value="5" step="1" id="pretreat-tss-threshold">
+            <input type="number" class="threshold-input" value="3000" step="100" id="pretreat-tss-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-sdi">
+            <div class="component-name">Pre-treatment Package</div>
+            <div class="component-trigger">SDI exceeds threshold</div>
+            <input type="number" class="threshold-input" value="6" step="0.5" id="pretreat-sdi-threshold">
+            <input type="number" class="threshold-input" value="8500" step="100" id="pretreat-sdi-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-pressure">
+            <div class="component-name">Boost Pump</div>
+            <div class="component-trigger">Pressure below threshold</div>
+            <input type="number" class="threshold-input" value="3" step="0.5" id="pretreat-pressure-threshold">
+            <input type="number" class="threshold-input" value="2500" step="100" id="pretreat-pressure-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-ph">
+            <div class="component-name">pH Adjustment Dosing</div>
+            <div class="component-trigger">pH outside safe range</div>
+            <input type="text" class="threshold-input" value="6 - 8.5" id="pretreat-ph-threshold" style="text-align:center">
+            <input type="number" class="threshold-input" value="1400" step="50" id="pretreat-ph-cost">
+          </div>
+
+          <div class="component-row" id="pretreat-quality">
+            <div class="component-name">Second Stage RO</div>
+            <div class="component-trigger">Target conductivity ultra-pure</div>
+            <input type="number" class="threshold-input" value="10" step="1" id="pretreat-quality-threshold">
+            <input type="number" class="threshold-input" value="15000" step="500" id="pretreat-quality-cost">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: RO Systems -->
+      <div class="section-content" id="section-systems">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--accent2);">precision_manufacturing</span>
+            RO System Catalog
+          </h1>
+          <p>Configure MEMR system specifications and pricing</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon cyan">
+              <span class="material-icons-outlined">category</span>
+            </div>
+            <div>
+              <div class="card-title">MEMR System Range</div>
+              <div class="card-subtitle">Packaged RO systems with auto-selection based on flow requirements</div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary btn-sm" onclick="addSystem()">
+                <span class="material-icons-outlined">add</span>
+                Add System
+              </button>
+            </div>
+          </div>
+
+          <div class="table-header systems">
+            <span>Model</span>
+            <span>Flow (m3/hr)</span>
+            <span>Base Cost</span>
+            <span>Membranes</span>
+            <span>Power (kW)</span>
+            <span>CIP Cost</span>
+            <span></span>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR0025</div>
+            <input type="number" class="threshold-input" value="0.25" step="0.05" id="sys-0025-flow">
+            <input type="number" class="threshold-input" value="1700" step="50" id="sys-0025-cost">
+            <input type="number" class="threshold-input" value="1" step="1" id="sys-0025-membranes">
+            <input type="number" class="threshold-input" value="0" step="0.5" id="sys-0025-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-0025-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR005</div>
+            <input type="number" class="threshold-input" value="0.5" step="0.1" id="sys-005-flow">
+            <input type="number" class="threshold-input" value="2200" step="50" id="sys-005-cost">
+            <input type="number" class="threshold-input" value="2" step="1" id="sys-005-membranes">
+            <input type="number" class="threshold-input" value="0" step="0.5" id="sys-005-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-005-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR01</div>
+            <input type="number" class="threshold-input" value="1" step="0.5" id="sys-01-flow">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-01-cost">
+            <input type="number" class="threshold-input" value="4" step="1" id="sys-01-membranes">
+            <input type="number" class="threshold-input" value="0" step="0.5" id="sys-01-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-01-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR02</div>
+            <input type="number" class="threshold-input" value="2" step="0.5" id="sys-02-flow">
+            <input type="number" class="threshold-input" value="4500" step="100" id="sys-02-cost">
+            <input type="number" class="threshold-input" value="2" step="1" id="sys-02-membranes">
+            <input type="number" class="threshold-input" value="3" step="0.5" id="sys-02-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-02-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR04</div>
+            <input type="number" class="threshold-input" value="4" step="0.5" id="sys-04-flow">
+            <input type="number" class="threshold-input" value="5500" step="100" id="sys-04-cost">
+            <input type="number" class="threshold-input" value="4" step="1" id="sys-04-membranes">
+            <input type="number" class="threshold-input" value="4" step="0.5" id="sys-04-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-04-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR06</div>
+            <input type="number" class="threshold-input" value="6" step="0.5" id="sys-06-flow">
+            <input type="number" class="threshold-input" value="12100" step="100" id="sys-06-cost">
+            <input type="number" class="threshold-input" value="6" step="1" id="sys-06-membranes">
+            <input type="number" class="threshold-input" value="7.5" step="0.5" id="sys-06-power">
+            <input type="number" class="threshold-input" value="3500" step="100" id="sys-06-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR09</div>
+            <input type="number" class="threshold-input" value="9" step="0.5" id="sys-09-flow">
+            <input type="number" class="threshold-input" value="15954" step="100" id="sys-09-cost">
+            <input type="number" class="threshold-input" value="9" step="1" id="sys-09-membranes">
+            <input type="number" class="threshold-input" value="7.5" step="0.5" id="sys-09-power">
+            <input type="number" class="threshold-input" value="4716" step="100" id="sys-09-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR012</div>
+            <input type="number" class="threshold-input" value="12" step="0.5" id="sys-012-flow">
+            <input type="number" class="threshold-input" value="23250" step="100" id="sys-012-cost">
+            <input type="number" class="threshold-input" value="12" step="1" id="sys-012-membranes">
+            <input type="number" class="threshold-input" value="11" step="0.5" id="sys-012-power">
+            <input type="number" class="threshold-input" value="4716" step="100" id="sys-012-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+
+          <div class="system-row">
+            <div class="system-model">MEMR016</div>
+            <input type="number" class="threshold-input" value="16" step="0.5" id="sys-016-flow">
+            <input type="number" class="threshold-input" value="27500" step="100" id="sys-016-cost">
+            <input type="number" class="threshold-input" value="16" step="1" id="sys-016-membranes">
+            <input type="number" class="threshold-input" value="11" step="0.5" id="sys-016-power">
+            <input type="number" class="threshold-input" value="4716" step="100" id="sys-016-cip">
+            <button class="btn btn-danger btn-sm" onclick="removeSystem(this)">
+              <span class="material-icons-outlined">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Temperature Correction -->
+      <div class="section-content" id="section-temperature">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--warning);">thermostat</span>
+            Temperature Correction Factors
+          </h1>
+          <p>Adjust membrane flux multipliers based on water temperature</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon warning">
+              <span class="material-icons-outlined">trending_up</span>
+            </div>
+            <div>
+              <div class="card-title">Flux Correction Table</div>
+              <div class="card-subtitle">Multipliers applied to compensate for temperature effects on membrane performance</div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <div class="info-box-header">
+              <span class="material-icons-outlined">info</span>
+              <span class="info-box-title">Temperature & Membrane Flux</span>
+            </div>
+            <p>Cold water reduces membrane permeability. The system automatically oversizes equipment when feed temperature is below 25C to maintain required output flow. Factor of 1.0 = 100% rated capacity at 25C.</p>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">5C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="0.45" step="0.01" id="temp-5">
+                <span class="input-addon">= 45%</span>
+              </div>
+              <div class="form-hint">Severe flux reduction at very cold temps</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">10C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="0.58" step="0.01" id="temp-10">
+                <span class="input-addon">= 58%</span>
+              </div>
+              <div class="form-hint">Cold water, significant oversizing needed</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">15C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="0.75" step="0.01" id="temp-15">
+                <span class="input-addon">= 75%</span>
+              </div>
+              <div class="form-hint">Cool water, moderate compensation</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">20C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="0.88" step="0.01" id="temp-20">
+                <span class="input-addon">= 88%</span>
+              </div>
+              <div class="form-hint">Typical ambient temperature</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">25C Factor <span class="unit">(Reference)</span></label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="1.00" step="0.01" id="temp-25" style="background:rgba(34,197,94,0.1);border-color:var(--success)">
+                <span class="input-addon" style="color:var(--success)">= 100%</span>
+              </div>
+              <div class="form-hint">Standard reference temperature</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">30C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="1.15" step="0.01" id="temp-30">
+                <span class="input-addon">= 115%</span>
+              </div>
+              <div class="form-hint">Warm water, increased flux</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">35C Factor</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="1.30" step="0.01" id="temp-35">
+                <span class="input-addon">= 130%</span>
+              </div>
+              <div class="form-hint">Hot water, maximum flux boost</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Confidence Scoring -->
+      <div class="section-content" id="section-confidence">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--success);">verified</span>
+            AI Confidence Scoring
+          </h1>
+          <p>Configure how the AI calculates proposal confidence scores</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon success">
+              <span class="material-icons-outlined">calculate</span>
+            </div>
+            <div>
+              <div class="card-title">Scoring Parameters</div>
+              <div class="card-subtitle">Points added or deducted based on data quality and completeness</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Base Score</label>
+              <input type="number" class="form-input" value="50" step="5" id="conf-base">
+              <div class="form-hint">Starting confidence score before adjustments</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Required Field Bonus</label>
+              <input type="number" class="form-input" value="5" step="1" id="conf-required">
+              <div class="form-hint">Points added per completed required field</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optional Field Bonus</label>
+              <input type="number" class="form-input" value="3" step="1" id="conf-optional">
+              <div class="form-hint">Points added per completed optional field</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Critical Alarm Penalty</label>
+              <input type="number" class="form-input" value="10" step="1" id="conf-critical-penalty">
+              <div class="form-hint">Points deducted per active critical alarm</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Warning Penalty</label>
+              <input type="number" class="form-input" value="3" step="1" id="conf-warning-penalty">
+              <div class="form-hint">Points deducted per active warning</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optimal Recovery Bonus</label>
+              <input type="number" class="form-input" value="5" step="1" id="conf-recovery-bonus">
+              <div class="form-hint">Points added if recovery is in optimal range</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optimal Markup Bonus</label>
+              <input type="number" class="form-input" value="5" step="1" id="conf-markup-bonus">
+              <div class="form-hint">Points added if markup is in healthy range</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <span class="material-icons-outlined">tune</span>
+            </div>
+            <div>
+              <div class="card-title">Confidence Thresholds</div>
+              <div class="card-subtitle">Define what constitutes low, medium, and high confidence</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Minimum Score</label>
+              <input type="number" class="form-input" value="20" step="5" id="conf-min">
+              <div class="form-hint">Floor value - confidence cannot go below this</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Maximum Score</label>
+              <input type="number" class="form-input" value="98" step="1" id="conf-max">
+              <div class="form-hint">Ceiling value - confidence cannot exceed this</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Medium Threshold</label>
+              <input type="number" class="form-input" value="70" step="5" id="conf-medium">
+              <div class="form-hint">Score at or above = Medium confidence (yellow)</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">High Threshold</label>
+              <input type="number" class="form-input" value="85" step="5" id="conf-high">
+              <div class="form-hint">Score at or above = High confidence (green)</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optimal Recovery Range</label>
+              <input type="text" class="form-input" value="70 - 85" id="conf-recovery-range">
+              <div class="form-hint">Recovery percentage range that earns bonus</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Optimal Markup Range</label>
+              <input type="text" class="form-input" value="25 - 40" id="conf-markup-range">
+              <div class="form-hint">Markup percentage range that earns bonus</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Pricing Rules -->
+      <div class="section-content" id="section-pricing">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--accent3);">payments</span>
+            Pricing Rules
+          </h1>
+          <p>Configure overhead calculations and margin formulas</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon purple">
+              <span class="material-icons-outlined">percent</span>
+            </div>
+            <div>
+              <div class="card-title">Overhead Percentages</div>
+              <div class="card-subtitle">Applied to total cost before markup calculation</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Workshop Overhead</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="5" step="0.5" id="pricing-workshop">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Assembly, testing, QC costs</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Contingency</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="5" step="0.5" id="pricing-contingency">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Buffer for unexpected costs</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Social Impact</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="2" step="0.5" id="pricing-social">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">ESG/sustainability contribution</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Total Overhead</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="12" id="pricing-total" disabled style="background:rgba(99,102,241,0.1);font-weight:600">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Sum of all overhead percentages</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon cyan">
+              <span class="material-icons-outlined">trending_up</span>
+            </div>
+            <div>
+              <div class="card-title">Default Markup Settings</div>
+              <div class="card-subtitle">Default markup percentage and acceptable range</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Default Markup</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="30" step="1" id="pricing-default-markup">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Initial markup for new proposals</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum Markup</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="10" step="1" id="pricing-min-markup">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Lowest allowed markup percentage</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Maximum Markup</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="100" step="5" id="pricing-max-markup">
+                <span class="input-addon">%</span>
+              </div>
+              <div class="form-hint">Highest allowed markup percentage</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">CIP Auto-Include Threshold</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="4" step="0.5" id="pricing-cip-threshold">
+                <span class="input-addon">m3/hr</span>
+              </div>
+              <div class="form-hint">Flow above this auto-includes CIP system</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Optional Components -->
+      <div class="section-content" id="section-options">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--accent2);">add_circle</span>
+            Optional Components
+          </h1>
+          <p>Configure pricing for user-selectable add-on components</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon cyan">
+              <span class="material-icons-outlined">view_in_ar</span>
+            </div>
+            <div>
+              <div class="card-title">Container Options</div>
+              <div class="card-subtitle">Containerized system enclosures</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">10ft Container</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="3000" step="100" id="opt-container-10">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">20ft Container</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="5500" step="100" id="opt-container-20">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">40ft Container</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="10500" step="100" id="opt-container-40">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <span class="material-icons-outlined">extension</span>
+            </div>
+            <div>
+              <div class="card-title">Add-On Components</div>
+              <div class="card-subtitle">Additional system options</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">UV Disinfection System</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="2500" step="100" id="opt-uv">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Remote Monitoring Package</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="3500" step="100" id="opt-remote">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">PLC Upgrade (Allen Bradley)</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="4500" step="100" id="opt-plc">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Stainless Steel Upgrade</label>
+              <div class="input-group">
+                <span class="input-addon">GBP</span>
+                <input type="number" class="form-input" value="6000" step="100" id="opt-stainless">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: AI Behavior -->
+      <div class="section-content" id="section-behavior">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--admin);">tune</span>
+            AI Behavior Settings
+          </h1>
+          <p>Configure reactive AI response timing and behavior</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon admin">
+              <span class="material-icons-outlined">speed</span>
+            </div>
+            <div>
+              <div class="card-title">Response Timing</div>
+              <div class="card-subtitle">Control how quickly the AI responds to user input</div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Debounce Delay</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="100" step="50" id="behavior-debounce">
+                <span class="input-addon">ms</span>
+              </div>
+              <div class="form-hint">Wait time after input before calculations run</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Animation Duration</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="300" step="50" id="behavior-animation">
+                <span class="input-addon">ms</span>
+              </div>
+              <div class="form-hint">Duration of UI transition animations</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Toast Display Time</label>
+              <div class="input-group">
+                <input type="number" class="form-input" value="3000" step="500" id="behavior-toast">
+                <span class="input-addon">ms</span>
+              </div>
+              <div class="form-hint">How long notification toasts remain visible</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon purple">
+              <span class="material-icons-outlined">toggle_on</span>
+            </div>
+            <div>
+              <div class="card-title">Feature Toggles</div>
+              <div class="card-subtitle">Enable or disable AI features</div>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 16px;">
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-auto-components">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Auto-Select Pre-Treatment Components</div>
+                <div class="form-hint">Automatically add components based on water quality</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-live-pricing">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Live Pricing Updates</div>
+                <div class="form-hint">Update pricing in real-time as parameters change</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-confidence">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Show Confidence Score</div>
+                <div class="form-hint">Display AI confidence indicator in the header</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-suggestions">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">AI Suggestions Panel</div>
+                <div class="form-hint">Show contextual suggestions in AI sidebar</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-decision-log">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Decision Audit Trail</div>
+                <div class="form-hint">Log all AI decisions for transparency</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle" onclick="toggleFeature(this)" id="feature-verbose">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Verbose Logging (Debug)</div>
+                <div class="form-hint">Log detailed calculation steps to console</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <span class="material-icons-outlined">visibility</span>
+            </div>
+            <div>
+              <div class="card-title">UI Visibility Controls</div>
+              <div class="card-subtitle">Show or hide interface elements</div>
+            </div>
+          </div>
+
+          <div style="display: grid; gap: 16px;">
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-persona-selector">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Persona Selector</div>
+                <div class="form-hint">Show role-based view filters (All, Business, Technician, Sales, Customer)</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-ai-button">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">AI Assistant Button</div>
+                <div class="form-hint">Show the AI Assistant toggle button in header</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-keyboard-toggle">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Keyboard Mode Toggle</div>
+                <div class="form-hint">Show keyboard shortcut mode button</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-theme-toggle">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Theme Toggle</div>
+                <div class="form-hint">Show dark/light theme switcher</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-sidebar-projects">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Sidebar Projects List</div>
+                <div class="form-hint">Show active projects in the sidebar</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-workflow-steps">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Workflow Step Indicators</div>
+                <div class="form-hint">Show the 6-phase progress steps at top</div>
+              </div>
+            </div>
+
+            <div class="toggle-switch">
+              <div class="toggle active" onclick="toggleFeature(this)" id="feature-engineer-override">
+                <div class="toggle-knob"></div>
+              </div>
+              <div>
+                <div class="toggle-label">Engineer Override Panel</div>
+                <div class="form-hint">Allow manual adjustments to AI recommendations</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Export/Import -->
+      <div class="section-content" id="section-export">
+        <div class="page-header">
+          <h1>
+            <span class="material-icons-outlined" style="color: var(--accent);">download</span>
+            Export / Import Configuration
+          </h1>
+          <p>Backup and restore AI configuration settings</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <span class="material-icons-outlined">file_download</span>
+            </div>
+            <div>
+              <div class="card-title">Export Configuration</div>
+              <div class="card-subtitle">Download current settings as JSON file</div>
+            </div>
+          </div>
+
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+            Export all AI configuration settings to a JSON file. This file can be used to backup your configuration or share it with other installations.
+          </p>
+
+          <button class="btn btn-primary" onclick="exportConfig()">
+            <span class="material-icons-outlined">download</span>
+            Export Configuration
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon cyan">
+              <span class="material-icons-outlined">file_upload</span>
+            </div>
+            <div>
+              <div class="card-title">Import Configuration</div>
+              <div class="card-subtitle">Load settings from a JSON file</div>
+            </div>
+          </div>
+
+          <div class="info-box warning">
+            <div class="info-box-header">
+              <span class="material-icons-outlined">warning</span>
+              <span class="info-box-title">Warning</span>
+            </div>
+            <p>Importing a configuration will overwrite all current settings. Make sure to export your current configuration first if you want to keep a backup.</p>
+          </div>
+
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importConfig(event)">
+          <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
+            <span class="material-icons-outlined">upload</span>
+            Import Configuration
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon danger">
+              <span class="material-icons-outlined">restart_alt</span>
+            </div>
+            <div>
+              <div class="card-title">Reset to Defaults</div>
+              <div class="card-subtitle">Restore all settings to factory defaults</div>
+            </div>
+          </div>
+
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+            This will reset ALL AI configuration settings to their original default values. This action cannot be undone.
+          </p>
+
+          <button class="btn btn-danger" onclick="resetAllDefaults()">
+            <span class="material-icons-outlined">delete_forever</span>
+            Reset All to Defaults
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-bar-info" id="unsavedIndicator" style="display:none">
+      <span class="material-icons-outlined">edit</span>
+      <span>You have unsaved changes</span>
+    </div>
+    <div class="action-bar-info" id="savedIndicator">
+      <span class="material-icons-outlined" style="color:var(--success)">check_circle</span>
+      <span>All changes saved</span>
+    </div>
+    <div class="action-bar-buttons">
+      <button class="btn btn-secondary" onclick="discardChanges()">
+        <span class="material-icons-outlined">undo</span>
+        Discard Changes
+      </button>
+      <button class="btn btn-success" onclick="saveAllSettings()">
+        <span class="material-icons-outlined">save</span>
+        Save All Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span class="material-icons-outlined">check_circle</span>
+    <span class="toast-message" id="toastMessage">Settings saved successfully!</span>
+  </div>
+
+  <script>
+    // Theme Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      const currentTheme = html.getAttribute('data-theme');
+
+      if (currentTheme === 'light') {
+        html.removeAttribute('data-theme');
+        themeIcon.textContent = 'light_mode';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        themeIcon.textContent = 'dark_mode';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Load saved theme
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('themeIcon').textContent = 'dark_mode';
+      }
+    })();
+
+    // Section Navigation
+    function showSection(sectionId) {
+      // Hide all sections
+      document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      // Deactivate all nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Show selected section
+      const section = document.getElementById('section-' + sectionId);
+      if (section) {
+        section.classList.add('active');
+      }
+
+      // Activate corresponding nav item
+      event.currentTarget.classList.add('active');
+    }
+
+    // Toggle Feature Switches
+    function toggleFeature(element) {
+      element.classList.toggle('active');
+      markUnsaved();
+    }
+
+    // Track unsaved changes
+    let hasUnsavedChanges = false;
+
+    function markUnsaved() {
+      hasUnsavedChanges = true;
+      document.getElementById('unsavedIndicator').style.display = 'flex';
+      document.getElementById('savedIndicator').style.display = 'none';
+    }
+
+    function markSaved() {
+      hasUnsavedChanges = false;
+      document.getElementById('unsavedIndicator').style.display = 'none';
+      document.getElementById('savedIndicator').style.display = 'flex';
+    }
+
+    // Listen for input changes
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('change', markUnsaved);
+      input.addEventListener('input', markUnsaved);
+    });
+
+    // Save Settings
+    function saveAllSettings() {
+      const config = collectAllSettings();
+      localStorage.setItem('waterlogic_ai_config', JSON.stringify(config));
+      showToast('Settings saved successfully!', 'success');
+      markSaved();
+    }
+
+    // Collect all settings into an object
+    function collectAllSettings() {
+      return {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        thresholds: {
+          critical: {
+            sdi: { max: parseFloat(document.getElementById('critical-sdi-max').value), message: document.getElementById('critical-sdi-message').value },
+            ph: { min: parseFloat(document.getElementById('critical-ph-min').value), max: parseFloat(document.getElementById('critical-ph-max').value), message: document.getElementById('critical-ph-message').value },
+            chlorine: { max: parseFloat(document.getElementById('critical-chlorine-max').value), message: document.getElementById('critical-chlorine-message').value },
+            iron: { max: parseFloat(document.getElementById('critical-iron-max').value), message: document.getElementById('critical-iron-message').value }
+          },
+          warnings: {
+            temperature: { min: parseFloat(document.getElementById('warning-temp-min').value), message: document.getElementById('warning-temp-message').value },
+            hardness: { max: parseFloat(document.getElementById('warning-hardness-max').value), message: document.getElementById('warning-hardness-message').value },
+            tds: { max: parseFloat(document.getElementById('warning-tds-max').value), message: document.getElementById('warning-tds-message').value },
+            tss: { max: parseFloat(document.getElementById('warning-tss-max').value), message: document.getElementById('warning-tss-message').value },
+            turbidity: { max: parseFloat(document.getElementById('warning-turbidity-max').value), message: document.getElementById('warning-turbidity-message').value },
+            pressure: { min: parseFloat(document.getElementById('warning-pressure-min').value), message: document.getElementById('warning-pressure-message').value },
+            conductivityTarget: { max: parseFloat(document.getElementById('warning-quality-max').value), message: document.getElementById('warning-quality-message').value }
+          },
+          pretreatment: {
+            chlorine: { threshold: parseFloat(document.getElementById('pretreat-chlorine-threshold').value), cost: parseFloat(document.getElementById('pretreat-chlorine-cost').value) },
+            iron_low: { threshold: parseFloat(document.getElementById('pretreat-iron-low-threshold').value), cost: parseFloat(document.getElementById('pretreat-iron-low-cost').value) },
+            iron_high: { threshold: parseFloat(document.getElementById('pretreat-iron-high-threshold').value), cost: parseFloat(document.getElementById('pretreat-iron-high-cost').value) },
+            hardness_moderate: { threshold: parseFloat(document.getElementById('pretreat-hardness-mod-threshold').value), cost: parseFloat(document.getElementById('pretreat-hardness-mod-cost').value) },
+            hardness_high: { threshold: parseFloat(document.getElementById('pretreat-hardness-high-threshold').value), cost: parseFloat(document.getElementById('pretreat-hardness-high-cost').value) },
+            turbidity: { threshold: parseFloat(document.getElementById('pretreat-turbidity-threshold').value), cost: parseFloat(document.getElementById('pretreat-turbidity-cost').value) },
+            tss: { threshold: parseFloat(document.getElementById('pretreat-tss-threshold').value), cost: parseFloat(document.getElementById('pretreat-tss-cost').value) },
+            sdi: { threshold: parseFloat(document.getElementById('pretreat-sdi-threshold').value), cost: parseFloat(document.getElementById('pretreat-sdi-cost').value) },
+            pressure: { threshold: parseFloat(document.getElementById('pretreat-pressure-threshold').value), cost: parseFloat(document.getElementById('pretreat-pressure-cost').value) },
+            ph: { range: document.getElementById('pretreat-ph-threshold').value, cost: parseFloat(document.getElementById('pretreat-ph-cost').value) },
+            quality: { threshold: parseFloat(document.getElementById('pretreat-quality-threshold').value), cost: parseFloat(document.getElementById('pretreat-quality-cost').value) }
+          }
+        },
+        temperatureCorrection: {
+          5: parseFloat(document.getElementById('temp-5').value),
+          10: parseFloat(document.getElementById('temp-10').value),
+          15: parseFloat(document.getElementById('temp-15').value),
+          20: parseFloat(document.getElementById('temp-20').value),
+          25: parseFloat(document.getElementById('temp-25').value),
+          30: parseFloat(document.getElementById('temp-30').value),
+          35: parseFloat(document.getElementById('temp-35').value)
+        },
+        confidence: {
+          baseScore: parseInt(document.getElementById('conf-base').value),
+          requiredFieldBonus: parseInt(document.getElementById('conf-required').value),
+          optionalFieldBonus: parseInt(document.getElementById('conf-optional').value),
+          criticalPenalty: parseInt(document.getElementById('conf-critical-penalty').value),
+          warningPenalty: parseInt(document.getElementById('conf-warning-penalty').value),
+          recoveryBonus: parseInt(document.getElementById('conf-recovery-bonus').value),
+          markupBonus: parseInt(document.getElementById('conf-markup-bonus').value),
+          minScore: parseInt(document.getElementById('conf-min').value),
+          maxScore: parseInt(document.getElementById('conf-max').value),
+          mediumThreshold: parseInt(document.getElementById('conf-medium').value),
+          highThreshold: parseInt(document.getElementById('conf-high').value),
+          recoveryRange: document.getElementById('conf-recovery-range').value,
+          markupRange: document.getElementById('conf-markup-range').value
+        },
+        pricing: {
+          workshopOverhead: parseFloat(document.getElementById('pricing-workshop').value),
+          contingency: parseFloat(document.getElementById('pricing-contingency').value),
+          socialImpact: parseFloat(document.getElementById('pricing-social').value),
+          defaultMarkup: parseInt(document.getElementById('pricing-default-markup').value),
+          minMarkup: parseInt(document.getElementById('pricing-min-markup').value),
+          maxMarkup: parseInt(document.getElementById('pricing-max-markup').value),
+          cipThreshold: parseFloat(document.getElementById('pricing-cip-threshold').value)
+        },
+        options: {
+          container10: parseInt(document.getElementById('opt-container-10').value),
+          container20: parseInt(document.getElementById('opt-container-20').value),
+          container40: parseInt(document.getElementById('opt-container-40').value),
+          uv: parseInt(document.getElementById('opt-uv').value),
+          remote: parseInt(document.getElementById('opt-remote').value),
+          plc: parseInt(document.getElementById('opt-plc').value),
+          stainless: parseInt(document.getElementById('opt-stainless').value)
+        },
+        behavior: {
+          debounce: parseInt(document.getElementById('behavior-debounce').value),
+          animation: parseInt(document.getElementById('behavior-animation').value),
+          toast: parseInt(document.getElementById('behavior-toast').value),
+          features: {
+            autoComponents: document.getElementById('feature-auto-components').classList.contains('active'),
+            livePricing: document.getElementById('feature-live-pricing').classList.contains('active'),
+            confidence: document.getElementById('feature-confidence').classList.contains('active'),
+            suggestions: document.getElementById('feature-suggestions').classList.contains('active'),
+            decisionLog: document.getElementById('feature-decision-log').classList.contains('active'),
+            verbose: document.getElementById('feature-verbose').classList.contains('active')
+          },
+          visibility: {
+            personaSelector: document.getElementById('feature-persona-selector').classList.contains('active'),
+            aiButton: document.getElementById('feature-ai-button').classList.contains('active'),
+            keyboardToggle: document.getElementById('feature-keyboard-toggle').classList.contains('active'),
+            themeToggle: document.getElementById('feature-theme-toggle').classList.contains('active'),
+            sidebarProjects: document.getElementById('feature-sidebar-projects').classList.contains('active'),
+            workflowSteps: document.getElementById('feature-workflow-steps').classList.contains('active'),
+            engineerOverride: document.getElementById('feature-engineer-override').classList.contains('active')
+          }
+        }
+      };
+    }
+
+    // Discard Changes
+    function discardChanges() {
+      if (hasUnsavedChanges) {
+        if (confirm('Are you sure you want to discard all unsaved changes?')) {
+          loadSavedSettings();
+          markSaved();
+          showToast('Changes discarded', 'info');
+        }
+      }
+    }
+
+    // Load saved settings
+    function loadSavedSettings() {
+      const saved = localStorage.getItem('waterlogic_ai_config');
+      if (saved) {
+        try {
+          const config = JSON.parse(saved);
+          applyConfig(config);
+        } catch (e) {
+          console.error('Failed to load saved settings:', e);
+        }
+      }
+    }
+
+    // Apply config to form
+    function applyConfig(config) {
+      // Apply thresholds
+      if (config.thresholds) {
+        if (config.thresholds.critical) {
+          const c = config.thresholds.critical;
+          if (c.sdi) {
+            document.getElementById('critical-sdi-max').value = c.sdi.max;
+            document.getElementById('critical-sdi-message').value = c.sdi.message;
+          }
+          if (c.ph) {
+            document.getElementById('critical-ph-min').value = c.ph.min;
+            document.getElementById('critical-ph-max').value = c.ph.max;
+            document.getElementById('critical-ph-message').value = c.ph.message;
+          }
+          if (c.chlorine) {
+            document.getElementById('critical-chlorine-max').value = c.chlorine.max;
+            document.getElementById('critical-chlorine-message').value = c.chlorine.message;
+          }
+          if (c.iron) {
+            document.getElementById('critical-iron-max').value = c.iron.max;
+            document.getElementById('critical-iron-message').value = c.iron.message;
+          }
+        }
+        // Continue with warnings, pretreatment, etc.
+      }
+
+      // Apply temperature correction
+      if (config.temperatureCorrection) {
+        Object.keys(config.temperatureCorrection).forEach(temp => {
+          const el = document.getElementById('temp-' + temp);
+          if (el) el.value = config.temperatureCorrection[temp];
+        });
+      }
+
+      // Apply confidence settings
+      if (config.confidence) {
+        const c = config.confidence;
+        if (c.baseScore) document.getElementById('conf-base').value = c.baseScore;
+        if (c.requiredFieldBonus) document.getElementById('conf-required').value = c.requiredFieldBonus;
+        if (c.optionalFieldBonus) document.getElementById('conf-optional').value = c.optionalFieldBonus;
+        if (c.criticalPenalty) document.getElementById('conf-critical-penalty').value = c.criticalPenalty;
+        if (c.warningPenalty) document.getElementById('conf-warning-penalty').value = c.warningPenalty;
+        if (c.recoveryBonus) document.getElementById('conf-recovery-bonus').value = c.recoveryBonus;
+        if (c.markupBonus) document.getElementById('conf-markup-bonus').value = c.markupBonus;
+        if (c.minScore) document.getElementById('conf-min').value = c.minScore;
+        if (c.maxScore) document.getElementById('conf-max').value = c.maxScore;
+        if (c.mediumThreshold) document.getElementById('conf-medium').value = c.mediumThreshold;
+        if (c.highThreshold) document.getElementById('conf-high').value = c.highThreshold;
+        if (c.recoveryRange) document.getElementById('conf-recovery-range').value = c.recoveryRange;
+        if (c.markupRange) document.getElementById('conf-markup-range').value = c.markupRange;
+      }
+
+      // Apply feature toggles
+      if (config.behavior && config.behavior.features) {
+        const f = config.behavior.features;
+        setToggle('feature-auto-components', f.autoComponents);
+        setToggle('feature-live-pricing', f.livePricing);
+        setToggle('feature-confidence', f.confidence);
+        setToggle('feature-suggestions', f.suggestions);
+        setToggle('feature-decision-log', f.decisionLog);
+        setToggle('feature-verbose', f.verbose);
+      }
+    }
+
+    function setToggle(id, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        if (value) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      }
+    }
+
+    // Export Configuration
+    function exportConfig() {
+      const config = collectAllSettings();
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'waterlogic-ai-config-' + new Date().toISOString().split('T')[0] + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Configuration exported!', 'success');
+    }
+
+    // Import Configuration
+    function importConfig(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const config = JSON.parse(e.target.result);
+          applyConfig(config);
+          showToast('Configuration imported successfully!', 'success');
+          markUnsaved();
+        } catch (err) {
+          showToast('Failed to import configuration: Invalid JSON', 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = ''; // Reset file input
+    }
+
+    // Reset functions
+    function resetCriticalDefaults() {
+      document.getElementById('critical-sdi-max').value = 6;
+      document.getElementById('critical-sdi-message').value = 'SDI HIGH - Pre-treatment required; RO at risk of rapid fouling';
+      document.getElementById('critical-ph-min').value = 5;
+      document.getElementById('critical-ph-max').value = 9;
+      document.getElementById('critical-ph-message').value = 'pH out of range - Risk of irreversible membrane damage';
+      document.getElementById('critical-chlorine-max').value = 0.05;
+      document.getElementById('critical-chlorine-message').value = 'Chlorine HIGH - Carbon filter + SMBS mandatory';
+      document.getElementById('critical-iron-max').value = 0.3;
+      document.getElementById('critical-iron-message').value = 'Iron Levels HIGH - Dedicated iron removal system required';
+      markUnsaved();
+      showToast('Critical alarm defaults restored', 'success');
+    }
+
+    function resetWarningDefaults() {
+      document.getElementById('warning-temp-min').value = 15;
+      document.getElementById('warning-hardness-max').value = 300;
+      document.getElementById('warning-tds-max').value = 1000;
+      document.getElementById('warning-tss-max').value = 5;
+      document.getElementById('warning-turbidity-max').value = 5;
+      document.getElementById('warning-pressure-min').value = 3;
+      document.getElementById('warning-quality-max').value = 10;
+      markUnsaved();
+      showToast('Warning thresholds defaults restored', 'success');
+    }
+
+    function resetAllDefaults() {
+      if (confirm('Are you sure you want to reset ALL settings to defaults? This cannot be undone.')) {
+        localStorage.removeItem('waterlogic_ai_config');
+        location.reload();
+      }
+    }
+
+    // Show Toast Notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+
+      toastMessage.textContent = message;
+      toast.className = 'toast ' + type;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Update total overhead
+    function updateTotalOverhead() {
+      const workshop = parseFloat(document.getElementById('pricing-workshop').value) || 0;
+      const contingency = parseFloat(document.getElementById('pricing-contingency').value) || 0;
+      const social = parseFloat(document.getElementById('pricing-social').value) || 0;
+      document.getElementById('pricing-total').value = (workshop + contingency + social).toFixed(1);
+    }
+
+    document.getElementById('pricing-workshop').addEventListener('input', updateTotalOverhead);
+    document.getElementById('pricing-contingency').addEventListener('input', updateTotalOverhead);
+    document.getElementById('pricing-social').addEventListener('input', updateTotalOverhead);
+
+    // Placeholder functions
+    function addPretreatmentRule() {
+      showToast('Add pre-treatment rule - Coming soon', 'info');
+    }
+
+    function addSystem() {
+      showToast('Add RO system - Coming soon', 'info');
+    }
+
+    function removeSystem(btn) {
+      if (confirm('Are you sure you want to remove this system?')) {
+        btn.closest('.system-row').remove();
+        markUnsaved();
+      }
+    }
+
+    // Load saved settings on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSavedSettings();
+    });
+
+    // Warn before leaving with unsaved changes
+    window.addEventListener('beforeunload', (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+  </script>
+</body>
+</html>
