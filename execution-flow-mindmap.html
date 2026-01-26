@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Execution Flow Sequence - Mindmap</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2942 50%, #0d1f3c 100%);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #mindmap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node-group {
+            cursor: pointer;
+        }
+
+        .node-rect {
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+            transition: filter 0.2s ease;
+        }
+
+        .node-group:hover .node-rect {
+            filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.4));
+        }
+
+        .node-text {
+            font-size: 13px;
+            font-weight: 500;
+            fill: #ffffff;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .node-sub {
+            font-size: 10px;
+            font-weight: 400;
+            fill: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .toggle-circle {
+            fill: rgba(255, 255, 255, 0.15);
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 1;
+            cursor: pointer;
+            transition: fill 0.2s ease;
+        }
+
+        .toggle-circle:hover {
+            fill: rgba(255, 255, 255, 0.25);
+        }
+
+        .toggle-text {
+            font-size: 12px;
+            font-weight: 600;
+            fill: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .link {
+            fill: none;
+            stroke: rgba(159, 176, 208, 0.4);
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .link.feedback {
+            stroke: rgba(255, 176, 32, 0.4);
+            stroke-dasharray: 6 4;
+        }
+
+        /* Color classes for nodes by layer type */
+        .node-root { fill: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .node-inputs { fill: #4dabf7; }
+        .node-structure { fill: #69db7c; }
+        .node-processing { fill: #ffd43b; }
+        .node-strategy { fill: #ff922b; }
+        .node-output { fill: #f06595; }
+        .node-governance { fill: #be4bdb; }
+        .node-learning { fill: #20c997; }
+        .node-outcomes { fill: #ff6b6b; }
+
+        /* Info Panel */
+        #info-panel {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            width: 360px;
+            max-height: calc(100vh - 48px);
+            background: rgba(26, 41, 66, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(159, 176, 208, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            padding: 24px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        #info-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #info-panel .panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        #info-panel .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            line-height: 1.4;
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        #info-panel .panel-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: background 0.2s ease;
+        }
+
+        #info-panel .panel-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        #info-panel .panel-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1a1a2e;
+        }
+
+        #info-panel .panel-description {
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+
+        #info-panel .panel-section {
+            margin-bottom: 16px;
+        }
+
+        #info-panel .panel-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(159, 176, 208, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        #info-panel .panel-io {
+            font-size: 13px;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #info-panel .panel-io-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+
+        #info-panel .panel-io-label {
+            font-weight: 500;
+            color: rgba(159, 176, 208, 0.9);
+            margin-right: 8px;
+            min-width: 30px;
+        }
+
+        #info-panel .panel-meta {
+            font-size: 12px;
+            color: rgba(159, 176, 208, 0.6);
+            padding-top: 12px;
+            border-top: 1px solid rgba(159, 176, 208, 0.15);
+        }
+
+        #info-panel .panel-meta span {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .node-rect.selected {
+            stroke: #4dabf7;
+            stroke-width: 3;
+        }
+
+        .node-rect.focused {
+            stroke: #ffd43b;
+            stroke-width: 3;
+            stroke-dasharray: 6 3;
+        }
+
+        /* Title */
+        .page-title {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(159, 176, 208, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 100;
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(26, 41, 66, 0.9);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.6;
+            border: 1px solid rgba(159, 176, 208, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .keyboard-hint.visible {
+            opacity: 1;
+        }
+
+        .keyboard-hint kbd {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-family: inherit;
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: rgba(159, 176, 208, 0.7);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-title">Execution Flow Sequence</div>
+
+    <!-- Info Panel -->
+    <div id="info-panel">
+        <div class="panel-header">
+            <div class="panel-title"></div>
+            <button class="panel-close">&times;</button>
+        </div>
+        <div class="panel-badge"></div>
+        <div class="panel-description"></div>
+        <div class="panel-section panel-value">
+            <div class="panel-section-title">Value</div>
+            <div class="panel-io"></div>
+        </div>
+        <div class="panel-section panel-inputs">
+            <div class="panel-section-title">Inputs</div>
+            <div class="panel-io"></div>
+        </div>
+        <div class="panel-section panel-outputs">
+            <div class="panel-section-title">Outputs</div>
+            <div class="panel-io"></div>
+        </div>
+        <div class="panel-meta"></div>
+    </div>
+
+    <svg id="mindmap"></svg>
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background: #4dabf7"></div>Inputs</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #69db7c"></div>Structure</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #ffd43b"></div>Processing</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #ff922b"></div>Strategy</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #f06595"></div>Output</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #be4bdb"></div>Governance</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #20c997"></div>Learning</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #ff6b6b"></div>Outcomes</div>
+    </div>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint" id="keyboard-hint">
+        <div><kbd>Arrow Keys</kbd> Navigate</div>
+        <div><kbd>Enter</kbd> Expand/Collapse</div>
+        <div><kbd>Space</kbd> View Details</div>
+        <div><kbd>Esc</kbd> Close Panel</div>
+        <div><kbd>Home</kbd> Go to Root</div>
+        <div><kbd>?</kbd> Toggle Help</div>
+    </div>
+
+    <script>
+        // Execution Flow Sequence mindmap data
+        const data = {
+            name: "AI Proposal System",
+            sub: "Execution Flow Sequence",
+            description: "Complete execution flow showing how AI-powered proposals are generated: Inputs -> Knowledge -> Decisions -> Simulation -> AI Engine -> Strategy -> Output -> Governance. Learning agents provide feedback loops for continuous improvement.",
+            colorClass: "node-root",
+            expanded: true,
+            children: [
+                {
+                    name: "Inputs",
+                    sub: "Layer 0: External data sources",
+                    description: "External inputs that feed into the proposal system, providing context, constraints, and historical data.",
+                    colorClass: "node-inputs",
+                    expanded: true,
+                    children: [
+                        {
+                            name: "Customer Case Inputs",
+                            sub: "sector, water, constraints, priorities",
+                            description: "Representative customer cases + project constraints + ESG priorities provided ahead of demo.",
+                            value: "Ensures recommendations are context-specific (industry + chemistry + constraints + ESG).",
+                            io: {
+                                in: ["Client sector/application", "Influent water quality", "Flow/conditions", "Targets", "Constraints", "ESG priorities"],
+                                out: ["Structured context vector", "Activated rules + decision branches"]
+                            },
+                            colorClass: "node-inputs"
+                        },
+                        {
+                            name: "Existing Artifacts",
+                            sub: "templates, spreadsheets",
+                            description: "Current proposal template + sizing/costing spreadsheets + margin/logistics assumptions.",
+                            value: "Anchors outputs to real MembraCon workflow (not generic).",
+                            io: {
+                                in: ["Word/PDF templates", "Cost/sizing sheets", "Margin/contingency rules"],
+                                out: ["Canonical schema", "Baseline pricing + assumptions"]
+                            },
+                            colorClass: "node-inputs"
+                        },
+                        {
+                            name: "Technology Catalog",
+                            sub: "UF, MBR, RO, UV, AOP",
+                            description: "List of common processes, constraints, vendors, envelopes.",
+                            value: "Grounds recommendations in deployable solutions and preferred families.",
+                            io: {
+                                in: ["Process modules", "Operating envelopes", "Vendors/families"],
+                                out: ["Option set for graph traversal"]
+                            },
+                            colorClass: "node-inputs"
+                        },
+                        {
+                            name: "Historical Context",
+                            sub: "past proposals, won/lost",
+                            description: "Anonymized dataset of prior proposals and outcomes.",
+                            value: "Enables pricing intelligence + win/loss feedback + calibration.",
+                            io: {
+                                in: ["5-10 past proposals", "Indicative prices", "Outcomes"],
+                                out: ["Training signals", "Deal-response priors"]
+                            },
+                            colorClass: "node-inputs"
+                        },
+                        {
+                            name: "ESG Framework",
+                            sub: "metrics, reporting style",
+                            description: "Preferred ESG metrics (water recovery, energy intensity, carbon).",
+                            value: "Makes sustainability a first-class optimization objective and reporting layer.",
+                            io: {
+                                in: ["Targets/metrics", "Claim styles"],
+                                out: ["ESG calculators", "ESG narrative templates"]
+                            },
+                            colorClass: "node-inputs"
+                        }
+                    ]
+                },
+                {
+                    name: "Structure",
+                    sub: "Layer 1: Knowledge & Decisions",
+                    description: "Core structural intelligence that encodes domain expertise and decision logic.",
+                    colorClass: "node-structure",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Structural Intelligence",
+                            sub: "knowledge graph, rules",
+                            description: "Decision network encoding MembraCon expertise: relationships among water params, tech choices, cost, ESG.",
+                            value: "Turns tribal knowledge into repeatable, explainable, scalable logic (guardrails + reuse).",
+                            io: {
+                                in: ["Domain rules", "Process constraints", "Standards/regulations"],
+                                out: ["Decision graph", "Constraints for AI engine"]
+                            },
+                            colorClass: "node-structure"
+                        },
+                        {
+                            name: "Decision Nodes",
+                            sub: "tech -> sizing -> ops -> pricing",
+                            description: "Explicit nodes: technology selection, system sizing, operational setup, pricing strategy, ESG enhancements, presentation.",
+                            value: "Prevents omissions; enforces completeness; makes reasoning queryable.",
+                            io: {
+                                in: ["Context vector", "Knowledge graph"],
+                                out: ["Candidate paths (solutions)", "Explainable branch decisions"]
+                            },
+                            colorClass: "node-structure"
+                        }
+                    ]
+                },
+                {
+                    name: "Processing",
+                    sub: "Layer 2: Simulation & AI",
+                    description: "Core processing layer where simulations validate designs and AI optimizes decisions.",
+                    colorClass: "node-processing",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Simulation & Checks",
+                            sub: "mass balance, OPEX, energy",
+                            description: "Quantitative checks inside the flow: verifies effluent targets, estimates OPEX, waste generation, energy use.",
+                            value: "Moves beyond 'plausible' to 'validated enough for proposals'.",
+                            io: {
+                                in: ["Candidate designs", "Formulas/models"],
+                                out: ["Performance estimates", "Cost + ESG metrics"]
+                            },
+                            colorClass: "node-processing"
+                        },
+                        {
+                            name: "AI Decision Engine",
+                            sub: "multi-objective optimization",
+                            description: "Optimizes across technical compliance, cost, margin, ESG priorities, and client preferences.",
+                            value: "Finds the 'geodesic' (best) path in a complex decision space faster than manual workflows.",
+                            io: {
+                                in: ["Decision graph", "Metrics from simulators", "Historical priors"],
+                                out: ["Ranked solution shortlist", "Chosen path + confidence"]
+                            },
+                            colorClass: "node-processing"
+                        }
+                    ]
+                },
+                {
+                    name: "Strategy",
+                    sub: "Layer 3: Pricing & ESG",
+                    description: "Strategic modules for pricing optimization and ESG compliance.",
+                    colorClass: "node-strategy",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Pricing Strategy",
+                            sub: "value-driven, BOO/BOT",
+                            description: "Selects pricing model and ranges (CAPEX sale vs BOO/BOT/service) and justifies margin/elasticity.",
+                            value: "Improves win-rate consistency and protects margin with data-backed pricing logic.",
+                            io: {
+                                in: ["Cost model", "Segment priors", "Client preference"],
+                                out: ["Price bands", "Commercial options", "Justifications"]
+                            },
+                            colorClass: "node-strategy"
+                        },
+                        {
+                            name: "ESG Optimization",
+                            sub: "water reuse, carbon, energy",
+                            description: "Uses ESG priorities as weights; can produce cost-optimized vs ESG-optimized scenarios.",
+                            value: "Differentiates brand with credible quantified sustainability and avoids greenwashing.",
+                            io: {
+                                in: ["ESG targets", "Metrics"],
+                                out: ["ESG features", "Quantified impacts", "Trade-off scenarios"]
+                            },
+                            colorClass: "node-strategy"
+                        }
+                    ]
+                },
+                {
+                    name: "Output",
+                    sub: "Layer 4: Proposal Generation",
+                    description: "Final output generation delivering ranked options with rationale.",
+                    colorClass: "node-output",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Proposal Output",
+                            sub: "ranked options, rationale",
+                            description: "Delivers ranked shortlist, rationale, and a draft proposal structure aligned to MembraCon templates.",
+                            value: "Cuts turnaround time drastically while keeping quality consistent.",
+                            io: {
+                                in: ["Chosen path", "Pricing + ESG narratives", "Template schema"],
+                                out: ["Draft proposal", "Client-facing explanation report"]
+                            },
+                            colorClass: "node-output"
+                        }
+                    ]
+                },
+                {
+                    name: "Governance",
+                    sub: "Layer 5: Audit & Compliance",
+                    description: "Governance layer ensuring explainability, auditability, and policy compliance.",
+                    colorClass: "node-governance",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Decision Ledger",
+                            sub: "immutable 'why' trail",
+                            description: "Permissioned blockchain logs inputs, decisions, overrides, confidence, and rationale.",
+                            value: "Explainability + auditability + governance (policy checks, approvals).",
+                            io: {
+                                in: ["Decision events", "Policy rules", "Human sign-offs"],
+                                out: ["Tamper-proof audit trail", "Queryable explanations"]
+                            },
+                            colorClass: "node-governance"
+                        },
+                        {
+                            name: "Governance & Compliance",
+                            sub: "policies, approvals",
+                            description: "Human-in-the-loop controls, policy enforcement, compliance checks and monitoring.",
+                            value: "Makes the system 'responsible by design' and safe for regulated contexts.",
+                            io: {
+                                in: ["Policies", "Threshold rules"],
+                                out: ["Approvals/flags", "Compliance reports"]
+                            },
+                            colorClass: "node-governance"
+                        }
+                    ]
+                },
+                {
+                    name: "Learning",
+                    sub: "Layer 6: Continuous Improvement",
+                    description: "Learning agents that enable continuous improvement through feedback loops.",
+                    colorClass: "node-learning",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Learning Agents Hub",
+                            sub: "continuous improvement",
+                            description: "Specialized agents: win/loss, pricing intelligence, tech performance, ESG tracking, external ingestion.",
+                            value: "System improves with every proposal and deployment-competitive advantage compounds over time.",
+                            io: {
+                                in: ["Outcomes", "New costs", "Performance data", "Reg updates"],
+                                out: ["Updated weights", "New rules", "Refreshed models"]
+                            },
+                            colorClass: "node-learning"
+                        },
+                        {
+                            name: "Win/Loss Agent",
+                            sub: "pattern mining",
+                            description: "Learns what correlates with wins/losses by segment; feeds back to proposal framing and selection.",
+                            value: "Improves win rate and messaging relevance.",
+                            io: {
+                                in: ["Won/lost outcomes", "Reasons"],
+                                out: ["Segment patterns", "Recommendation nudges"]
+                            },
+                            colorClass: "node-learning"
+                        },
+                        {
+                            name: "Pricing Agent",
+                            sub: "elasticity, benchmarks",
+                            description: "Learns price sensitivity, supports alternate financing options, integrates market benchmarks.",
+                            value: "Optimizes margin without losing deals to uncertainty-driven discounting.",
+                            io: {
+                                in: ["Historical deals", "Segment priors"],
+                                out: ["Price recommendations", "Discount rules", "Model updates"]
+                            },
+                            colorClass: "node-learning"
+                        },
+                        {
+                            name: "Tech Performance Agent",
+                            sub: "real-world reliability",
+                            description: "Tracks actual performance/lifetime/maintenance outcomes and updates tech priors.",
+                            value: "Keeps proposals technically sharp and reduces risk from optimistic assumptions.",
+                            io: {
+                                in: ["Ops data", "Maintenance data"],
+                                out: ["Updated performance priors", "Better OPEX estimates"]
+                            },
+                            colorClass: "node-learning"
+                        },
+                        {
+                            name: "ESG Tracking Agent",
+                            sub: "outcomes vs projections",
+                            description: "Compares projected vs actual ESG outcomes; refines calculators and supports proof points.",
+                            value: "Strengthens credibility and client trust with verifiable sustainability claims.",
+                            io: {
+                                in: ["Measured savings", "Energy use", "Carbon estimates"],
+                                out: ["Calibrated ESG models", "Case-study proof points"]
+                            },
+                            colorClass: "node-learning"
+                        },
+                        {
+                            name: "Knowledge Ingestion",
+                            sub: "regulations, market data",
+                            description: "Scans external updates (regulatory changes, new tech, cost shifts) and flags/updates the system.",
+                            value: "Prevents knowledge staleness in a fast-moving field.",
+                            io: {
+                                in: ["Reg updates", "Industry reports"],
+                                out: ["Rule updates", "Alerts", "Catalog refresh"]
+                            },
+                            colorClass: "node-learning"
+                        }
+                    ]
+                },
+                {
+                    name: "Outcomes",
+                    sub: "Layer 7: Results & Roadmap",
+                    description: "Business outcomes and deployment roadmap for measuring success.",
+                    colorClass: "node-outcomes",
+                    expanded: false,
+                    children: [
+                        {
+                            name: "Business Outcomes",
+                            sub: "speed, win rate, margin",
+                            description: "Expected results: reduced turnaround, consistent quality, improved win rate, value-driven pricing, ESG differentiation.",
+                            value: "Maps system capabilities to measurable business KPIs.",
+                            io: {
+                                in: ["System adoption", "Data feedback"],
+                                out: ["KPI improvements", "Strategic insights"]
+                            },
+                            colorClass: "node-outcomes"
+                        },
+                        {
+                            name: "Roadmap",
+                            sub: "phased deployment",
+                            description: "Phases: discovery -> MVP -> expansion -> pilot -> full deployment -> ongoing evolution.",
+                            value: "Reduces risk; delivers value early; builds trust and adoption.",
+                            io: {
+                                in: ["Workshops", "Data", "Pilot feedback"],
+                                out: ["Production rollout", "Continuous improvement"]
+                            },
+                            colorClass: "node-outcomes"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // Color mapping
+        const COLOR_MAP = {
+            "node-root": "#667eea",
+            "node-inputs": "#4dabf7",
+            "node-structure": "#69db7c",
+            "node-processing": "#ffd43b",
+            "node-strategy": "#ff922b",
+            "node-output": "#f06595",
+            "node-governance": "#be4bdb",
+            "node-learning": "#20c997",
+            "node-outcomes": "#ff6b6b"
+        };
+
+        // SVG setup
+        const svg = d3.select("#mindmap");
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        svg.attr("width", width).attr("height", height);
+
+        const g = svg.append("g");
+
+        // Zoom behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.3, 3])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+
+        svg.call(zoom);
+
+        // Initial transform to center
+        svg.call(zoom.transform, d3.zoomIdentity.translate(width / 6, height / 2).scale(0.85));
+
+        // Node dimensions
+        const nodeHeight = 52;
+        const nodePadding = 20;
+        const levelGap = 200;
+        const verticalGap = 12;
+        const toggleRadius = 12;
+
+        // Calculate text width
+        function getTextWidth(text, fontSize = 13) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = `500 ${fontSize}px Google Sans, Segoe UI, Roboto, sans-serif`;
+            return context.measureText(text).width;
+        }
+
+        // Get node width based on text (including sub text)
+        function getNodeWidth(d) {
+            const nameWidth = getTextWidth(d.data.name, 13);
+            const subWidth = d.data.sub ? getTextWidth(d.data.sub, 10) : 0;
+            const maxTextWidth = Math.max(nameWidth, subWidth);
+            return Math.max(maxTextWidth + nodePadding * 2.5, 160);
+        }
+
+        // Get color based on colorClass
+        function getColor(d) {
+            return COLOR_MAP[d.data.colorClass] || "#667eea";
+        }
+
+        // Check if node has children
+        function hasChildren(d) {
+            return d.data.children && d.data.children.length > 0;
+        }
+
+        // Custom tree layout
+        function computeLayout(root) {
+            function computeSubtreeHeight(node) {
+                if (!node.children || node.children.length === 0) {
+                    node.subtreeHeight = nodeHeight;
+                    return node.subtreeHeight;
+                }
+
+                let totalHeight = 0;
+                node.children.forEach((child, i) => {
+                    totalHeight += computeSubtreeHeight(child);
+                    if (i < node.children.length - 1) {
+                        totalHeight += verticalGap;
+                    }
+                });
+                node.subtreeHeight = totalHeight;
+                return totalHeight;
+            }
+
+            computeSubtreeHeight(root);
+
+            function assignPositions(node, x, yStart) {
+                node.x = x;
+
+                if (!node.children || node.children.length === 0) {
+                    node.y = yStart + nodeHeight / 2;
+                    return;
+                }
+
+                let currentY = yStart;
+                node.children.forEach((child, i) => {
+                    assignPositions(child, x + getNodeWidth(node) + levelGap, currentY);
+                    currentY += child.subtreeHeight + verticalGap;
+                });
+
+                const firstChild = node.children[0];
+                const lastChild = node.children[node.children.length - 1];
+                node.y = (firstChild.y + lastChild.y) / 2;
+            }
+
+            assignPositions(root, 0, -root.subtreeHeight / 2);
+        }
+
+        // Build hierarchy with expanded state
+        function buildHierarchy(data) {
+            const root = d3.hierarchy(data, d => d.expanded !== false ? d.children : null);
+            computeLayout(root);
+            return root;
+        }
+
+        // Generate curved path
+        function generatePath(source, target) {
+            const sourceWidth = getNodeWidth(source);
+            const startX = source.x + sourceWidth + toggleRadius * 2 + 4;
+            const startY = source.y;
+            const endX = target.x;
+            const endY = target.y;
+
+            const midX = startX + (endX - startX) * 0.5;
+
+            return `M ${startX} ${startY}
+                    C ${midX} ${startY},
+                      ${midX} ${endY},
+                      ${endX} ${endY}`;
+        }
+
+        // Store previous positions for animation
+        let previousPositions = new Map();
+
+        // Animation duration
+        const duration = 500;
+
+        // Info panel elements
+        const infoPanel = document.getElementById('info-panel');
+        const panelTitle = infoPanel.querySelector('.panel-title');
+        const panelBadge = infoPanel.querySelector('.panel-badge');
+        const panelDescription = infoPanel.querySelector('.panel-description');
+        const panelValue = infoPanel.querySelector('.panel-value .panel-io');
+        const panelInputs = infoPanel.querySelector('.panel-inputs .panel-io');
+        const panelOutputs = infoPanel.querySelector('.panel-outputs .panel-io');
+        const panelMeta = infoPanel.querySelector('.panel-meta');
+        const panelClose = infoPanel.querySelector('.panel-close');
+
+        let selectedNode = null;
+
+        // Show info panel
+        function showInfoPanel(d) {
+            if (selectedNode) {
+                g.selectAll('.node-rect').classed('selected', false);
+            }
+            selectedNode = d;
+
+            g.selectAll('.node-group')
+                .filter(node => node.data.name === d.data.name)
+                .select('.node-rect')
+                .classed('selected', true);
+
+            panelTitle.textContent = d.data.name;
+
+            const layerName = d.data.sub || 'Component';
+            panelBadge.textContent = layerName;
+            panelBadge.style.background = getColor(d);
+
+            panelDescription.textContent = d.data.description || 'No description available.';
+
+            // Value
+            if (d.data.value) {
+                infoPanel.querySelector('.panel-value').style.display = 'block';
+                panelValue.textContent = d.data.value;
+            } else {
+                infoPanel.querySelector('.panel-value').style.display = 'none';
+            }
+
+            // IO
+            if (d.data.io) {
+                infoPanel.querySelector('.panel-inputs').style.display = 'block';
+                infoPanel.querySelector('.panel-outputs').style.display = 'block';
+                panelInputs.innerHTML = d.data.io.in.map(i => `<div class="panel-io-item"><span class="panel-io-label">></span>${i}</div>`).join('');
+                panelOutputs.innerHTML = d.data.io.out.map(o => `<div class="panel-io-item"><span class="panel-io-label">></span>${o}</div>`).join('');
+            } else {
+                infoPanel.querySelector('.panel-inputs').style.display = 'none';
+                infoPanel.querySelector('.panel-outputs').style.display = 'none';
+            }
+
+            // Meta
+            const childCount = d.data.children ? d.data.children.length : 0;
+            const path = d.ancestors().reverse().map(n => n.data.name).join(' > ');
+
+            panelMeta.innerHTML = `
+                <span><strong>Path:</strong> ${path}</span>
+                <span><strong>Depth:</strong> Level ${d.depth}</span>
+                ${childCount > 0 ? `<span><strong>Children:</strong> ${childCount} items</span>` : ''}
+            `;
+
+            infoPanel.classList.add('visible');
+        }
+
+        // Hide info panel
+        function hideInfoPanel() {
+            infoPanel.classList.remove('visible');
+            if (selectedNode) {
+                g.selectAll('.node-rect').classed('selected', false);
+                selectedNode = null;
+            }
+        }
+
+        panelClose.addEventListener('click', hideInfoPanel);
+
+        function onNodeClick(event, d) {
+            event.stopPropagation();
+            showInfoPanel(d);
+        }
+
+        svg.on('click', function(event) {
+            if (event.target === this) {
+                hideInfoPanel();
+            }
+        });
+
+        let toggleSource = null;
+
+        function toggleNode(event, d) {
+            event.stopPropagation();
+            if (hasChildren(d)) {
+                toggleSource = d;
+                d.data.expanded = d.data.expanded === false ? true : false;
+                update(d);
+            }
+        }
+
+        function generateCollapsedPath(source) {
+            const sourceWidth = getNodeWidth(source);
+            const x = source.x + sourceWidth + toggleRadius * 2 + 4;
+            const y = source.y;
+            return `M ${x} ${y} C ${x} ${y}, ${x} ${y}, ${x} ${y}`;
+        }
+
+        function update(toggledNode = null) {
+            const root = buildHierarchy(data);
+            const nodes = root.descendants();
+            const links = root.links();
+
+            const nodeMap = new Map();
+            nodes.forEach(d => {
+                nodeMap.set(d.data.name, d);
+            });
+
+            function getSourcePosition(d) {
+                if (toggledNode) {
+                    return { x: toggledNode.x, y: toggledNode.y };
+                }
+                if (d.parent) {
+                    const parentKey = d.parent.ancestors().map(n => n.data.name).join('/');
+                    const parentPos = previousPositions.get(parentKey);
+                    if (parentPos) return parentPos;
+                    return { x: d.parent.x, y: d.parent.y };
+                }
+                return { x: d.x, y: d.y };
+            }
+
+            function getCollapsePosition(d) {
+                const sourceNode = nodeMap.get(d.source.data.name);
+                if (sourceNode) {
+                    return sourceNode;
+                }
+                if (toggledNode) {
+                    return toggledNode;
+                }
+                const prevPos = previousPositions.get(d.source.data.name);
+                if (prevPos) {
+                    return { x: prevPos.x, y: prevPos.y, data: d.source.data };
+                }
+                return d.source;
+            }
+
+            const easing = d3.easeCubicInOut;
+
+            function getLinkKey(d) {
+                const sourcePath = d.source.ancestors().map(n => n.data.name).join('/');
+                const targetPath = d.target.ancestors().map(n => n.data.name).join('/');
+                return sourcePath + '->' + targetPath;
+            }
+
+            g.selectAll(".link").interrupt();
+            g.selectAll(".node-group").interrupt();
+
+            const link = g.selectAll(".link")
+                .data(links, getLinkKey);
+
+            link.exit()
+                .each(function(d) {
+                    d.collapseTarget = getCollapsePosition(d);
+                })
+                .transition()
+                .duration(duration)
+                .ease(easing)
+                .attr("d", function(d) {
+                    const target = d.collapseTarget;
+                    const sourceWidth = getTextWidth(target.data.name) + nodePadding * 2;
+                    const x = target.x + sourceWidth + toggleRadius * 2 + 4;
+                    const y = target.y;
+                    return `M ${x} ${y} C ${x} ${y}, ${x} ${y}, ${x} ${y}`;
+                })
+                .attr("opacity", 0)
+                .remove();
+
+            const linkEnter = link.enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("opacity", 0)
+                .attr("d", d => generateCollapsedPath(d.source));
+
+            link.merge(linkEnter)
+                .transition()
+                .duration(duration)
+                .ease(easing)
+                .attr("d", d => generatePath(d.source, d.target))
+                .attr("opacity", 1);
+
+            function getNodeKey(d) {
+                return d.ancestors().map(n => n.data.name).join('/');
+            }
+
+            const node = g.selectAll(".node-group")
+                .data(nodes, getNodeKey);
+
+            node.exit()
+                .each(function(d) {
+                    d.sourcePosition = getSourcePosition(d);
+                })
+                .transition()
+                .duration(duration)
+                .ease(easing)
+                .attr("transform", d => `translate(${d.sourcePosition.x}, ${d.sourcePosition.y})`)
+                .attr("opacity", 0)
+                .on("end", function() {
+                    d3.select(this).remove();
+                });
+
+            const nodeEnter = node.enter()
+                .append("g")
+                .attr("class", "node-group")
+                .attr("opacity", 0)
+                .attr("transform", d => {
+                    const source = getSourcePosition(d);
+                    return `translate(${source.x}, ${source.y})`;
+                });
+
+            // Node rectangle with gradient fill
+            nodeEnter.append("rect")
+                .attr("class", "node-rect")
+                .attr("x", 0)
+                .attr("y", -nodeHeight / 2)
+                .attr("width", d => getNodeWidth(d))
+                .attr("height", nodeHeight)
+                .attr("rx", 8)
+                .attr("ry", 8)
+                .attr("fill", d => getColor(d))
+                .on("click", onNodeClick);
+
+            // Node text (name)
+            nodeEnter.append("text")
+                .attr("class", "node-text")
+                .attr("x", d => getNodeWidth(d) / 2)
+                .attr("y", d => d.data.sub ? -6 : 0)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .text(d => d.data.name);
+
+            // Node sub text
+            nodeEnter.filter(d => d.data.sub)
+                .append("text")
+                .attr("class", "node-sub")
+                .attr("x", d => getNodeWidth(d) / 2)
+                .attr("y", 10)
+                .attr("dy", "0.35em")
+                .attr("text-anchor", "middle")
+                .text(d => d.data.sub);
+
+            // Toggle button
+            const toggleGroup = nodeEnter.filter(d => hasChildren(d))
+                .append("g")
+                .attr("class", "toggle-group")
+                .attr("transform", d => `translate(${getNodeWidth(d) + toggleRadius + 4}, 0)`)
+                .on("click", toggleNode);
+
+            toggleGroup.append("circle")
+                .attr("class", "toggle-circle")
+                .attr("r", toggleRadius);
+
+            toggleGroup.append("text")
+                .attr("class", "toggle-text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "0.35em")
+                .text(d => d.data.expanded === false ? "+" : "-");
+
+            const nodeUpdate = node.merge(nodeEnter);
+
+            nodeUpdate.transition()
+                .duration(duration)
+                .ease(easing)
+                .attr("opacity", 1)
+                .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+            nodeUpdate.select(".toggle-text")
+                .text(d => d.data.expanded === false ? "+" : "-");
+
+            nodeUpdate.select(".node-rect")
+                .attr("fill", d => getColor(d));
+
+            previousPositions = new Map();
+            nodes.forEach(d => {
+                const key = d.ancestors().map(n => n.data.name).join('/');
+                previousPositions.set(key, { x: d.x, y: d.y, name: d.data.name });
+            });
+        }
+
+        // Initial render
+        update();
+
+        // Handle window resize
+        window.addEventListener("resize", () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            svg.attr("width", newWidth).attr("height", newHeight);
+        });
+
+        // Keyboard navigation
+        let focusedNode = null;
+        const keyboardHint = document.getElementById('keyboard-hint');
+
+        function getVisibleNodes() {
+            const root = buildHierarchy(data);
+            return root.descendants();
+        }
+
+        function updateFocusVisual() {
+            g.selectAll('.node-rect').classed('focused', false);
+            if (focusedNode) {
+                g.selectAll('.node-group')
+                    .filter(node => node.data.name === focusedNode.data.name &&
+                                   node.depth === focusedNode.depth)
+                    .select('.node-rect')
+                    .classed('focused', true);
+            }
+        }
+
+        function focusNode(node) {
+            focusedNode = node;
+            updateFocusVisual();
+            panToNode(node);
+        }
+
+        function panToNode(node) {
+            const transform = d3.zoomTransform(svg.node());
+            const nodeWidth = getNodeWidth(node);
+            const targetX = width / 2 - (node.x + nodeWidth / 2) * transform.k;
+            const targetY = height / 2 - node.y * transform.k;
+
+            svg.transition()
+                .duration(300)
+                .call(zoom.transform, d3.zoomIdentity
+                    .translate(targetX, targetY)
+                    .scale(transform.k));
+        }
+
+        function findNodeInDirection(currentNode, direction) {
+            const nodes = getVisibleNodes();
+            const current = nodes.find(n =>
+                n.data.name === currentNode.data.name &&
+                n.depth === currentNode.depth
+            );
+
+            if (!current) return null;
+
+            switch (direction) {
+                case 'right':
+                    if (current.children && current.children.length > 0) {
+                        return current.children[0];
+                    }
+                    return null;
+
+                case 'left':
+                    if (current.parent) {
+                        return current.parent;
+                    }
+                    return null;
+
+                case 'down':
+                    if (current.parent) {
+                        const siblings = current.parent.children;
+                        const idx = siblings.indexOf(current);
+                        if (idx < siblings.length - 1) {
+                            return siblings[idx + 1];
+                        }
+                    }
+                    const nodesBelow = nodes.filter(n => n.y > current.y);
+                    if (nodesBelow.length > 0) {
+                        nodesBelow.sort((a, b) => {
+                            const yDiff = a.y - b.y;
+                            if (Math.abs(yDiff) < 10) {
+                                return a.depth - b.depth;
+                            }
+                            return yDiff;
+                        });
+                        return nodesBelow[0];
+                    }
+                    return null;
+
+                case 'up':
+                    if (current.parent) {
+                        const siblings = current.parent.children;
+                        const idx = siblings.indexOf(current);
+                        if (idx > 0) {
+                            return siblings[idx - 1];
+                        }
+                    }
+                    const nodesAbove = nodes.filter(n => n.y < current.y);
+                    if (nodesAbove.length > 0) {
+                        nodesAbove.sort((a, b) => {
+                            const yDiff = b.y - a.y;
+                            if (Math.abs(yDiff) < 10) {
+                                return a.depth - b.depth;
+                            }
+                            return yDiff;
+                        });
+                        return nodesAbove[0];
+                    }
+                    return null;
+            }
+            return null;
+        }
+
+        function toggleKeyboardHint() {
+            keyboardHint.classList.toggle('visible');
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            const nodes = getVisibleNodes();
+
+            switch (event.key) {
+                case '?':
+                    event.preventDefault();
+                    toggleKeyboardHint();
+                    break;
+
+                case 'Escape':
+                    event.preventDefault();
+                    hideInfoPanel();
+                    keyboardHint.classList.remove('visible');
+                    break;
+
+                case 'Home':
+                    event.preventDefault();
+                    focusNode(nodes[0]);
+                    break;
+
+                case 'ArrowRight':
+                    event.preventDefault();
+                    if (!focusedNode) {
+                        focusNode(nodes[0]);
+                    } else {
+                        const current = nodes.find(n =>
+                            n.data.name === focusedNode.data.name &&
+                            n.depth === focusedNode.depth
+                        );
+                        if (current && hasChildren(current) && current.data.expanded === false) {
+                            current.data.expanded = true;
+                            update(current);
+                            setTimeout(() => {
+                                const newNodes = getVisibleNodes();
+                                const updated = newNodes.find(n =>
+                                    n.data.name === focusedNode.data.name &&
+                                    n.depth === focusedNode.depth
+                                );
+                                if (updated && updated.children) {
+                                    focusNode(updated.children[0]);
+                                }
+                            }, 100);
+                        } else {
+                            const next = findNodeInDirection(focusedNode, 'right');
+                            if (next) focusNode(next);
+                        }
+                    }
+                    break;
+
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    if (!focusedNode) {
+                        focusNode(nodes[0]);
+                    } else {
+                        const next = findNodeInDirection(focusedNode, 'left');
+                        if (next) focusNode(next);
+                    }
+                    break;
+
+                case 'ArrowDown':
+                    event.preventDefault();
+                    if (!focusedNode) {
+                        focusNode(nodes[0]);
+                    } else {
+                        const next = findNodeInDirection(focusedNode, 'down');
+                        if (next) focusNode(next);
+                    }
+                    break;
+
+                case 'ArrowUp':
+                    event.preventDefault();
+                    if (!focusedNode) {
+                        focusNode(nodes[0]);
+                    } else {
+                        const next = findNodeInDirection(focusedNode, 'up');
+                        if (next) focusNode(next);
+                    }
+                    break;
+
+                case 'Enter':
+                    event.preventDefault();
+                    if (focusedNode) {
+                        const current = nodes.find(n =>
+                            n.data.name === focusedNode.data.name &&
+                            n.depth === focusedNode.depth
+                        );
+                        if (current && hasChildren(current)) {
+                            current.data.expanded = current.data.expanded === false ? true : false;
+                            update(current);
+                            setTimeout(() => {
+                                const newNodes = getVisibleNodes();
+                                const updated = newNodes.find(n =>
+                                    n.data.name === focusedNode.data.name &&
+                                    n.depth === focusedNode.depth
+                                );
+                                if (updated) {
+                                    focusedNode = updated;
+                                    updateFocusVisual();
+                                }
+                            }, 100);
+                        }
+                    }
+                    break;
+
+                case ' ':
+                    event.preventDefault();
+                    if (focusedNode) {
+                        const current = nodes.find(n =>
+                            n.data.name === focusedNode.data.name &&
+                            n.depth === focusedNode.depth
+                        );
+                        if (current) {
+                            showInfoPanel(current);
+                        }
+                    }
+                    break;
+
+                case 'Tab':
+                    event.preventDefault();
+                    if (!focusedNode) {
+                        focusNode(nodes[0]);
+                    } else {
+                        const currentIdx = nodes.findIndex(n =>
+                            n.data.name === focusedNode.data.name &&
+                            n.depth === focusedNode.depth
+                        );
+                        const nextIdx = event.shiftKey
+                            ? (currentIdx - 1 + nodes.length) % nodes.length
+                            : (currentIdx + 1) % nodes.length;
+                        focusNode(nodes[nextIdx]);
+                    }
+                    break;
+            }
+        });
+
+        // Show hint briefly on load
+        setTimeout(() => {
+            keyboardHint.classList.add('visible');
+            setTimeout(() => {
+                keyboardHint.classList.remove('visible');
+            }, 3000);
+        }, 1000);
+    </script>
+</body>
+</html>

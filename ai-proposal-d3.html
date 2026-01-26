@@ -123,6 +123,45 @@
     .flow-toggle .material-icons-outlined{
       font-size:14px;
     }
+    .speed-control{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:6px;
+      margin-left:8px;
+    }
+    .speed-control input[type="range"]{
+      width:60px;
+      height:4px;
+      -webkit-appearance:none;
+      appearance:none;
+      background:rgba(159,176,208,.3);
+      border-radius:2px;
+      cursor:pointer;
+    }
+    .speed-control input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:12px;
+      height:12px;
+      background:rgba(124,92,255,.8);
+      border-radius:50%;
+      cursor:pointer;
+      transition:background .2s;
+    }
+    .speed-control input[type="range"]::-webkit-slider-thumb:hover{
+      background:rgba(124,92,255,1);
+    }
+    .speed-control input[type="range"]::-moz-range-thumb{
+      width:12px;
+      height:12px;
+      background:rgba(124,92,255,.8);
+      border:none;
+      border-radius:50%;
+      cursor:pointer;
+    }
     .panel .content{
       padding:12px;
       overflow:auto;
@@ -1059,6 +1098,18 @@
       height:100%;
       display:block;
     }
+    #mindmapViz{
+      width:100%;
+      height:100%;
+      display:block;
+      background: linear-gradient(180deg, rgba(10,22,40,.3) 0%, rgba(26,41,66,.2) 100%);
+    }
+    .mm-node:hover .mm-rect{
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.4));
+    }
+    .mm-toggle:hover circle{
+      fill: rgba(255,255,255,.25);
+    }
     .legend{
       position:absolute;
       left:12px;
@@ -1402,18 +1453,24 @@
     <section class="panel" id="graphPanel">
       <div class="top">
         <h2>Execution Flow Sequence</h2>
-        <button id="flowToggle" class="flow-toggle active" title="Toggle flow animation">
-          <span class="material-icons-outlined">waves</span>
-          <span class="label">Flow</span>
+        <button id="viewToggle" class="flow-toggle" title="Toggle between Flow and MindMap views">
+          <span class="material-icons-outlined" id="viewToggleIcon">account_tree</span>
+          <span class="label" id="viewToggleLabel">MindMap</span>
         </button>
+        <div id="speedControl" class="speed-control" title="Adjust flow animation speed">
+          <span class="material-icons-outlined" style="font-size:14px;opacity:.7;">speed</span>
+          <input type="range" id="speedSlider" min="0.3" max="2.5" step="0.1" value="1.0">
+          <span id="speedLabel" style="font-size:10px;min-width:32px;opacity:.7;">1.0x</span>
+        </div>
         <span class="badge" id="statusBadge">Ready</span>
       </div>
       <div class="content" style="padding:0;display:flex;flex-direction:column;">
         <div class="toast" id="toast"></div>
 
         <svg id="viz" role="img" aria-label="D3 concept map"></svg>
+        <svg id="mindmapViz" role="img" aria-label="Mindmap view" style="display:none;"></svg>
 
-        <div class="legend" aria-hidden="true">
+        <div class="legend" id="graphLegend" aria-hidden="true">
           <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><path d="M2,7 L9,2 L16,7 L9,12 Z" fill="rgba(255,165,0,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Decision</div>
           <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><rect x="2" y="3" width="14" height="8" fill="rgba(64,224,208,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Process</div>
           <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="9,1 16,4 16,10 9,13 2,10 2,4" fill="rgba(186,85,211,.90)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> AI Engine</div>
@@ -1422,6 +1479,18 @@
           <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><ellipse cx="9" cy="7" rx="7" ry="5" fill="rgba(255,193,37,.85)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Governance</div>
           <div class="tag"><svg width="18" height="14" style="vertical-align:middle;margin-right:4px"><polygon points="5,1 13,1 17,5 17,9 13,13 5,13 1,9 1,5" fill="rgba(0,206,209,.80)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg> Agent</div>
           <div class="tag"><span style="width:20px;height:2px;display:inline-block;vertical-align:middle;margin-right:4px;border-top:2px dashed rgba(0,206,209,.80)"></span> Feedback</div>
+          <div class="tag" style="border-left:2px solid rgba(159,176,208,.3);padding-left:8px;margin-left:4px;"><span style="width:20px;height:3px;display:inline-block;vertical-align:middle;margin-right:4px;background:rgba(100,220,255,.85);border-radius:1px;"></span> Incoming</div>
+          <div class="tag"><span style="width:20px;height:3px;display:inline-block;vertical-align:middle;margin-right:4px;background:rgba(255,170,100,.85);border-radius:1px;"></span> Outgoing</div>
+        </div>
+        <div class="legend" id="mindmapLegend" aria-hidden="true" style="display:none;">
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#4dabf7;border-radius:3px;"></span> Inputs</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#69db7c;border-radius:3px;"></span> Structure</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#ffd43b;border-radius:3px;"></span> Processing</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#ff922b;border-radius:3px;"></span> Strategy</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#f06595;border-radius:3px;"></span> Output</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#be4bdb;border-radius:3px;"></span> Governance</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#20c997;border-radius:3px;"></span> Learning</div>
+          <div class="tag"><span style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;background:#ff6b6b;border-radius:3px;"></span> Outcomes</div>
         </div>
       </div>
     </section>
@@ -2897,13 +2966,16 @@
     let flowAnimationActive = true;
     let flowVisibleNodes = null; // null means all nodes visible, Set means filtered
 
-    // Particle configuration per link type
+    // Particle configuration per link type (base speeds - higher = slower)
     const PARTICLE_CONFIG = {
-      context: { speed: 2200, interval: 1800, radius: 3, trail: true },
-      core: { speed: 1800, interval: 1200, radius: 4, trail: true },
-      gov: { speed: 2500, interval: 2200, radius: 3, trail: false },
-      learning: { speed: 2000, interval: 1500, radius: 3.5, trail: true }
+      context: { speed: 4500, interval: 3500, radius: 3, trail: true },
+      core: { speed: 4000, interval: 3000, radius: 4, trail: true },
+      gov: { speed: 5000, interval: 4000, radius: 3, trail: false },
+      learning: { speed: 4200, interval: 3200, radius: 3.5, trail: true }
     };
+
+    // Speed multiplier controlled by slider (0.5 = faster, 2.0 = slower)
+    let flowSpeedMultiplier = 1.0;
 
     // Get the path element for a specific link
     function getLinkPath(linkData) {
@@ -2952,7 +3024,7 @@
 
       // Animate from start (source) to end (target)
       const startTime = performance.now();
-      const duration = config.speed;
+      const duration = config.speed * flowSpeedMultiplier;
 
       function updateParticle(currentTime) {
         if (!flowAnimationActive) {
@@ -3078,18 +3150,485 @@
       }
     }, 2000);
 
-    // Flow animation toggle button
-    const flowToggleBtn = document.getElementById("flowToggle");
-    flowToggleBtn.addEventListener("click", () => {
-      flowToggleBtn.classList.toggle("active");
-      if (flowToggleBtn.classList.contains("active")) {
-        startFlowAnimation();
-        showToast("Flow animation enabled");
-      } else {
-        stopFlowAnimation();
-        showToast("Flow animation paused");
+    // Start flow animation by default
+    startFlowAnimation();
+
+    // Speed slider control
+    const speedSlider = document.getElementById("speedSlider");
+    const speedLabel = document.getElementById("speedLabel");
+    const speedControl = document.getElementById("speedControl");
+
+    speedSlider.addEventListener("input", (e) => {
+      flowSpeedMultiplier = parseFloat(e.target.value);
+      speedLabel.textContent = flowSpeedMultiplier.toFixed(1) + "x";
+    });
+
+    // ============ LEGEND HOVER HIGHLIGHTING ============
+    // Node type to nodeType mapping
+    const LEGEND_TYPE_MAP = {
+      "Decision": "decision",
+      "Process": "process",
+      "AI Engine": "ai",
+      "Strategy": "strategy",
+      "Input/Output": "input",
+      "Governance": "governance",
+      "Agent": "agent"
+    };
+
+    // Add hover listeners to legend items
+    document.querySelectorAll("#graphLegend .tag").forEach(tag => {
+      const text = tag.textContent.trim();
+      const nodeType = LEGEND_TYPE_MAP[text];
+
+      if (nodeType) {
+        tag.style.cursor = "pointer";
+        tag.style.transition = "background .2s, transform .2s";
+
+        tag.addEventListener("mouseenter", () => {
+          tag.style.background = "rgba(124,92,255,.2)";
+          tag.style.transform = "scale(1.05)";
+          highlightNodeTypeConnections(nodeType);
+        });
+
+        tag.addEventListener("mouseleave", () => {
+          tag.style.background = "";
+          tag.style.transform = "";
+          clearTypeHighlight();
+        });
       }
     });
+
+    function highlightNodeTypeConnections(nodeType) {
+      // Find all nodes of this type
+      const matchingNodeIds = new Set(NODES.filter(n => n.nodeType === nodeType).map(n => n.id));
+
+      // Highlight nodes of this type
+      nodeSel.selectAll(".shape")
+        .attr("stroke", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return matchingNodeIds.has(nodeData.id) ? "rgba(180,160,255,.95)" : "rgba(255,255,255,.2)";
+        })
+        .attr("stroke-width", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return matchingNodeIds.has(nodeData.id) ? 3 : 1;
+        })
+        .attr("opacity", function() {
+          const nodeData = d3.select(this.parentNode).datum();
+          return matchingNodeIds.has(nodeData.id) ? 1 : 0.4;
+        });
+
+      // Highlight all connections to/from these nodes in purple
+      linkSel
+        .attr("opacity", l => {
+          const srcId = l.source.id;
+          const tgtId = l.target.id;
+          return (matchingNodeIds.has(srcId) || matchingNodeIds.has(tgtId)) ? 1 : 0.08;
+        })
+        .attr("stroke", l => {
+          const srcId = l.source.id;
+          const tgtId = l.target.id;
+          if (matchingNodeIds.has(srcId) || matchingNodeIds.has(tgtId)) {
+            return "rgba(160,140,255,.85)"; // Purple for type connections
+          }
+          return "rgba(159,176,208,.1)";
+        })
+        .attr("stroke-width", l => {
+          const srcId = l.source.id;
+          const tgtId = l.target.id;
+          return (matchingNodeIds.has(srcId) || matchingNodeIds.has(tgtId)) ? 2.5 : 0.5;
+        });
+    }
+
+    function clearTypeHighlight() {
+      // Reset node styles
+      nodeSel.selectAll(".shape")
+        .attr("stroke", "rgba(255,255,255,.35)")
+        .attr("stroke-width", 1.5)
+        .attr("opacity", 1);
+
+      // Reset link styles
+      linkSel
+        .attr("opacity", 1)
+        .attr("stroke", d => PRIMARY_PATH.has(d.key) ? "rgba(124,92,255,.65)" : "rgba(159,176,208,.40)")
+        .attr("stroke-width", d => PRIMARY_PATH.has(d.key) ? 2.0 : 1.2)
+        .attr("stroke-dasharray", d => d.type === "learning" ? "4 3" : "none");
+    }
+
+    // ============ MINDMAP VIEW ============
+    const viewToggleBtn = document.getElementById("viewToggle");
+    const viewToggleIcon = document.getElementById("viewToggleIcon");
+    const viewToggleLabel = document.getElementById("viewToggleLabel");
+    const mindmapSvg = d3.select("#mindmapViz");
+    const graphLegend = document.getElementById("graphLegend");
+    const mindmapLegend = document.getElementById("mindmapLegend");
+    let mindmapInitialized = false;
+    let currentView = "graph"; // "graph" or "mindmap"
+
+    // Mindmap data structure
+    const mindmapData = {
+      name: "AI Proposal System",
+      sub: "Execution Flow Sequence",
+      description: "Complete execution flow showing how AI-powered proposals are generated.",
+      colorClass: "node-root",
+      expanded: true,
+      children: [
+        {
+          name: "Inputs",
+          sub: "Layer 0",
+          description: "External inputs that feed into the proposal system.",
+          colorClass: "node-inputs",
+          expanded: true,
+          nodeIds: ["caseInputs", "artifacts", "catalog", "history", "esgFramework"],
+          children: [
+            { name: "Customer Case Inputs", sub: "sector, water, constraints", colorClass: "node-inputs", nodeId: "caseInputs" },
+            { name: "Existing Artifacts", sub: "templates, spreadsheets", colorClass: "node-inputs", nodeId: "artifacts" },
+            { name: "Technology Catalog", sub: "UF, MBR, RO, UV, AOP", colorClass: "node-inputs", nodeId: "catalog" },
+            { name: "Historical Context", sub: "past proposals, won/lost", colorClass: "node-inputs", nodeId: "history" },
+            { name: "ESG Framework", sub: "metrics, reporting", colorClass: "node-inputs", nodeId: "esgFramework" }
+          ]
+        },
+        {
+          name: "Structure",
+          sub: "Layer 1",
+          description: "Core structural intelligence encoding domain expertise.",
+          colorClass: "node-structure",
+          expanded: false,
+          children: [
+            { name: "Structural Intelligence", sub: "knowledge graph, rules", colorClass: "node-structure", nodeId: "knowledgeLayer" },
+            { name: "Decision Nodes", sub: "tech → sizing → ops", colorClass: "node-structure", nodeId: "decisionNodes" }
+          ]
+        },
+        {
+          name: "Processing",
+          sub: "Layer 2",
+          description: "Simulation and AI optimization layer.",
+          colorClass: "node-processing",
+          expanded: false,
+          children: [
+            { name: "Simulation & Checks", sub: "mass balance, OPEX", colorClass: "node-processing", nodeId: "simulators" },
+            { name: "AI Decision Engine", sub: "multi-objective optimization", colorClass: "node-processing", nodeId: "aiEngine" }
+          ]
+        },
+        {
+          name: "Strategy",
+          sub: "Layer 3",
+          description: "Pricing and ESG optimization modules.",
+          colorClass: "node-strategy",
+          expanded: false,
+          children: [
+            { name: "Pricing Strategy", sub: "value-driven, BOO/BOT", colorClass: "node-strategy", nodeId: "pricing" },
+            { name: "ESG Optimization", sub: "water reuse, carbon", colorClass: "node-strategy", nodeId: "esgOptimize" }
+          ]
+        },
+        {
+          name: "Output",
+          sub: "Layer 4",
+          description: "Proposal generation with ranked options.",
+          colorClass: "node-output",
+          expanded: false,
+          children: [
+            { name: "Proposal Output", sub: "ranked options, rationale", colorClass: "node-output", nodeId: "proposalOut" }
+          ]
+        },
+        {
+          name: "Governance",
+          sub: "Layer 5",
+          description: "Audit trail and compliance controls.",
+          colorClass: "node-governance",
+          expanded: false,
+          children: [
+            { name: "Decision Ledger", sub: "immutable 'why' trail", colorClass: "node-governance", nodeId: "ledger" },
+            { name: "Governance & Compliance", sub: "policies, approvals", colorClass: "node-governance", nodeId: "governance" }
+          ]
+        },
+        {
+          name: "Learning",
+          sub: "Layer 6",
+          description: "Continuous improvement through feedback loops.",
+          colorClass: "node-learning",
+          expanded: false,
+          children: [
+            { name: "Learning Agents Hub", sub: "continuous improvement", colorClass: "node-learning", nodeId: "agents" },
+            { name: "Win/Loss Agent", sub: "pattern mining", colorClass: "node-learning", nodeId: "winLoss" },
+            { name: "Pricing Agent", sub: "elasticity, benchmarks", colorClass: "node-learning", nodeId: "pricingAgent" },
+            { name: "Tech Performance Agent", sub: "real-world reliability", colorClass: "node-learning", nodeId: "techPerf" },
+            { name: "ESG Tracking Agent", sub: "outcomes vs projections", colorClass: "node-learning", nodeId: "esgTrack" },
+            { name: "Knowledge Ingestion", sub: "regulations, market", colorClass: "node-learning", nodeId: "ingestion" }
+          ]
+        },
+        {
+          name: "Outcomes",
+          sub: "Layer 7",
+          description: "Business results and deployment roadmap.",
+          colorClass: "node-outcomes",
+          expanded: false,
+          children: [
+            { name: "Business Outcomes", sub: "speed, win rate, margin", colorClass: "node-outcomes", nodeId: "outcomes" },
+            { name: "Roadmap", sub: "phased deployment", colorClass: "node-outcomes", nodeId: "roadmap" }
+          ]
+        }
+      ]
+    };
+
+    const MINDMAP_COLORS = {
+      "node-root": "#667eea",
+      "node-inputs": "#4dabf7",
+      "node-structure": "#69db7c",
+      "node-processing": "#ffd43b",
+      "node-strategy": "#ff922b",
+      "node-output": "#f06595",
+      "node-governance": "#be4bdb",
+      "node-learning": "#20c997",
+      "node-outcomes": "#ff6b6b"
+    };
+
+    // Mindmap rendering
+    let mindmapG, mindmapZoom, mindmapPreviousPositions = new Map();
+    const mmNodeHeight = 48, mmNodePadding = 18, mmLevelGap = 180, mmVerticalGap = 10, mmToggleRadius = 11;
+
+    function getMmTextWidth(text, fontSize = 12) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = `500 ${fontSize}px Google Sans, Segoe UI, Roboto, sans-serif`;
+      return ctx.measureText(text).width;
+    }
+
+    function getMmNodeWidth(d) {
+      const nameW = getMmTextWidth(d.data.name, 12);
+      const subW = d.data.sub ? getMmTextWidth(d.data.sub, 9) : 0;
+      return Math.max(nameW, subW) + mmNodePadding * 2.5 + 10;
+    }
+
+    function getMmColor(d) {
+      return MINDMAP_COLORS[d.data.colorClass] || "#667eea";
+    }
+
+    function mmHasChildren(d) {
+      return d.data.children && d.data.children.length > 0;
+    }
+
+    function computeMmLayout(root) {
+      function computeSubtreeHeight(node) {
+        if (!node.children || node.children.length === 0) {
+          node.subtreeHeight = mmNodeHeight;
+          return node.subtreeHeight;
+        }
+        let total = 0;
+        node.children.forEach((c, i) => {
+          total += computeSubtreeHeight(c);
+          if (i < node.children.length - 1) total += mmVerticalGap;
+        });
+        node.subtreeHeight = total;
+        return total;
+      }
+      computeSubtreeHeight(root);
+
+      function assignPositions(node, x, yStart) {
+        node.x = x;
+        if (!node.children || node.children.length === 0) {
+          node.y = yStart + mmNodeHeight / 2;
+          return;
+        }
+        let currentY = yStart;
+        node.children.forEach((c) => {
+          assignPositions(c, x + getMmNodeWidth(node) + mmLevelGap, currentY);
+          currentY += c.subtreeHeight + mmVerticalGap;
+        });
+        const first = node.children[0], last = node.children[node.children.length - 1];
+        node.y = (first.y + last.y) / 2;
+      }
+      assignPositions(root, 0, -root.subtreeHeight / 2);
+    }
+
+    function buildMmHierarchy(data) {
+      const root = d3.hierarchy(data, d => d.expanded !== false ? d.children : null);
+      computeMmLayout(root);
+      return root;
+    }
+
+    function generateMmPath(source, target) {
+      const sW = getMmNodeWidth(source);
+      const sX = source.x + sW + mmToggleRadius * 2 + 4, sY = source.y;
+      const tX = target.x, tY = target.y;
+      const mX = sX + (tX - sX) * 0.5;
+      return `M ${sX} ${sY} C ${mX} ${sY}, ${mX} ${tY}, ${tX} ${tY}`;
+    }
+
+    function initMindmap() {
+      if (mindmapInitialized) return;
+      mindmapInitialized = true;
+
+      const container = document.querySelector("#graphPanel .content");
+      const mmW = container.clientWidth || 800;
+      const mmH = container.clientHeight - 60 || 500;
+
+      mindmapSvg.attr("width", mmW).attr("height", mmH);
+      mindmapG = mindmapSvg.append("g");
+
+      mindmapZoom = d3.zoom()
+        .scaleExtent([0.3, 3])
+        .on("zoom", (e) => mindmapG.attr("transform", e.transform));
+
+      mindmapSvg.call(mindmapZoom);
+      mindmapSvg.call(mindmapZoom.transform, d3.zoomIdentity.translate(mmW / 8, mmH / 2).scale(0.75));
+
+      updateMindmap();
+    }
+
+    function updateMindmap(toggledNode = null) {
+      const root = buildMmHierarchy(mindmapData);
+      const nodes = root.descendants();
+      const mmLinks = root.links();
+      const easing = d3.easeCubicInOut;
+      const duration = 400;
+
+      function getSourcePos(d) {
+        if (toggledNode) return { x: toggledNode.x, y: toggledNode.y };
+        if (d.parent) {
+          const pk = d.parent.ancestors().map(n => n.data.name).join('/');
+          const pp = mindmapPreviousPositions.get(pk);
+          if (pp) return pp;
+          return { x: d.parent.x, y: d.parent.y };
+        }
+        return { x: d.x, y: d.y };
+      }
+
+      // Links
+      const link = mindmapG.selectAll(".mm-link").data(mmLinks, d => d.source.ancestors().map(n => n.data.name).join('/') + '->' + d.target.ancestors().map(n => n.data.name).join('/'));
+
+      link.exit().transition().duration(duration).ease(easing).attr("opacity", 0).remove();
+
+      const linkEnter = link.enter().append("path").attr("class", "mm-link")
+        .attr("fill", "none").attr("stroke", "rgba(159,176,208,.4)").attr("stroke-width", 2)
+        .attr("opacity", 0).attr("d", d => {
+          const s = getSourcePos(d.source);
+          return `M ${s.x} ${s.y} C ${s.x} ${s.y}, ${s.x} ${s.y}, ${s.x} ${s.y}`;
+        });
+
+      link.merge(linkEnter).transition().duration(duration).ease(easing)
+        .attr("d", d => generateMmPath(d.source, d.target)).attr("opacity", 1);
+
+      // Nodes
+      const node = mindmapG.selectAll(".mm-node").data(nodes, d => d.ancestors().map(n => n.data.name).join('/'));
+
+      node.exit().each(function(d) { d.sourcePos = getSourcePos(d); })
+        .transition().duration(duration).ease(easing)
+        .attr("transform", d => `translate(${d.sourcePos.x}, ${d.sourcePos.y})`)
+        .attr("opacity", 0).remove();
+
+      const nodeEnter = node.enter().append("g").attr("class", "mm-node")
+        .attr("opacity", 0).attr("transform", d => {
+          const s = getSourcePos(d);
+          return `translate(${s.x}, ${s.y})`;
+        }).style("cursor", "pointer");
+
+      nodeEnter.append("rect").attr("class", "mm-rect")
+        .attr("x", 0).attr("y", -mmNodeHeight / 2)
+        .attr("width", d => getMmNodeWidth(d)).attr("height", mmNodeHeight)
+        .attr("rx", 6).attr("ry", 6).attr("fill", d => getMmColor(d))
+        .attr("stroke", "rgba(255,255,255,.2)").attr("stroke-width", 1);
+
+      nodeEnter.append("text").attr("class", "mm-text")
+        .attr("x", d => getMmNodeWidth(d) / 2).attr("y", d => d.data.sub ? -6 : 0)
+        .attr("dy", "0.35em").attr("text-anchor", "middle")
+        .attr("fill", "#fff").attr("font-size", "12px").attr("font-weight", "500")
+        .text(d => d.data.name);
+
+      nodeEnter.filter(d => d.data.sub).append("text").attr("class", "mm-sub")
+        .attr("x", d => getMmNodeWidth(d) / 2).attr("y", 9)
+        .attr("dy", "0.35em").attr("text-anchor", "middle")
+        .attr("fill", "rgba(255,255,255,.7)").attr("font-size", "9px")
+        .text(d => d.data.sub);
+
+      // Toggle buttons
+      const toggle = nodeEnter.filter(d => mmHasChildren(d)).append("g").attr("class", "mm-toggle")
+        .attr("transform", d => `translate(${getMmNodeWidth(d) + mmToggleRadius + 3}, 0)`);
+
+      toggle.append("circle").attr("r", mmToggleRadius)
+        .attr("fill", "rgba(255,255,255,.15)").attr("stroke", "rgba(255,255,255,.3)");
+
+      toggle.append("text").attr("text-anchor", "middle").attr("dy", "0.35em")
+        .attr("fill", "rgba(255,255,255,.8)").attr("font-size", "11px").attr("font-weight", "600")
+        .text(d => d.data.expanded === false ? "+" : "-");
+
+      // Click handlers
+      nodeEnter.on("click", (e, d) => {
+        e.stopPropagation();
+        // If it has a nodeId, select that node in the main graph
+        if (d.data.nodeId) {
+          const graphNode = nodeById.get(d.data.nodeId);
+          if (graphNode) {
+            selectNodeWithPerspective(graphNode, currentPerspective);
+          }
+        } else {
+          // Show layer info
+          const det = {
+            label: d.data.name,
+            sub: d.data.sub || "",
+            details: { concept: d.data.description || "Layer grouping", value: "Organizes related components" }
+          };
+          details.innerHTML = cardHTML("Mindmap Node", `
+            <p style="color:var(--muted);font-size:12px;"><b style="color:var(--text)">${escapeHtml(d.data.name)}</b> — ${escapeHtml(d.data.sub || '')}</p>
+            <p style="margin-top:8px;">${escapeHtml(d.data.description || 'Click child nodes to see details.')}</p>
+          `);
+          showToast(`Selected: ${d.data.name}`);
+        }
+      });
+
+      toggle.on("click", (e, d) => {
+        e.stopPropagation();
+        if (mmHasChildren(d)) {
+          d.data.expanded = d.data.expanded === false ? true : false;
+          updateMindmap(d);
+        }
+      });
+
+      const nodeUpdate = node.merge(nodeEnter);
+      nodeUpdate.transition().duration(duration).ease(easing)
+        .attr("opacity", 1).attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+      nodeUpdate.select(".mm-toggle text").text(d => d.data.expanded === false ? "+" : "-");
+
+      mindmapPreviousPositions = new Map();
+      nodes.forEach(d => {
+        mindmapPreviousPositions.set(d.ancestors().map(n => n.data.name).join('/'), { x: d.x, y: d.y });
+      });
+    }
+
+    // Toggle between graph and mindmap views
+    viewToggleBtn.addEventListener("click", () => {
+      if (currentView === "graph") {
+        // Switch to mindmap
+        currentView = "mindmap";
+        viewToggleBtn.classList.add("active");
+        viewToggleIcon.textContent = "waves";
+        viewToggleLabel.textContent = "Flow";
+        svg.style("display", "none");
+        mindmapSvg.style("display", "block");
+        graphLegend.style.display = "none";
+        mindmapLegend.style.display = "flex";
+        speedControl.style.display = "none";
+        stopFlowAnimation();
+        initMindmap();
+        showToast("MindMap view");
+      } else {
+        // Switch back to graph
+        currentView = "graph";
+        viewToggleBtn.classList.remove("active");
+        viewToggleIcon.textContent = "account_tree";
+        viewToggleLabel.textContent = "MindMap";
+        svg.style("display", "block");
+        mindmapSvg.style("display", "none");
+        graphLegend.style.display = "flex";
+        mindmapLegend.style.display = "none";
+        speedControl.style.display = "flex";
+        startFlowAnimation();
+        showToast("Flow view");
+      }
+    });
+
+    // Background click on mindmap clears selection
+    mindmapSvg.on("click", () => clearSelection());
 
     // Background click clears selection
     svg.on("click", () => clearSelection());
@@ -3140,12 +3679,24 @@
           return nodeData.id === d.id ? 2.5 : 1.5;
         });
 
+      // Highlight connected links with distinct colors for incoming vs outgoing
       linkSel
-        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.18)
-        .attr("stroke", l => (l.source.id===d.id || l.target.id===d.id)
-          ? (PRIMARY_PATH.has(l.key) ? "rgba(124,92,255,.85)" : "rgba(159,176,208,.60)")
-          : "rgba(159,176,208,.25)")
-        .attr("stroke-width", l => (l.source.id===d.id || l.target.id===d.id) ? 2.0 : 1.0);
+        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.12)
+        .attr("stroke", l => {
+          if (l.target.id===d.id) {
+            return l.type === "learning" ? "rgba(100,220,255,.7)" : "rgba(100,220,255,.85)";
+          } else if (l.source.id===d.id) {
+            return l.type === "learning" ? "rgba(255,170,100,.7)" : "rgba(255,170,100,.85)";
+          }
+          return "rgba(159,176,208,.15)";
+        })
+        .attr("stroke-width", l => (l.source.id===d.id || l.target.id===d.id) ? 3 : 0.8)
+        .attr("stroke-dasharray", l => {
+          if (l.source.id===d.id || l.target.id===d.id) {
+            return l.type === "learning" ? "6 4" : "none";
+          }
+          return l.type === "learning" ? "4 3" : "none";
+        });
 
       const det = d.details ?? {};
       const body =
@@ -3164,10 +3715,12 @@
       const relHTML = `
         <div class="card">
           <h3>Connections</h3>
-          <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.5;">
-            <b style="color:rgba(234,240,255,.92)">Incoming</b>: ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+          <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.6;">
+            <span style="display:inline-block;width:12px;height:3px;background:rgba(100,220,255,.85);border-radius:1px;vertical-align:middle;margin-right:6px;"></span>
+            <b style="color:rgba(100,220,255,.9)">Incoming</b>: ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
             <br/>
-            <b style="color:rgba(234,240,255,.92)">Outgoing</b>: ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+            <span style="display:inline-block;width:12px;height:3px;background:rgba(255,170,100,.85);border-radius:1px;vertical-align:middle;margin-right:6px;"></span>
+            <b style="color:rgba(255,170,100,.9)">Outgoing</b>: ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
           </p>
         </div>
       `;
@@ -3211,7 +3764,8 @@
       linkSel
         .attr("opacity", 1)
         .attr("stroke", d => PRIMARY_PATH.has(d.key) ? "rgba(124,92,255,.65)" : "rgba(159,176,208,.40)")
-        .attr("stroke-width", d => PRIMARY_PATH.has(d.key) ? 2.0 : 1.2);
+        .attr("stroke-width", d => PRIMARY_PATH.has(d.key) ? 2.0 : 1.2)
+        .attr("stroke-dasharray", d => d.type === "learning" ? "4 3" : "none");
 
       // restore default details panel
       details.innerHTML = `
@@ -3519,8 +4073,28 @@
           return nodeData.id === d.id ? 2.5 : 1.5;
         });
 
+      // Highlight connected links with distinct colors for incoming vs outgoing
+      // Incoming (target is selected node): cyan/blue
+      // Outgoing (source is selected node): orange/warm
       linkSel
-        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.18);
+        .attr("opacity", l => (l.source.id===d.id || l.target.id===d.id) ? 1 : 0.12)
+        .attr("stroke", l => {
+          if (l.target.id===d.id) {
+            // Incoming connection - cyan/blue
+            return l.type === "learning" ? "rgba(100,220,255,.7)" : "rgba(100,220,255,.85)";
+          } else if (l.source.id===d.id) {
+            // Outgoing connection - orange/warm
+            return l.type === "learning" ? "rgba(255,170,100,.7)" : "rgba(255,170,100,.85)";
+          }
+          return "rgba(159,176,208,.15)";
+        })
+        .attr("stroke-width", l => (l.source.id===d.id || l.target.id===d.id) ? 3 : 0.8)
+        .attr("stroke-dasharray", l => {
+          if (l.source.id===d.id || l.target.id===d.id) {
+            return l.type === "learning" ? "6 4" : "none";
+          }
+          return l.type === "learning" ? "4 3" : "none";
+        });
 
       const det = d.details ?? {};
       const perspData = PERSPECTIVES[perspective];
@@ -3569,9 +4143,11 @@
         <div class="card">
           <h3>Connections</h3>
           <p style="margin:0;color:var(--muted);font-size:12px;line-height:1.6;">
-            <b style="color:rgba(234,240,255,.92)">Feeds from:</b> ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+            <span style="display:inline-block;width:12px;height:3px;background:rgba(100,220,255,.85);border-radius:1px;vertical-align:middle;margin-right:6px;"></span>
+            <b style="color:rgba(100,220,255,.9)">Incoming:</b> ${incoming.length ? incoming.map(n=>escapeHtml(n.label)).join(", ") : "—"}
             <br/>
-            <b style="color:rgba(234,240,255,.92)">Feeds to:</b> ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
+            <span style="display:inline-block;width:12px;height:3px;background:rgba(255,170,100,.85);border-radius:1px;vertical-align:middle;margin-right:6px;"></span>
+            <b style="color:rgba(255,170,100,.9)">Outgoing:</b> ${outgoing.length ? outgoing.map(n=>escapeHtml(n.label)).join(", ") : "—"}
           </p>
         </div>
       `;

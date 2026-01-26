@@ -184,6 +184,127 @@
       transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
+    /* ==================== PERSONA SYSTEM ==================== */
+    .persona-selector {
+      display: flex;
+      gap: 4px;
+      margin-right: 16px;
+      padding: 4px;
+      background: var(--card);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      transition: all 0.3s ease;
+    }
+
+    .persona-selector.hidden {
+      display: none;
+    }
+
+    #personaToggle.has-filter {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      border-color: transparent;
+    }
+
+    .persona-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .persona-chip:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .persona-chip.active {
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(34,211,238,0.15));
+      color: var(--text);
+      border: 1px solid rgba(99,102,241,0.3);
+    }
+
+    .persona-chip .material-icons-outlined {
+      font-size: 14px;
+    }
+
+    [data-theme="light"] .persona-selector {
+      background: var(--input-bg);
+    }
+
+    [data-theme="light"] .persona-chip:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    [data-theme="light"] .persona-chip.active {
+      background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(8,145,178,0.1));
+      border-color: rgba(79,70,229,0.3);
+    }
+
+    /* Persona visibility rules - exclude persona selector chips */
+    [data-persona="technician"] [data-persona]:not([data-persona*="technician"]):not(.persona-chip) {
+      display: none !important;
+    }
+    [data-persona="business"] [data-persona]:not([data-persona*="business"]):not(.persona-chip) {
+      display: none !important;
+    }
+    [data-persona="sales"] [data-persona]:not([data-persona*="sales"]):not(.persona-chip) {
+      display: none !important;
+    }
+    [data-persona="customer"] [data-persona]:not([data-persona*="customer"]):not(.persona-chip) {
+      display: none !important;
+    }
+
+    /* Highlight key info for each persona */
+    [data-persona="business"] [data-persona-key="business"],
+    [data-persona="technician"] [data-persona-key="technician"],
+    [data-persona="sales"] [data-persona-key="sales"],
+    [data-persona="customer"] [data-persona-key="customer"] {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.2);
+    }
+
+    /* Persona indicator badge on panels */
+    .persona-badge {
+      display: none;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: auto;
+    }
+
+    [data-persona="technician"] .persona-badge.technician,
+    [data-persona="business"] .persona-badge.business,
+    [data-persona="sales"] .persona-badge.sales,
+    [data-persona="customer"] .persona-badge.customer {
+      display: inline-block;
+    }
+
+    .persona-badge.technician { background: rgba(34,211,238,0.2); color: var(--accent2); }
+    .persona-badge.business { background: rgba(168,85,247,0.2); color: var(--accent3); }
+    .persona-badge.sales { background: rgba(34,197,94,0.2); color: var(--success); }
+    .persona-badge.customer { background: rgba(99,102,241,0.2); color: var(--accent); }
+
+    /* Responsive persona selector */
+    @media (max-width: 1200px) {
+      .persona-chip span:not(.material-icons-outlined) {
+        display: none;
+      }
+      .persona-chip {
+        padding: 6px 8px;
+      }
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -947,6 +1068,161 @@
     .tech-stat-value {
       font-weight: 600;
       color: var(--accent2);
+    }
+
+    /* Solution View Toggle */
+    .solution-view-toggle {
+      display: flex;
+      gap: 4px;
+      margin-left: auto;
+      padding: 3px;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .view-toggle-btn {
+      width: 32px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .view-toggle-btn:hover {
+      background: rgba(99,102,241,0.1);
+      color: var(--text);
+    }
+
+    .view-toggle-btn.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .view-toggle-btn .material-icons-outlined {
+      font-size: 16px;
+    }
+
+    .solution-view {
+      display: none;
+    }
+
+    .solution-view.active {
+      display: block;
+    }
+
+    /* Decision Tree Styles */
+    .decision-tree-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 8px;
+    }
+
+    .decision-tree-header .material-icons-outlined {
+      font-size: 18px;
+    }
+
+    .tree-scenarios {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .scenario-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .scenario-btn:hover {
+      background: rgba(0,212,170,0.1);
+      border-color: rgba(0,212,170,0.3);
+      color: var(--text);
+    }
+
+    .scenario-btn.active {
+      background: rgba(0,212,170,0.15);
+      border-color: #00d4aa;
+      color: #00d4aa;
+    }
+
+    .decision-tree-svg {
+      width: 100%;
+      height: 340px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .decision-tree-svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .tree-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 12px;
+      padding: 10px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-dot.recommended { background: #00d4aa; }
+    .legend-dot.decision { background: #7c5cff; }
+    .legend-dot.technology { background: #ffa500; }
+
+    /* Decision Tree Node Styles */
+    .decision-node { cursor: pointer; }
+    .decision-node:hover .node-circle { filter: brightness(1.2); }
+    .tree-link { fill: none; stroke-width: 2; }
+
+    [data-theme="light"] .decision-tree-svg {
+      background: rgba(0,0,0,0.03);
+    }
+
+    [data-theme="light"] .tree-legend {
+      background: rgba(0,0,0,0.05);
+    }
+
+    [data-theme="light"] .scenario-btn {
+      background: rgba(0,0,0,0.03);
     }
 
     /* Metrics Cards */
@@ -2102,7 +2378,7 @@
     }
   </style>
 </head>
-<body>
+<body data-persona="all">
   <!-- Header -->
   <header class="app-header">
     <div class="logo">
@@ -2136,6 +2412,10 @@
         AI Assistant
         <span class="ai-pulse"></span>
       </button>
+      <!-- Admin Settings -->
+      <a href="admin-ai-settings.html" class="theme-toggle" title="AI Admin Settings" style="text-decoration:none">
+        <span class="material-icons-outlined">admin_panel_settings</span>
+      </a>
       <!-- Keyboard Mode Toggle -->
       <button class="theme-toggle" id="keyboardToggle" onclick="toggleKeyboardMode()" title="Toggle keyboard mode (Ctrl+K)">
         <span class="material-icons-outlined" id="keyboardIcon">keyboard</span>
@@ -2145,6 +2425,34 @@
         <span class="material-icons-outlined" id="themeIcon">light_mode</span>
       </button>
       <span style="font-size:12px;color:var(--muted)">Internal System v1.0</span>
+
+      <!-- Persona Toggle & Selector -->
+      <button class="theme-toggle" id="personaToggle" onclick="togglePersonaSelector()" title="Toggle persona views">
+        <span class="material-icons-outlined" id="personaToggleIcon">groups</span>
+      </button>
+      <div class="persona-selector" id="personaSelector">
+        <div class="persona-chip active" data-persona="all" onclick="setPersona('all')" title="View all content">
+          <span class="material-icons-outlined">groups</span>
+          <span>All</span>
+        </div>
+        <div class="persona-chip" data-persona="business" onclick="setPersona('business')" title="Business focus: Margins, ROI, ESG, governance">
+          <span class="material-icons-outlined">analytics</span>
+          <span>Business</span>
+        </div>
+        <div class="persona-chip" data-persona="technician" onclick="setPersona('technician')" title="Technician focus: Water quality, sizing, pre-treatment">
+          <span class="material-icons-outlined">engineering</span>
+          <span>Technician</span>
+        </div>
+        <div class="persona-chip" data-persona="sales" onclick="setPersona('sales')" title="Sales focus: Pricing, discounts, customer value">
+          <span class="material-icons-outlined">storefront</span>
+          <span>Sales</span>
+        </div>
+        <div class="persona-chip" data-persona="customer" onclick="setPersona('customer')" title="Customer focus: Final price, benefits, warranty">
+          <span class="material-icons-outlined">person</span>
+          <span>Customer</span>
+        </div>
+      </div>
+
       <div class="user-avatar">TE</div>
     </div>
   </header>
@@ -2315,13 +2623,14 @@
         <div class="step-content active" id="step-assessment">
         <div class="content-grid">
           <!-- Input Specifications Panel -->
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician sales" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">input</span>
                 Input Specifications
               </div>
               <span class="panel-badge">Step 1</span>
+              <span class="persona-badge technician">Technical</span>
             </div>
 
             <div class="form-group">
@@ -2527,13 +2836,23 @@
           </div>
 
           <!-- AI Solution Design Panel -->
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business sales" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">smart_toy</span>
                 AI Solution Design
               </div>
               <span class="panel-badge">Optimizing</span>
+              <span class="persona-badge technician">Technical</span>
+              <!-- View Toggle -->
+              <div class="solution-view-toggle">
+                <button class="view-toggle-btn active" data-view="grid" onclick="setSolutionView('grid')" title="Technology Grid">
+                  <span class="material-icons-outlined">grid_view</span>
+                </button>
+                <button class="view-toggle-btn" data-view="tree" onclick="setSolutionView('tree')" title="AI Decision Tree">
+                  <span class="material-icons-outlined">account_tree</span>
+                </button>
+              </div>
             </div>
 
             <div class="ai-processing">
@@ -2541,11 +2860,13 @@
               <span class="ai-text">Analyzing 847 possible configurations...</span>
             </div>
 
-            <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">
-              Recommended technology train based on your specifications:
-            </p>
+            <!-- Grid View -->
+            <div id="solutionGridView" class="solution-view active">
+              <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">
+                Recommended technology train based on your specifications:
+              </p>
 
-            <div class="tech-grid">
+              <div class="tech-grid">
               <div class="tech-card recommended selected">
                 <div class="tech-name">UF</div>
                 <div class="tech-full">Ultrafiltration</div>
@@ -2570,7 +2891,45 @@
                   <div class="tech-stat">Energy: <span class="tech-stat-value">0.1 kWh/m³</span></div>
                 </div>
               </div>
-            </div>
+              </div>
+            </div><!-- End Grid View -->
+
+            <!-- Tree View (AI Decision Tree) -->
+            <div id="solutionTreeView" class="solution-view">
+              <div class="decision-tree-header">
+                <span class="material-icons-outlined">account_tree</span>
+                <span>AI Decision Tree — Technology Selection</span>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">
+                Interactive visualization of AI technology selection based on your water parameters. Click nodes for details.
+              </p>
+              <!-- Use Case Scenarios -->
+              <div class="tree-scenarios">
+                <span style="font-size:10px;color:var(--muted);margin-right:8px;">USE CASES:</span>
+                <button class="scenario-btn" onclick="applyTreeScenario('food-bev')" title="High solids, moderate salinity">
+                  <span>🍺</span> Food & Bev
+                </button>
+                <button class="scenario-btn" onclick="applyTreeScenario('semiconductor')" title="Ultra-pure water needed">
+                  <span>💾</span> Semiconductor
+                </button>
+                <button class="scenario-btn" onclick="applyTreeScenario('municipal')" title="Secondary effluent polishing">
+                  <span>🏙️</span> Municipal
+                </button>
+                <button class="scenario-btn" onclick="applyTreeScenario('pharma')" title="WFI-grade water">
+                  <span>💊</span> Pharma
+                </button>
+              </div>
+              <!-- Decision Tree SVG Container -->
+              <div id="decisionTreeContainer" class="decision-tree-svg">
+                <!-- D3 will render the tree here -->
+              </div>
+              <!-- Tree Legend -->
+              <div class="tree-legend">
+                <div class="legend-item"><span class="legend-dot recommended"></span> Recommended Path</div>
+                <div class="legend-item"><span class="legend-dot decision"></span> Decision Node</div>
+                <div class="legend-item"><span class="legend-dot technology"></span> Technology</div>
+              </div>
+            </div><!-- End Tree View -->
 
             <!-- Reactive System Info Display -->
             <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.2);border-radius:10px;border:1px solid var(--line)">
@@ -2615,12 +2974,13 @@
           </div>
 
           <!-- Decision Trail Panel -->
-          <div class="content-panel full-width">
+          <div class="content-panel full-width" data-persona="technician business" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">account_tree</span>
                 Decision Trail
               </div>
+              <span class="persona-badge business">Governance</span>
               <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">
                 <span class="material-icons-outlined" style="font-size:14px">download</span>
                 Export Audit
@@ -2718,13 +3078,14 @@
         </div>
 
         <div class="content-grid">
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">biotech</span>
                 Lab Test Requirements
               </div>
               <span class="panel-badge">Phase 2</span>
+              <span class="persona-badge technician">Technical</span>
             </div>
 
             <div class="form-group">
@@ -2793,13 +3154,14 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">assignment</span>
                 Test Results
               </div>
               <span class="panel-badge">Awaiting Data</span>
+              <span class="persona-badge technician">Technical</span>
             </div>
 
             <div style="text-align:center;padding:48px 24px;color:var(--muted)">
@@ -2878,13 +3240,14 @@
         </div>
 
         <div class="content-grid">
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">precision_manufacturing</span>
                 Pilot Plant Options
               </div>
               <span class="panel-badge">Phase 3</span>
+              <span class="persona-badge technician">Technical</span>
             </div>
 
             <div class="form-group">
@@ -2943,13 +3306,14 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business sales" data-persona-key="sales">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">handshake</span>
                 Technology Partners
               </div>
               <span class="panel-badge">Innovation Ecosystem</span>
+              <span class="persona-badge sales">Sales</span>
             </div>
 
             <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
@@ -3068,12 +3432,13 @@
           </div>
         </div>
 
-        <div class="content-panel full-width">
+        <div class="content-panel full-width" data-persona="technician business sales" data-persona-key="technician">
           <div class="panel-header">
             <div class="panel-title">
               <span class="material-icons-outlined">compare</span>
               Ranked Solutions
             </div>
+            <span class="persona-badge technician">Technical</span>
           </div>
 
           <table class="solution-table">
@@ -3134,12 +3499,13 @@
         </div>
 
         <div class="content-grid" style="margin-top:20px">
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician sales" data-persona-key="technician">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">tune</span>
                 Vendor Selection
               </div>
+              <span class="persona-badge technician">Technical</span>
             </div>
             <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
               Include or exclude specific vendors in the solution:
@@ -3154,12 +3520,13 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="business sales" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">balance</span>
                 Optimization Weights
               </div>
+              <span class="persona-badge business">Strategy</span>
             </div>
             <div class="range-group">
               <div class="range-header">
@@ -3207,23 +3574,23 @@
           <p class="workflow-subtitle">Pricing intelligence with ESG impact assessment and ROI analysis</p>
         </div>
 
-        <div class="metrics-grid">
-          <div class="metric-card">
+        <div class="metrics-grid" data-persona="business sales customer">
+          <div class="metric-card" data-persona-key="business">
             <div class="metric-label">Total CapEx</div>
             <div class="metric-value accent">£1.24M</div>
             <div class="metric-change">Base equipment + installation</div>
           </div>
-          <div class="metric-card">
+          <div class="metric-card" data-persona-key="business">
             <div class="metric-label">Annual OpEx</div>
             <div class="metric-value warning">£185K</div>
             <div class="metric-change">Energy + chemicals + labor</div>
           </div>
-          <div class="metric-card">
+          <div class="metric-card" data-persona-key="business">
             <div class="metric-label">10yr NPV</div>
             <div class="metric-value accent2">£2.89M</div>
             <div class="metric-change">At 8% discount rate</div>
           </div>
-          <div class="metric-card">
+          <div class="metric-card" data-persona-key="customer">
             <div class="metric-label">Recommended Price</div>
             <div class="metric-value success">£1.49M</div>
             <div class="metric-change positive">20% margin</div>
@@ -3231,12 +3598,13 @@
         </div>
 
         <div class="content-grid">
-          <div class="content-panel">
+          <div class="content-panel" data-persona="business sales" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">pie_chart</span>
                 CapEx Breakdown
               </div>
+              <span class="persona-badge business">Financial</span>
             </div>
 
             <div class="cost-bar">
@@ -3266,12 +3634,13 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="business sales customer" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">trending_up</span>
                 OpEx Projection (10yr)
               </div>
+              <span class="persona-badge business">ROI</span>
             </div>
 
             <div id="opex-chart" style="height:200px;display:flex;align-items:flex-end;gap:8px;padding:20px 0">
@@ -3298,12 +3667,13 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="business sales" data-persona-key="sales">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">sell</span>
                 Pricing Strategy
               </div>
+              <span class="persona-badge sales">Sales</span>
             </div>
 
             <div class="form-group">
@@ -3331,12 +3701,13 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="business sales" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">analytics</span>
                 Component Pricing
               </div>
+              <span class="persona-badge business">Financial</span>
             </div>
 
             <table class="solution-table" style="font-size:12px">
@@ -3422,13 +3793,14 @@
           </div>
 
           <!-- ESG & Carbon Metrics Panel -->
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business sales customer" data-persona-key="customer">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">eco</span>
                 ESG & Carbon Impact
               </div>
               <span class="panel-badge">Sustainability</span>
+              <span class="persona-badge customer">Customer</span>
             </div>
 
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px">
@@ -3494,12 +3866,13 @@
         </div>
 
         <div class="content-grid">
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business sales" data-persona-key="business">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">checklist</span>
                 Pre-flight Checklist
               </div>
+              <span class="persona-badge business">Governance</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px">
@@ -3541,12 +3914,13 @@
             </div>
           </div>
 
-          <div class="content-panel">
+          <div class="content-panel" data-persona="technician business sales customer" data-persona-key="sales">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">download</span>
                 Export Options
               </div>
+              <span class="persona-badge sales">Sales</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px">
@@ -3579,12 +3953,13 @@
             </div>
           </div>
 
-          <div class="content-panel full-width">
+          <div class="content-panel full-width" data-persona="technician business sales customer" data-persona-key="customer">
             <div class="panel-header">
               <div class="panel-title">
                 <span class="material-icons-outlined">preview</span>
                 Proposal Preview
               </div>
+              <span class="persona-badge customer">Customer</span>
               <div style="display:flex;gap:8px">
                 <button class="btn btn-secondary" style="padding:6px 12px;font-size:11px">
                   <span class="material-icons-outlined" style="font-size:14px">edit</span>
@@ -4135,6 +4510,52 @@
         localStorage.setItem('theme', 'light');
       }
     }
+
+    // Toggle Persona Selector visibility
+    function togglePersonaSelector() {
+      const selector = document.getElementById('personaSelector');
+      const toggle = document.getElementById('personaToggle');
+      const icon = document.getElementById('personaToggleIcon');
+      const isHidden = selector.classList.toggle('hidden');
+
+      if (isHidden) {
+        icon.textContent = 'person_search';
+        toggle.title = 'Show persona views';
+      } else {
+        icon.textContent = 'groups';
+        toggle.title = 'Hide persona views';
+      }
+
+      // Update toggle button state if a filter is active
+      updatePersonaToggleState();
+      localStorage.setItem('personaSelectorHidden', isHidden);
+    }
+
+    // Update toggle button to show if a non-default persona is active
+    function updatePersonaToggleState() {
+      const toggle = document.getElementById('personaToggle');
+      const activePersona = document.querySelector('.persona-chip.active');
+      const isFiltered = activePersona && activePersona.dataset.persona !== 'all';
+      const isHidden = document.getElementById('personaSelector').classList.contains('hidden');
+
+      if (isFiltered && isHidden) {
+        toggle.classList.add('has-filter');
+        toggle.title = `Viewing: ${activePersona.dataset.persona} (click to change)`;
+      } else {
+        toggle.classList.remove('has-filter');
+      }
+    }
+
+    // Load saved persona selector state
+    (function() {
+      const hidden = localStorage.getItem('personaSelectorHidden') === 'true';
+      if (hidden) {
+        const selector = document.getElementById('personaSelector');
+        const icon = document.getElementById('personaToggleIcon');
+        if (selector) selector.classList.add('hidden');
+        if (icon) icon.textContent = 'person_search';
+      }
+    })();
 
     // Load saved theme on page load
     (function() {
@@ -5716,9 +6137,371 @@
       CalculationEngine.runAll();
     }
 
+    // ==================== PERSONA SYSTEM ====================
+    let currentPersona = localStorage.getItem('userPersona') || 'all';
+    let personaInitialized = false;
+
+    function setPersona(persona) {
+      currentPersona = persona;
+      document.body.setAttribute('data-persona', persona);
+
+      // Update selector UI
+      document.querySelectorAll('.persona-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.persona === persona);
+      });
+
+      // Update AI suggestions based on persona (if available)
+      if (typeof updateAISuggestions === 'function') {
+        try { updateAISuggestions(); } catch(e) { console.log('AI suggestions update skipped'); }
+      }
+
+      // Log persona change (skip on initial load)
+      if (personaInitialized && typeof logDecision === 'function') {
+        try { logDecision(`Switched to ${persona} view`, `User changed persona filter`, 'user'); } catch(e) {}
+      }
+
+      // Save preference
+      localStorage.setItem('userPersona', persona);
+
+      // Show notification (skip on initial load)
+      if (personaInitialized) {
+        const personaNames = {
+          all: 'All Content',
+          business: 'Business Focus',
+          technician: 'Technician Focus',
+          sales: 'Sales Focus',
+          customer: 'Customer View'
+        };
+        showNotification('visibility', `Viewing: ${personaNames[persona]}`, 'success');
+      }
+
+      personaInitialized = true;
+
+      // Update toggle button state if selector is hidden
+      if (typeof updatePersonaToggleState === 'function') {
+        updatePersonaToggleState();
+      }
+
+      console.log('[Persona] Set to:', persona);
+    }
+
+    // Get persona-specific suggestions
+    function getPersonaSuggestions(persona) {
+      const suggestions = {
+        business: [
+          { action: 'View margin analysis', icon: 'trending_up' },
+          { action: 'Generate ESG report', icon: 'eco' },
+          { action: 'Compare alternatives', icon: 'compare_arrows' },
+          { action: 'Decision audit trail', icon: 'history' }
+        ],
+        technician: [
+          { action: 'Check pre-treatment', icon: 'filter_alt' },
+          { action: 'Verify sizing', icon: 'straighten' },
+          { action: 'Review water quality', icon: 'water_drop' },
+          { action: 'View alarms', icon: 'warning' }
+        ],
+        sales: [
+          { action: 'Generate quote', icon: 'request_quote' },
+          { action: 'Apply discount', icon: 'sell' },
+          { action: 'Calculate ROI', icon: 'calculate' },
+          { action: 'Win probability', icon: 'emoji_events' }
+        ],
+        customer: [
+          { action: 'View summary', icon: 'summarize' },
+          { action: 'See benefits', icon: 'stars' },
+          { action: 'Environmental impact', icon: 'eco' },
+          { action: 'Warranty info', icon: 'verified_user' }
+        ]
+      };
+      return suggestions[persona] || [];
+    }
+
+    // Initialize persona on load
+    function initPersona() {
+      const savedPersona = localStorage.getItem('userPersona') || 'all';
+      setPersona(savedPersona);
+    }
+
+    // ==================== SOLUTION VIEW TOGGLE ====================
+    function setSolutionView(view) {
+      // Update buttons
+      document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+
+      // Update views
+      document.getElementById('solutionGridView').classList.toggle('active', view === 'grid');
+      document.getElementById('solutionTreeView').classList.toggle('active', view === 'tree');
+
+      // Render tree if switching to tree view
+      if (view === 'tree') {
+        renderDecisionTree();
+      }
+
+      localStorage.setItem('solutionView', view);
+    }
+
+    // ==================== DECISION TREE DATA ====================
+    const DECISION_TREE_DATA = {
+      id: 'root', name: 'Water Analysis', question: 'Analyze water quality',
+      children: [
+        {
+          id: 'solids-branch', name: 'Solids Treatment', question: 'TSS treatment path',
+          children: [
+            { id: 'tss-high', name: 'High TSS', question: 'TSS > 100 mg/L',
+              children: [
+                { id: 'daf', name: 'DAF', tech: 'DAF', description: 'Dissolved Air Flotation', leaf: true },
+                { id: 'clarifier', name: 'Clarifier', tech: 'CLAR', description: 'Primary Clarification', leaf: true }
+              ]
+            },
+            { id: 'tss-med', name: 'Medium TSS', question: '50 < TSS ≤ 100',
+              children: [
+                { id: 'uf', name: 'UF', tech: 'UF', description: 'Ultrafiltration', leaf: true },
+                { id: 'mf', name: 'MF', tech: 'MF', description: 'Microfiltration', leaf: true }
+              ]
+            },
+            { id: 'tss-low', name: 'Low TSS', question: 'TSS ≤ 50 mg/L',
+              children: [
+                { id: 'direct', name: 'Direct', tech: 'DIRECT', description: 'Direct treatment', leaf: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'dissolved-branch', name: 'Dissolved Solids', question: 'TDS treatment path',
+          children: [
+            { id: 'tds-high', name: 'High TDS', question: 'TDS > 2000 mg/L',
+              children: [
+                { id: 'ro', name: 'RO', tech: 'RO', description: 'Reverse Osmosis', leaf: true },
+                { id: 'ed', name: 'ED', tech: 'ED', description: 'Electrodialysis', leaf: true }
+              ]
+            },
+            { id: 'tds-med', name: 'Medium TDS', question: '500 < TDS ≤ 2000',
+              children: [
+                { id: 'nf', name: 'NF', tech: 'NF', description: 'Nanofiltration', leaf: true },
+                { id: 'ix', name: 'IX', tech: 'IX', description: 'Ion Exchange', leaf: true }
+              ]
+            },
+            { id: 'tds-low', name: 'Low TDS', question: 'TDS ≤ 500 mg/L',
+              children: [
+                { id: 'polish', name: 'Polish', tech: 'POLISH', description: 'Final polishing', leaf: true }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'disinfection-branch', name: 'Disinfection', question: 'Final treatment',
+          children: [
+            { id: 'uv', name: 'UV', tech: 'UV', description: 'UV Disinfection', leaf: true },
+            { id: 'aop', name: 'AOP', tech: 'AOP', description: 'Advanced Oxidation', leaf: true },
+            { id: 'chlor', name: 'Cl₂', tech: 'CHLOR', description: 'Chlorination', leaf: true }
+          ]
+        }
+      ]
+    };
+
+    const TECH_INFO = {
+      RO: { name: 'Reverse Osmosis', recovery: 0.75, energy: 3.5, capex: 450, color: '#00d4aa' },
+      NF: { name: 'Nanofiltration', recovery: 0.85, energy: 2.5, capex: 350, color: '#35d0ba' },
+      UF: { name: 'Ultrafiltration', recovery: 0.95, energy: 0.5, capex: 200, color: '#7c5cff' },
+      MF: { name: 'Microfiltration', recovery: 0.97, energy: 0.3, capex: 150, color: '#9370db' },
+      DAF: { name: 'Dissolved Air Flotation', recovery: 0.98, energy: 0.3, capex: 150, color: '#ffa500' },
+      UV: { name: 'UV Disinfection', recovery: 1.0, energy: 0.1, capex: 50, color: '#e066ff' },
+      AOP: { name: 'Advanced Oxidation', recovery: 1.0, energy: 0.5, capex: 120, color: '#ff69b4' },
+      CLAR: { name: 'Primary Clarifier', recovery: 0.99, energy: 0.1, capex: 100, color: '#cd853f' },
+      ED: { name: 'Electrodialysis', recovery: 0.80, energy: 2.0, capex: 400, color: '#20b2aa' },
+      IX: { name: 'Ion Exchange', recovery: 0.95, energy: 0.2, capex: 180, color: '#32cd32' },
+      DIRECT: { name: 'Direct Feed', recovery: 1.0, energy: 0.0, capex: 0, color: '#87ceeb' },
+      POLISH: { name: 'Final Polish', recovery: 0.99, energy: 0.1, capex: 30, color: '#98fb98' },
+      CHLOR: { name: 'Chlorination', recovery: 1.0, energy: 0.05, capex: 20, color: '#f0e68c' }
+    };
+
+    const DECISION_SCENARIOS = [
+      { id: 'food-bev', name: 'Food & Beverage', tss: 200, tds: 800, path: 'DAF → NF → UV' },
+      { id: 'semiconductor', name: 'Semiconductor', tss: 30, tds: 3500, path: 'Direct → RO → UV' },
+      { id: 'municipal', name: 'Municipal Reuse', tss: 80, tds: 1200, path: 'UF → NF → UV' },
+      { id: 'pharma', name: 'Pharmaceutical', tss: 15, tds: 400, path: 'Direct → Polish → UV' }
+    ];
+
+    function applyTreeScenario(scenarioId) {
+      const scenario = DECISION_SCENARIOS.find(s => s.id === scenarioId);
+      if (!scenario) return;
+
+      // Update scenario button states
+      document.querySelectorAll('.tree-scenarios .scenario-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.onclick.toString().includes(scenarioId));
+      });
+
+      // Update state values (this would update the reactive system)
+      state.feedTSS = scenario.tss;
+      state.feedTDS = scenario.tds;
+
+      // Re-render tree with new values
+      renderDecisionTree();
+
+      // Show notification
+      showNotification('science', `Applied ${scenario.name} scenario: TSS=${scenario.tss}, TDS=${scenario.tds}`, 'success');
+
+      // Log decision
+      logDecision(`Applied ${scenario.name} use case`, `TSS=${scenario.tss} mg/L, TDS=${scenario.tds} mg/L`, 'user');
+    }
+
+    function renderDecisionTree() {
+      const container = document.getElementById('decisionTreeContainer');
+      if (!container) return;
+
+      // Get current values from state
+      const tss = state.feedTSS || 50;
+      const tds = state.feedTDS || 500;
+
+      const width = container.clientWidth || 500;
+      const height = 320;
+      const margin = { top: 30, right: 20, bottom: 20, left: 20 };
+      const nodeRadius = 16;
+
+      container.innerHTML = '';
+
+      // Check if D3 is available
+      if (typeof d3 === 'undefined') {
+        container.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted)">
+            <span class="material-icons-outlined" style="font-size:48px;margin-bottom:12px;opacity:0.5">account_tree</span>
+            <p style="font-size:13px;margin-bottom:8px">D3.js library required for interactive tree</p>
+            <p style="font-size:11px">Current path: TSS=${tss} → TDS=${tds}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const svg = d3.select(container).append('svg')
+        .attr('width', '100%').attr('height', '100%')
+        .attr('viewBox', `0 0 ${width} ${height}`);
+
+      // Defs for glow effect
+      const defs = svg.append('defs');
+      const glow = defs.append('filter').attr('id', 'tree-glow')
+        .attr('x', '-50%').attr('y', '-50%').attr('width', '200%').attr('height', '200%');
+      glow.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'blur');
+      const feMerge = glow.append('feMerge');
+      feMerge.append('feMergeNode').attr('in', 'blur');
+      feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      const mainGroup = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      // Create hierarchy
+      const root = d3.hierarchy(DECISION_TREE_DATA);
+      const treeLayout = d3.tree()
+        .size([innerWidth, innerHeight - 20])
+        .separation((a, b) => a.parent === b.parent ? 1 : 1.3);
+      treeLayout(root);
+
+      // Determine recommended path based on current values
+      function getRecommendedPath() {
+        const path = ['root'];
+        path.push('solids-branch');
+        if (tss > 100) { path.push('tss-high'); path.push('daf'); }
+        else if (tss > 50) { path.push('tss-med'); path.push('uf'); }
+        else { path.push('tss-low'); path.push('direct'); }
+        path.push('dissolved-branch');
+        if (tds > 2000) { path.push('tds-high'); path.push('ro'); }
+        else if (tds > 500) { path.push('tds-med'); path.push('nf'); }
+        else { path.push('tds-low'); path.push('polish'); }
+        path.push('disinfection-branch');
+        path.push('uv');
+        return path;
+      }
+      const recommendedPath = getRecommendedPath();
+
+      // Draw links
+      function diagonal(s, d) {
+        const midY = (s.y + d.y) / 2;
+        return `M${s.x},${s.y} C${s.x},${midY} ${d.x},${midY} ${d.x},${d.y}`;
+      }
+
+      root.links().forEach((link, i) => {
+        const isActive = recommendedPath.includes(link.source.data.id) &&
+                        recommendedPath.includes(link.target.data.id);
+        mainGroup.append('path')
+          .attr('d', diagonal(link.source, link.target))
+          .attr('fill', 'none')
+          .attr('stroke', isActive ? '#00d4aa' : 'rgba(159,176,208,.25)')
+          .attr('stroke-width', isActive ? 2.5 : 1.5)
+          .attr('opacity', isActive ? 1 : 0.6);
+      });
+
+      // Draw nodes
+      root.descendants().forEach((node) => {
+        const isActive = recommendedPath.includes(node.data.id);
+        const isLeaf = node.data.leaf;
+        const tech = TECH_INFO[node.data.tech];
+
+        const g = mainGroup.append('g')
+          .attr('transform', `translate(${node.x}, ${node.y})`)
+          .style('cursor', isLeaf ? 'pointer' : 'default');
+
+        // Glow for active nodes
+        if (isActive) {
+          g.append('circle').attr('r', nodeRadius + 4)
+            .attr('fill', 'none').attr('stroke', '#00d4aa')
+            .attr('stroke-width', 2).attr('opacity', 0.5)
+            .attr('filter', 'url(#tree-glow)');
+        }
+
+        // Node circle
+        const nodeColor = isActive
+          ? (tech ? tech.color : '#00d4aa')
+          : (isLeaf ? '#ffa500' : '#7c5cff');
+
+        g.append('circle')
+          .attr('r', isLeaf ? nodeRadius - 2 : nodeRadius)
+          .attr('fill', nodeColor)
+          .attr('stroke', isActive ? '#fff' : 'rgba(255,255,255,.3)')
+          .attr('stroke-width', isActive ? 2 : 1)
+          .attr('opacity', isActive ? 1 : 0.7);
+
+        // Node label
+        const label = isLeaf ? node.data.name : (node.depth === 0 ? '?' : '•');
+        g.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+          .attr('fill', '#fff').attr('font-size', isLeaf ? '8px' : '12px')
+          .attr('font-weight', 'bold').text(label);
+
+        // Branch labels
+        if (!isLeaf && node.depth > 0) {
+          mainGroup.append('text')
+            .attr('x', node.x).attr('y', node.y + nodeRadius + 10)
+            .attr('text-anchor', 'middle')
+            .attr('fill', isActive ? '#00d4aa' : 'var(--muted)')
+            .attr('font-size', '8px')
+            .attr('font-weight', isActive ? 'bold' : 'normal')
+            .text(node.data.name);
+        }
+
+        // Tooltip on click for leaf nodes
+        if (isLeaf && tech) {
+          g.on('click', function(event) {
+            event.stopPropagation();
+            showNotification('biotech',
+              `${tech.name}: Recovery ${(tech.recovery * 100).toFixed(0)}%, Energy ${tech.energy} kWh/m³, CAPEX £${tech.capex}/m³/day`,
+              'info'
+            );
+          });
+        }
+      });
+
+      // Current values indicator
+      svg.append('text').attr('x', 10).attr('y', 16)
+        .attr('fill', 'var(--muted)').attr('font-size', '10px')
+        .text(`Current: TSS=${tss} mg/L, TDS=${tds} mg/L`);
+    }
+
     // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       initOpexChart();
+
+      // Initialize persona system
+      initPersona();
 
       // Initialize step 1 as active
       goToStep(1);
@@ -5726,6 +6509,10 @@
       // Initialize reactive system
       bindReactiveInputs();
       CalculationEngine.runAll();
+
+      // Initialize solution view (restore saved preference)
+      const savedView = localStorage.getItem('solutionView') || 'grid';
+      setSolutionView(savedView);
 
       // Initialize AI features
       updateAISuggestions();
